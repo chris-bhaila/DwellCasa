@@ -2,31 +2,35 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
-use App\Contracts\BookingRepositoryInterface;
-use App\Contracts\UserRepositoryInterface;
-use App\Contracts\RoomTypeRepositoryInterface;
-use App\Contracts\RoomRepositoryInterface;
 use App\Contracts\AmenityRepositoryInterface;
-use App\Contracts\ServiceRepositoryInterface;
-use App\Contracts\GalleryImageRepositoryInterface;
-use App\Contracts\HouseRuleRepositoryInterface;
-use App\Contracts\GuestRepositoryInterface;
 use App\Contracts\BookingInquiryRepositoryInterface;
+use App\Contracts\BookingRepositoryInterface;
+use App\Contracts\CheckInRepositoryInterface;
+use App\Contracts\CheckOutRepositoryInterface;
+use App\Contracts\GalleryImageRepositoryInterface;
+use App\Contracts\GuestRepositoryInterface;
+use App\Contracts\HouseRuleRepositoryInterface;
 use App\Contracts\PaymentRepositoryInterface;
 use App\Contracts\PropertySettingRepositoryInterface;
-use App\Repositories\BookingRepository;
-use App\Repositories\UserRepository;
-use App\Repositories\RoomTypeRepository;
-use App\Repositories\RoomRepository;
+use App\Contracts\RoomRepositoryInterface;
+use App\Contracts\RoomTypeRepositoryInterface;
+use App\Contracts\ServiceRepositoryInterface;
+use App\Contracts\UserRepositoryInterface;
 use App\Repositories\AmenityRepository;
-use App\Repositories\ServiceRepository;
-use App\Repositories\GalleryImageRepository;
-use App\Repositories\HouseRuleRepository;
-use App\Repositories\GuestRepository;
 use App\Repositories\BookingInquiryRepository;
+use App\Repositories\BookingRepository;
+use App\Repositories\CheckInRepository;
+use App\Repositories\CheckOutRepository;
+use App\Repositories\GalleryImageRepository;
+use App\Repositories\GuestRepository;
+use App\Repositories\HouseRuleRepository;
 use App\Repositories\PaymentRepository;
 use App\Repositories\PropertySettingRepository;
+use App\Repositories\RoomRepository;
+use App\Repositories\RoomTypeRepository;
+use App\Repositories\ServiceRepository;
+use App\Repositories\UserRepository;
+use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -47,6 +51,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(BookingInquiryRepositoryInterface::class, BookingInquiryRepository::class);
         $this->app->bind(PaymentRepositoryInterface::class, PaymentRepository::class);
         $this->app->bind(PropertySettingRepositoryInterface::class, PropertySettingRepository::class);
+        $this->app->bind(CheckInRepositoryInterface::class, CheckInRepository::class);
+        $this->app->bind(CheckOutRepositoryInterface::class, CheckOutRepository::class);
     }
 
     /**

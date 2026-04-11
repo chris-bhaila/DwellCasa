@@ -2,11 +2,12 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Booking extends Model
 {
@@ -15,6 +16,7 @@ class Booking extends Model
     protected $fillable = [
         'booking_ref',
         'guest_id',
+        'room_id',
         'room_type_id',
         'booking_inquiry_id',
         'check_in_date',
@@ -64,5 +66,19 @@ class Booking extends Model
     public function payments(): HasMany
     {
         return $this->hasMany(Payment::class);
+    }
+    public function room(): BelongsTo
+    {
+        return $this->belongsTo(Room::class);
+    }
+
+    public function checkIn(): HasOne
+    {
+        return $this->hasOne(CheckIn::class);
+    }
+
+    public function checkOut(): HasOne
+    {
+        return $this->hasOne(CheckOut::class);
     }
 }

@@ -12,6 +12,8 @@ use App\Http\Controllers\GalleryImageController;
 use App\Http\Controllers\HouseRuleController;
 use App\Http\Controllers\GuestController;
 use App\Http\Controllers\BookingInquiryController;
+use App\Http\Controllers\CheckInController;
+use App\Http\Controllers\CheckOutController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PropertySettingController;
 
@@ -27,3 +29,5 @@ Route::apiResource('guests', GuestController::class);
 Route::apiResource('booking-inquiries', BookingInquiryController::class);
 Route::apiResource('payments', PaymentController::class);
 Route::apiResource('property-settings', PropertySettingController::class);
+Route::apiResource('check-ins', CheckInController::class);
+Route::apiResource('check-outs', CheckOutController::class);
