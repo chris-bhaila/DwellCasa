@@ -26,13 +26,37 @@ class RoomController extends Controller
         $roomType = $this->roomTypeRepository->find($id);
         abort_if(!$roomType, 404);
         
-        $bookedDates = Booking::where('room_type_id', $id)
-            ->whereIn('status', ['confirmed', 'checked_in'])
-            ->get(['check_in_date', 'check_out_date'])
-            ->map(fn($b) => [
-                'from' => $b->check_in_date->format('Y-m-d'),
-                'to'   => $b->check_out_date->format('Y-m-d'),
-            ]);
+        $totalRooms = \App\Models\Room::where('room_type_id', $id)->count();
+
+        $bookedDates = [];
+        if ($totalRooms === 0) {
+            $period = \Carbon\CarbonPeriod::create(now(), now()->addYears(2));
+            foreach ($period as $date) {
+                $bookedDates[] = $date->format('Y-m-d');
+            }
+        } else {
+            $bookings = Booking::where('room_type_id', $id)
+                ->whereIn('status', ['pending', 'confirmed', 'checked_in'])
+                ->where('check_out_date', '>', now()->toDateString())
+                ->get(['check_in_date', 'check_out_date']);
+
+            $dateCounts = [];
+            foreach ($bookings as $booking) {
+                // The checkout date is available for a new check-in, so we subtract a day for the period.
+                $period = \Carbon\CarbonPeriod::create($booking->check_in_date, $booking->check_out_date->copy()->subDay());
+                foreach ($period as $date) {
+                    $dateStr = $date->format('Y-m-d');
+                    $dateCounts[$dateStr] = ($dateCounts[$dateStr] ?? 0) + 1;
+                }
+            }
+
+            foreach ($dateCounts as $date => $count) {
+                if ($count >= $totalRooms) {
+                    $bookedDates[] = $date;
+                }
+            }
+            sort($bookedDates);
+        }
 
         return view('web.room', compact('roomType', 'bookedDates'));
     }

@@ -37,7 +37,6 @@ class UserController extends Controller
     public function store(StoreUserRequest $request)
     {
         $data = $request->validated();
-        $data['password'] = bcrypt($data['password']); // Hash password
         $user = $this->userRepository->create($data);
         return response()->json([
             'success' => true,
@@ -49,9 +48,6 @@ class UserController extends Controller
     public function update(UpdateUserRequest $request, $id)
     {
         $data = $request->validated();
-        if (isset($data['password'])) {
-            $data['password'] = bcrypt($data['password']);
-        }
         $user = $this->userRepository->update($id, $data);
         return response()->json([
             'success' => true,

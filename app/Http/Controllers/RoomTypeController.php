@@ -120,4 +120,51 @@ class RoomTypeController extends Controller
         ], 200);
     }
 
+    public function availability(Request $request, $id)
+    {
+        $request->validate([
+            'month' => 'required|date_format:Y-m',
+        ]);
+
+        $roomType = RoomType::withCount('rooms')->findOrFail($id);
+        $totalRooms = $roomType->rooms_count;
+
+        // Parse month range
+        $startOfMonth = \Carbon\Carbon::parse($request->month)->startOfMonth();
+        $endOfMonth   = \Carbon\Carbon::parse($request->month)->endOfMonth();
+
+        // Get all bookings that overlap this month
+        $bookings = Booking::where('room_type_id', $id)
+            ->whereIn('status', ['pending', 'confirmed', 'checked_in'])
+            ->where('check_in_date', '<', $endOfMonth)
+            ->where('check_out_date', '>', $startOfMonth)
+            ->get(['check_in_date', 'check_out_date']);
+
+        // Find fully booked dates
+        $fullyBookedDates = [];
+        $current = $startOfMonth->copy();
+
+        while ($current <= $endOfMonth) {
+            $bookingsOnDate = $bookings->filter(function ($booking) use ($current) {
+                return $current >= \Carbon\Carbon::parse($booking->check_in_date)
+                    && $current < \Carbon\Carbon::parse($booking->check_out_date);
+            })->count();
+
+            if ($totalRooms === 0 || $bookingsOnDate >= $totalRooms) {
+                $fullyBookedDates[] = $current->format('Y-m-d');
+            }
+
+            $current->addDay();
+        }
+
+        return response()->json([
+            'data' => [
+                'room_type_id'      => $id,
+                'month'             => $request->month,
+                'total_rooms'       => $totalRooms,
+                'fully_booked_dates' => $fullyBookedDates,
+            ],
+            'message' => 'Availability fetched successfully'
+        ]);
+    }
 }

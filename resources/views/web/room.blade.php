@@ -142,11 +142,9 @@
                     <form id="bw-form" action="{{ route('booking.create') }}" method="GET">
                         <input type="hidden" name="room_type_id" value="{{ $roomType->id }}">
                         <input type="hidden" name="stay_type" value="short_term">
-                        <input type="hidden" name="rate_per_night" value="{{ $roomType->price_per_night ?? 15000 }}">
                         <input type="hidden" name="check_in_date" id="bw-form-checkin">
                         <input type="hidden" name="check_out_date" id="bw-form-checkout">
                         <input type="hidden" name="num_guests" id="bw-form-guests">
-                        <input type="hidden" name="total_amount" id="bw-form-total">
 
                         <button type="submit" id="bw-btn" disabled
                             class="block w-full bg-primary text-white text-center px-6 py-4 rounded-xl font-bold tracking-wide 
@@ -191,6 +189,13 @@
         return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     }
 
+    function toLocalYMD(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+
     function updateSummary() {
         if (!checkInDate || !checkOutDate) {
             summary.classList.add('hidden');
@@ -212,10 +217,9 @@
         cancelD.setDate(cancelD.getDate() - 1);
         cancelDate.textContent = formatShort(cancelD);
 
-        document.getElementById('bw-form-checkin').value = checkInDate.toISOString().split('T')[0];
-        document.getElementById('bw-form-checkout').value = checkOutDate.toISOString().split('T')[0];
+        document.getElementById('bw-form-checkin').value = toLocalYMD(checkInDate);
+        document.getElementById('bw-form-checkout').value = toLocalYMD(checkOutDate);
         document.getElementById('bw-form-guests').value = document.getElementById('bw-guests').value;
-        document.getElementById('bw-form-total').value = subtotal;
 
         summary.classList.remove('hidden');
         cancelMsg.classList.remove('hidden');
@@ -237,6 +241,25 @@
                 checkoutPicker.set('minDate', checkInDate
                     ? new Date(checkInDate.getTime() + 86400000)
                     : 'today');
+
+                let maxDate = null;
+                if (checkInDate) {
+                    const checkInStr = toLocalYMD(checkInDate);
+                    for (let i = 0; i < BOOKED.length; i++) {
+                        if (BOOKED[i] >= checkInStr) {
+                            maxDate = BOOKED[i];
+                            break;
+                        }
+                    }
+                }
+                checkoutPicker.set('maxDate', maxDate);
+
+                if (maxDate && checkOutDate) {
+                    if (toLocalYMD(checkOutDate) > maxDate) {
+                        checkOutDate = null;
+                        checkoutPicker.clear();
+                    }
+                }
             }
             updateSummary();
         }
@@ -245,7 +268,6 @@
     checkoutPicker = flatpickr(checkoutInput, {
         minDate: 'today',
         dateFormat: 'm/d/Y',
-        disable: BOOKED,
         disableMobile: true,
         onChange: function (selected) {
             checkOutDate = selected[0] || null;

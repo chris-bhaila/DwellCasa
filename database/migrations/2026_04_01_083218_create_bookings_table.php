@@ -27,6 +27,7 @@ return new class extends Migration
             $table->decimal('amount_paid', 10, 2)->default(0);
  
             $table->enum('status', [
+                'pending',
                 'confirmed',
                 'checked_in',
                 'checked_out',

@@ -31,3 +31,4 @@ Route::apiResource('payments', PaymentController::class);
 Route::apiResource('property-settings', PropertySettingController::class);
 Route::apiResource('check-ins', CheckInController::class);
 Route::apiResource('check-outs', CheckOutController::class);
+Route::get('room-types/{id}/availability', [RoomTypeController::class, 'availability']);
