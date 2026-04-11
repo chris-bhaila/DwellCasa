@@ -72,15 +72,14 @@
     <section id="booking-form" class="relative z-30 -mt-10 md:-mt-14 px-4">
         <div class="max-w-6xl mx-auto">
             <div class="glass shadow-2xl rounded-3xl md:rounded-full p-2 md:p-3" data-aos="zoom-in" data-aos-delay="200">
-                <form action="{{ route('booking.store') }}" method="POST" class="flex flex-col md:flex-row items-center gap-1">
-                    @csrf
+                <form action="{{ route('booking.create') }}" method="GET" class="flex flex-col md:flex-row items-center gap-1">
                     <div class="w-full md:flex-1 px-8 py-4 border-b md:border-b-0 md:border-r border-slate-200/50">
                         <label class="block text-[10px] uppercase tracking-widest text-slate-400 mb-1 font-bold">Check In</label>
-                        <input type="date" name="check_in" class="bg-transparent border-none p-0 focus:ring-0 text-sm font-semibold w-full text-slate-800">
+                        <input type="date" name="check_in_date" class="bg-transparent border-none p-0 focus:ring-0 text-sm font-semibold w-full text-slate-800">
                     </div>
                     <div class="w-full md:flex-1 px-8 py-4 border-b md:border-b-0 md:border-r border-slate-200/50">
                         <label class="block text-[10px] uppercase tracking-widest text-slate-400 mb-1 font-bold">Check Out</label>
-                        <input type="date" name="check_out" class="bg-transparent border-none p-0 focus:ring-0 text-sm font-semibold w-full text-slate-800">
+                        <input type="date" name="check_out_date" class="bg-transparent border-none p-0 focus:ring-0 text-sm font-semibold w-full text-slate-800">
                     </div>
                     <div class="w-full md:flex-1 px-8 py-4">
                         <label class="block text-[10px] uppercase tracking-widest text-slate-400 mb-1 font-bold">Room Type</label>

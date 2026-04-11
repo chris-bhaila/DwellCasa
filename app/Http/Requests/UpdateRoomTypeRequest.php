@@ -24,6 +24,7 @@ class UpdateRoomTypeRequest extends FormRequest
             'sort_order' => 'integer',
             'amenities' => 'nullable|array',
             'amenities.*' => 'exists:amenities,id',
+            'is_standalone' => 'boolean',
         ];
     }
 }

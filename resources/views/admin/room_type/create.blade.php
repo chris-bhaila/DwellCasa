@@ -99,6 +99,12 @@
                         <label for="is_active" class="ml-3 text-sm font-medium text-slate-700">Active (Visible on website)</label>
                     </div>
                     
+                    <div class="flex items-center">
+                        <input type="hidden" name="is_standalone" value="0">
+                        <input type="checkbox" name="is_standalone" id="is_standalone" value="1" class="rounded text-primary focus:ring-primary w-5 h-5 border-slate-300">
+                        <label for="is_standalone" class="ml-3 text-sm font-medium text-slate-700">Standalone Property (Only select if there is only one of this room type)</label>
+                    </div>
+
                     <div class="pt-4 border-t border-slate-100 flex flex-col gap-3">
                         <button type="submit" class="w-full bg-primary text-white px-6 py-3 rounded-xl font-medium hover:bg-[#8E795E] transition-all shadow-sm">
                             Create Room Type
@@ -135,6 +141,7 @@
         const formData = new FormData(this);
         const data = Object.fromEntries(formData.entries());
         data.is_active = this.querySelector('#is_active').checked ? 1 : 0;
+        data.is_standalone = this.querySelector('#is_standalone').checked ? 1 : 0;
         data.amenities = formData.getAll('amenities[]');
         
         try {

@@ -139,8 +139,7 @@
                     </p>
 
                     <!-- Hidden form -->
-                    <form id="bw-form" action="{{ route('booking.store') }}" method="POST">
-                        @csrf
+                    <form id="bw-form" action="{{ route('booking.create') }}" method="GET">
                         <input type="hidden" name="room_type_id" value="{{ $roomType->id }}">
                         <input type="hidden" name="stay_type" value="short_term">
                         <input type="hidden" name="rate_per_night" value="{{ $roomType->price_per_night ?? 15000 }}">

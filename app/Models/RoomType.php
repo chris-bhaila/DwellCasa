@@ -24,6 +24,7 @@ class RoomType extends Model
         'size_sqft',
         'is_active',
         'sort_order',
+        'is_standalone',
     ];
 
     protected $casts = [
