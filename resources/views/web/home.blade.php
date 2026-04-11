@@ -3,16 +3,15 @@
 @section('title', 'DwellCasa - Luxury Stays in Lalitpur')
 
 @section('content')
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
-<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
+@push('head')
 <style>
     /* Typography & Core Styling */
-    .font-serif { font-family: 'Playfair Display', serif; }
-    .font-sans { font-family: 'Inter', sans-serif; }
+    .font-serif { font-family: 'Cormorant Garamond', serif; }
+    .font-sans { font-family: 'DM Sans', sans-serif; }
     
     html { scroll-behavior: smooth; }
-    body { font-family: 'Inter', sans-serif; background-color: #fbfbf9; overflow-x: hidden; }
+    body { font-family: 'DM Sans', sans-serif; background-color: #fbfbf9; overflow-x: hidden; }
 
     /* Glassmorphism Effect */
     .glass {
@@ -42,19 +41,20 @@
         opacity: 0.6;
     }
 </style>
+@endpush
 
-<main x-data="{ mobileMenu: false }">
+<main>
 
     <section class="relative min-h-[85vh] flex items-center justify-center overflow-hidden bg-slate-900">
         <div class="absolute inset-0 z-0">
-            <img src="https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&q=80&w=1920" 
+            <img src="https://upload.wikimedia.org/wikipedia/commons/6/68/Pashupatinaath0587.JPG" 
                  class="hero-zoom w-full h-full object-cover opacity-50" alt="DwellCasa Interior">
             <div class="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-slate-900/60"></div>
         </div>
         
         <div class="relative z-10 text-center text-white px-6 max-w-5xl" data-aos="fade-up" data-aos-duration="1200">
-            <span class="uppercase tracking-[0.4em] text-xs md:text-sm mb-6 block font-medium opacity-90">Experience Nepal Like Never Before</span>
-            <h1 class="font-serif text-5xl md:text-8xl mb-8 italic">Stay in Elegance.</h1>
+            <span class="font-serif uppercase tracking-[0.1em] text-xs md:text-xl mb-6 block font-medium opacity-90">Rooted in Culture, Refined in Comfort</span>
+            <h1 class="font-serif text-5xl font-extrabold md:text-8xl mb-8 italic">Experience <span class="text-[#F0C97A]">Elegance.</span></h1>
             <p class="text-base md:text-xl font-light max-w-2xl mx-auto mb-12 leading-relaxed opacity-80">
                 A sanctuary of sophisticated comfort nestled in the heart of Lalitpur. Your journey to tranquility starts here.
             </p>
@@ -91,7 +91,8 @@
                         </select>
                     </div>
                     <div class="w-full md:w-auto p-1">
-                        <button type="submit" class="w-full md:px-10 py-4 md:py-5 rounded-2xl md:rounded-full bg-slate-900 text-white hover:bg-blue-900 transition-all uppercase tracking-widest text-xs font-bold shadow-lg transform hover:scale-[1.02]">
+                        <button type="submit" class="w-full md:px-10 py-4 md:py-5 rounded-2xl md:rounded-full bg-primary text-white hover:bg-primary-dark
+                        transition-all uppercase tracking-widest text-xs font-bold shadow-lg transform hover:scale-[1.02]">
                             Check Availability
                         </button>
                     </div>
@@ -104,10 +105,10 @@
         <div class="max-w-7xl mx-auto px-6">
             <div class="flex flex-col md:flex-row justify-between items-end mb-20" data-aos="fade-right">
                 <div class="max-w-xl">
-                    <h2 class="font-serif text-4xl md:text-6xl mb-6 text-slate-900 italic">Curated Spaces</h2>
+                    <h2 class="font-serif text-4xl md:text-6xl mb-6 text-black font-bold italic">Curated Spaces</h2>
                     <p class="text-slate-500 text-lg leading-relaxed">Each room is a masterpiece of design, blending local Nepalese artistry with modern minimalist luxury.</p>
                 </div>
-                <a href="{{ route('rooms') }}" class="mt-8 md:mt-0 inline-flex items-center gap-3 text-slate-900 border-b-2 border-slate-900 pb-2 font-bold hover:text-blue-600 hover:border-blue-600 transition-all group">
+                <a href="{{ route('web.rooms.index') }}" class="mt-8 md:mt-0 inline-flex items-center gap-3 text-black border-b-2 border-black pb-2 font-bold hover:text-primary hover:border-primary transition-all group">
                     View All Accommodations
                     <span class="group-hover:translate-x-2 transition-transform">→</span>
                 </a>
@@ -115,16 +116,16 @@
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
                 @foreach($featuredRoomTypes as $roomType)
-                <div class="group bg-white rounded-[2.5rem] overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 border border-slate-100" data-aos="fade-up" data-aos-delay="{{ $loop->index * 150 }}">
+                <a href="{{ route('web.rooms.show', $roomType->id) }}" class="block group bg-white rounded-[2.5rem] cursor-pointer overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 border border-slate-100" data-aos="fade-up" data-aos-delay="{{ $loop->index * 150 }}">
                     <div class="relative aspect-[4/5] overflow-hidden">
                         <img src="https://images.unsplash.com/photo-1618773928121-c32242e63f39?auto=format&fit=crop&q=80&w=800" 
                              class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="{{ $roomType->name }}">
                         <div class="absolute top-6 left-6 glass px-5 py-2 rounded-full text-sm font-bold text-slate-900 shadow-sm">
-                            ${{ $roomType->price_per_night }} <span class="text-[10px] font-normal text-slate-500 italic">/ night</span>
+                            Rs.{{ $roomType->price_per_night }} <span class="text-[10px] font-normal text-slate-500 italic">/ night</span>
                         </div>
                     </div>
                     <div class="p-10">
-                        <h3 class="font-serif text-3xl mb-3 group-hover:text-blue-600 transition-colors">{{ $roomType->name }}</h3>
+                        <h3 class="font-serif text-3xl font-bold text-black mb-3 group-hover:text-primary transition-colors">{{ $roomType->name }}</h3>
                         <div class="flex flex-wrap gap-4 text-[10px] text-slate-400 mb-8 uppercase tracking-[0.2em] font-bold">
                             <span>45 m²</span>
                             <span class="text-slate-200">•</span>
@@ -132,11 +133,11 @@
                             <span class="text-slate-200">•</span>
                             <span>King Bed</span>
                         </div>
-                        <a href="{{ route('rooms') }}" class="inline-flex items-center gap-2 font-bold text-slate-900 group-hover:gap-4 transition-all">
+                        <span class="inline-flex items-center gap-2 font-bold text-slate-900 group-hover:gap-4 transition-all">
                             Explore Room <span>→</span>
-                        </a>
+                        </span>
                     </div>
-                </div>
+                </a>
                 @endforeach
             </div>
         </div>
@@ -144,35 +145,45 @@
 
     <section class="py-24 bg-white">
         <div class="max-w-7xl mx-auto px-6">
-            <div class="text-center mb-24" data-aos="fade-up">
-                <span class="uppercase tracking-[0.3em] text-xs text-blue-600 font-bold mb-4 block">World Class Facilities</span>
-                <h2 class="font-serif text-4xl md:text-5xl text-slate-900 italic">Unrivaled Excellence</h2>
-                <div class="w-24 h-1 bg-slate-900 mx-auto mt-8"></div>
+            <div class="text-center mb-6" data-aos="fade-up">
+                <span class="uppercase tracking-[0.1em] text-md text-primary font-bold mb-4 block">World Class Facilities</span>
+                <h2 class="font-serif font-bold text-4xl md:text-5xl text-black italic">Unrivaled Excellence</h2>
+                <div class="w-24 h-1 bg-black mx-auto mt-8"></div>
             </div>
 
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-12">
+            <div class="grid grid-cols-2 md:grid-cols-6 gap-12">
                 @foreach($amenities as $amenity)
-                <div class="group text-center p-10 rounded-[3rem] hover:bg-slate-50 transition-all duration-300" data-aos="zoom-in">
-                    <div class="w-24 h-24 bg-slate-50 rounded-[2rem] flex items-center justify-center mx-auto mb-8 group-hover:bg-slate-900 group-hover:text-white transition-all transform group-hover:rotate-[10deg] shadow-inner">
-                        <span class="text-4xl">{{ $amenity->icon ?: '✨' }}</span>
+                <div class="group text-center p-10 rounded-[3rem] hover:bg-slate-50 transition-all duration-300 cursor-pointer" data-aos="zoom-in">
+                    <div class="w-16 h-16 text-black bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-8 group-hover:bg-slate-900 group-hover:text-white transition-all transform group-hover:rotate-[10deg] shadow-inner">
+                        <span class="text-2xl flex items-center justify-center">
+                            @if($amenity->icon)
+                                @if(str_contains($amenity->icon, '<'))
+                                    {!! $amenity->icon !!}
+                                @else
+                                    <i data-lucide="{{ $amenity->icon }}" class="w-8 h-8"></i>
+                                @endif
+                            @else
+                                ✨
+                            @endif
+                        </span>
                     </div>
-                    <h3 class="text-xl font-bold text-slate-900 mb-2">{{ $amenity->name }}</h3>
-                    <p class="text-sm text-slate-400 font-light italic">Premium Quality</p>
+                    <h3 class="text-lg font-bold text-black mb-2">{{ $amenity->name }}</h3>
+                    <!-- <p class="text-sm text-slate-400 font-light italic">{{ $amenity->description }}</p> -->
                 </div>
                 @endforeach
             </div>
         </div>
     </section>
 
-    <section class="relative py-32 md:py-48 overflow-hidden bg-slate-900">
+    <section class="relative py-32 md:py-48 overflow-hidden bg-black/75">
         <div class="absolute inset-0 z-0">
-            <img src="https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&q=80&w=1920" 
+            <img src="https://cdn1.prayagsamagam.com/media/2025/05/20170044/3-42.webp" 
                  class="w-full h-full object-cover opacity-30" alt="Footer Background">
-            <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent"></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
         </div>
         
         <div class="relative z-10 max-w-4xl mx-auto text-center px-6" data-aos="fade-up">
-            <h2 class="font-serif text-5xl md:text-7xl text-white mb-10 italic">
+            <h2 class="font-serif font-bold text-5xl md:text-7xl text-white mb-10 italic">
                 Ready for an <br> unforgettable escape?
             </h2>
             <p class="text-white/60 text-lg md:text-xl mb-14 max-w-xl mx-auto font-light leading-relaxed">
@@ -186,16 +197,10 @@
     </section>
 
 </main>
-
-<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        AOS.init({
-            duration: 1000,
-            once: true,
-            offset: 100,
-        });
+    document.addEventListener('DOMContentLoaded', () => {
+        lucide.createIcons();
     });
 </script>
-
 @endsection

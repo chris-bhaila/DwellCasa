@@ -3,7 +3,7 @@
 @section('title', 'Contact Us - DwellCasa')
 
 @section('content')
-<section class="py-20 bg-[#fbfbf9]">
+<section class="pb-20 bg-[#fbfbf9]">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-16">
             <h1 class="text-5xl md:text-6xl font-serif italic font-bold text-slate-900 mb-4">Contact Us</h1>
@@ -44,7 +44,7 @@
                         <label class="block text-sm font-medium text-slate-700 mb-2">Message</label>
                         <textarea name="message" rows="5" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" required></textarea>
                     </div>
-                    <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-4 rounded-lg font-semibold hover:shadow-lg transition-all">
+                    <button type="submit" class="w-full bg-primary text-white px-6 py-4 rounded-lg font-semibold hover:shadow-lg hover:bg-primary-dark transition-all">
                         Send Message
                     </button>
                 </form>

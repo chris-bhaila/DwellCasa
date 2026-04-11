@@ -4,16 +4,21 @@ namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
 use App\Contracts\RoomTypeRepositoryInterface;
-use App\Http\Requests\StoreBookingInquiryRequest;
+use App\Contracts\BookingRepositoryInterface;
+use App\Http\Requests\StoreBookingRequest;
 use Illuminate\Http\Request;
 
 class BookingController extends Controller
 {
     protected $roomTypeRepository;
+    protected $bookingRepository;
 
-    public function __construct(RoomTypeRepositoryInterface $roomTypeRepository)
-    {
+    public function __construct(
+        RoomTypeRepositoryInterface $roomTypeRepository,
+        BookingRepositoryInterface $bookingRepository
+    ) {
         $this->roomTypeRepository = $roomTypeRepository;
+        $this->bookingRepository = $bookingRepository;
     }
 
     public function create()
@@ -22,10 +27,10 @@ class BookingController extends Controller
         return view('web.booking', compact('roomTypes'));
     }
 
-    public function store(StoreBookingInquiryRequest $request)
+    public function store(StoreBookingRequest $request)
     {
-        // For now, just redirect with success
-        // In real app, save to database using BookingInquiryRepository
-        return redirect()->route('home')->with('success', 'Booking inquiry submitted successfully! We will contact you soon.');
+        $this->bookingRepository->create($request->validated());
+
+        return redirect()->route('home')->with('success', 'Booking submitted successfully! We will contact you soon to confirm.');
     }
 }

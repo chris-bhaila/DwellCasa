@@ -15,7 +15,6 @@ class StoreRoomTypeRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255',
-            'slug' => 'required|string|max:255|unique:room_types,slug',
             'description' => 'nullable|string',
             'max_occupancy' => 'required|integer|min:1',
             'price_per_night' => 'nullable|numeric|min:0',
@@ -23,6 +22,8 @@ class StoreRoomTypeRequest extends FormRequest
             'size_sqft' => 'nullable|string|max:50',
             'is_active' => 'boolean',
             'sort_order' => 'integer',
+            'amenities' => 'nullable|array',
+            'amenities.*' => 'exists:amenities,id',
         ];
     }
 }

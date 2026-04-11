@@ -16,6 +16,29 @@
             <form action="{{ route('booking.store') }}" method="POST">
                 @csrf
 
+                <!-- Hidden fields for calculated amounts -->
+                <input type="hidden" name="rate_per_night" id="input_rate_per_night">
+                <input type="hidden" name="rate_per_month" id="input_rate_per_month">
+                <input type="hidden" name="total_amount" id="input_total_amount">
+
+                <!-- Validation Errors -->
+                @if ($errors->any())
+                <div class="mb-10 bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg">
+                    <div class="flex">
+                        <div class="ml-3">
+                            <h3 class="text-sm font-medium text-red-800">There were some errors with your submission:</h3>
+                            <div class="mt-2 text-sm text-red-700">
+                                <ul class="list-disc pl-5 space-y-1">
+                                    @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @endif
+
                 <!-- Guest Information -->
                 <div class="mb-10">
                     <h2 class="text-3xl font-serif italic font-bold text-slate-900 mb-8">Guest Information</h2>
@@ -50,11 +73,11 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label class="block text-sm font-medium text-slate-700 mb-2">Check-in Date *</label>
-                            <input type="date" name="check_in_date" value="{{ old('check_in_date') }}" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" required>
+                            <input type="date" id="check_in_date" name="check_in_date" value="{{ old('check_in_date') }}" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" required>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-slate-700 mb-2">Check-out Date *</label>
-                            <input type="date" name="check_out_date" value="{{ old('check_out_date') }}" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" required>
+                            <input type="date" id="check_out_date" name="check_out_date" value="{{ old('check_out_date') }}" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" required>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-slate-700 mb-2">Stay Type *</label>
@@ -65,14 +88,31 @@
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-slate-700 mb-2">Room Type *</label>
-                            <select name="room_type_id" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" required>
-                                <option value="">Select Room Type</option>
+                            <select id="room_type_id" name="room_type_id" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" required>
+                                <option value="" data-price="0" data-price-month="0">Select Room Type</option>
                                 @foreach($roomTypes as $roomType)
-                                    <option value="{{ $roomType->id }}" {{ old('room_type_id') == $roomType->id ? 'selected' : '' }}>
-                                        {{ $roomType->name }} - ${{ $roomType->price_per_night }}/night
-                                    </option>
+                                <option value="{{ $roomType->id }}" data-price="{{ $roomType->price_per_night }}" data-price-month="{{ $roomType->price_per_month ?? 0 }}" {{ old('room_type_id') == $roomType->id ? 'selected' : '' }}>
+                                    {{ $roomType->name }} - ${{ $roomType->price_per_night }}/night
+                                </option>
                                 @endforeach
                             </select>
+                        </div>
+                    </div>
+
+                    <!-- Booking Summary -->
+                    <div id="booking-summary" class="mt-8 p-6 bg-blue-50 rounded-xl border border-blue-100 hidden">
+                        <h3 class="text-xl font-serif italic font-bold text-slate-900 mb-4">Booking Summary</h3>
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-slate-700">Rate per night:</span>
+                            <span class="font-semibold text-slate-900" id="summary-rate">$0.00</span>
+                        </div>
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-slate-700">Number of nights:</span>
+                            <span class="font-semibold text-slate-900" id="summary-nights">0</span>
+                        </div>
+                        <div class="border-t border-blue-200 my-4 pt-4 flex justify-between items-center">
+                            <span class="text-lg font-bold text-slate-900">Total Amount:</span>
+                            <span class="text-2xl font-bold text-primary" id="summary-total">$0.00</span>
                         </div>
                     </div>
                 </div>
@@ -82,13 +122,13 @@
                     <h2 class="text-3xl font-serif italic font-bold text-slate-900 mb-8">Additional Information</h2>
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-2">Special Requests</label>
-                        <textarea name="message" rows="4" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" placeholder="Any special requests or additional information...">{{ old('message') }}</textarea>
+                        <textarea name="special_requests" rows="4" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" placeholder="Any special requests or additional information...">{{ old('special_requests') }}</textarea>
                     </div>
                 </div>
 
                 <!-- Submit Button -->
                 <div class="text-center">
-                    <button type="submit" class="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-10 py-4 rounded-lg font-bold text-lg hover:shadow-lg transition-all">
+                    <button type="submit" class="bg-primary text-white px-10 py-4 rounded-lg font-bold text-lg hover:bg-primary-dark hover:shadow-lg transition-all">
                         Submit Booking Inquiry
                     </button>
                 </div>
@@ -96,4 +136,77 @@
         </div>
     </div>
 </section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const checkInInput = document.getElementById('check_in_date');
+        const checkOutInput = document.getElementById('check_out_date');
+        const roomTypeSelect = document.getElementById('room_type_id');
+
+        const summarySection = document.getElementById('booking-summary');
+        const summaryRate = document.getElementById('summary-rate');
+        const summaryNights = document.getElementById('summary-nights');
+        const summaryTotal = document.getElementById('summary-total');
+
+        const inputRatePerNight = document.getElementById('input_rate_per_night');
+        const inputRatePerMonth = document.getElementById('input_rate_per_month');
+        const inputTotalAmount = document.getElementById('input_total_amount');
+
+        function calculateTotal() {
+            if (!checkInInput || !checkOutInput || !roomTypeSelect) return;
+
+            const checkInDate = new Date(checkInInput.value);
+            const checkOutDate = new Date(checkOutInput.value);
+            const selectedOption = roomTypeSelect.options[roomTypeSelect.selectedIndex];
+            const ratePerNight = parseFloat(selectedOption.getAttribute('data-price')) || 0;
+            const ratePerMonth = parseFloat(selectedOption.getAttribute('data-price-month')) || 0;
+
+            if (checkInInput.value && checkOutInput.value && ratePerNight >= 0 && checkOutDate > checkInDate) {
+                const diffTime = checkOutDate - checkInDate;
+                const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)); // Ignores anything after decimal
+                const totalAmount = ratePerNight * diffDays;
+
+                summarySection.classList.remove('hidden');
+                summaryRate.textContent = '$' + ratePerNight.toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+                summaryNights.textContent = diffDays;
+                summaryTotal.textContent = '$' + totalAmount.toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+
+                if (inputRatePerNight) inputRatePerNight.value = ratePerNight;
+                if (inputRatePerMonth) inputRatePerMonth.value = ratePerMonth;
+                if (inputTotalAmount) inputTotalAmount.value = totalAmount;
+            } else {
+                summarySection.classList.add('hidden');
+
+                if (inputRatePerNight) inputRatePerNight.value = '';
+                if (inputRatePerMonth) inputRatePerMonth.value = '';
+                if (inputTotalAmount) inputTotalAmount.value = '';
+            }
+        }
+
+
+        [checkInInput, checkOutInput, roomTypeSelect].forEach(el => el?.addEventListener('change', calculateTotal));
+        checkInInput?.addEventListener('change', function() {
+            if (this.value) {
+                let [y, m, d] = this.value.split('-');
+                let minDate = new Date(y, m - 1, d);
+                minDate.setDate(minDate.getDate() + 1);
+                let minDateStr = minDate.getFullYear() + '-' + String(minDate.getMonth() + 1).padStart(2, '0') + '-' + String(minDate.getDate()).padStart(2, '0');
+                checkOutInput.min = minDateStr;
+                if (checkOutInput.value && checkOutInput.value <= this.value) {
+                    checkOutInput.value = minDateStr;
+                    calculateTotal();
+                }
+            }
+        });
+
+        calculateTotal();
+
+    });
+</script>
 @endsection

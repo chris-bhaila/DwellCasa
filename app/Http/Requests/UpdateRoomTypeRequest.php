@@ -15,7 +15,6 @@ class UpdateRoomTypeRequest extends FormRequest
     {
         return [
             'name' => 'sometimes|required|string|max:255',
-            'slug' => 'sometimes|required|string|max:255|unique:room_types,slug,' . $this->route('room_type'),
             'description' => 'nullable|string',
             'max_occupancy' => 'sometimes|required|integer|min:1',
             'price_per_night' => 'nullable|numeric|min:0',
@@ -23,6 +22,8 @@ class UpdateRoomTypeRequest extends FormRequest
             'size_sqft' => 'nullable|string|max:50',
             'is_active' => 'boolean',
             'sort_order' => 'integer',
+            'amenities' => 'nullable|array',
+            'amenities.*' => 'exists:amenities,id',
         ];
     }
 }

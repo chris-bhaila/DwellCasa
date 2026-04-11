@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Support\Str;
 
 class RoomType extends Model
 {
@@ -54,5 +55,24 @@ class RoomType extends Model
     public function galleryImages(): MorphMany
     {
         return $this->morphMany(GalleryImage::class, 'imageable');
+    }
+
+    protected static function booted()
+    {
+        static::creating(function ($model) {
+            $model->slug = Str::slug($model->name);
+        });
+
+        static::updating(function ($model) {
+            if ($model->isDirty('name') || empty($model->slug)) {
+                $model->slug = Str::slug($model->name);
+            }
+        });
+
+        static::saved(function ($model) {
+            if (request()->has('amenities')) {
+                $model->amenities()->sync(request('amenities', []));
+            }
+        });
     }
 }
