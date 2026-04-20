@@ -50,7 +50,7 @@ $roomTypes = collect([
     <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden hover:shadow-md transition-shadow group flex flex-col">
         <!-- Image Thumbnail -->
         <a href="{{ route('admin.room_type.edit', $roomType->id) }}" class="block h-48 bg-slate-200 relative overflow-hidden">
-            <img src="{{ $roomType->image ?? 'https://images.unsplash.com/photo-1505693314120-0d443867891c?auto=format&fit=crop&q=80&w=800' }}" alt="{{ $roomType->name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+            <img src="{{ $roomType->thumbnail ? asset('storage/' . $roomType->thumbnail) : ($roomType->image ?? 'https://images.unsplash.com/photo-1505693314120-0d443867891c?auto=format&fit=crop&q=80&w=800') }}" alt="{{ $roomType->name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
             <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-lg text-sm font-bold text-slate-900 shadow-sm">
                 Rs. {{ number_format($roomType->price_per_night, 0) }}<span class="text-xs text-slate-500 font-normal">/night</span>
             </div>

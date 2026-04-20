@@ -6,9 +6,9 @@
 <section class="pb-20 bg-[#fbfbf9]">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-12">
-            <h1 class="text-5xl md:text-6xl font-serif italic font-bold text-slate-900 mb-4">About DwellCasa</h1>
+            <h1 class="text-5xl md:text-6xl font-serif italic font-bold text-slate-900 mb-4">{{ $webInfo->about_heading }}</h1>
             <p class="text-lg text-slate-700 max-w-3xl mx-auto">
-                Welcome to DwellCasa, where luxury meets comfort in the heart of Lalitpur. We pride ourselves on providing exceptional hospitality and creating memorable experiences for our guests.
+                {{ $webInfo->about_sub_description }}    
             </p>
         </div>
 
@@ -16,13 +16,7 @@
             <div>
                 <h2 class="text-3xl md:text-4xl font-serif italic font-bold text-slate-900 mb-6">Our Story</h2>
                 <p class="text-gray-600 mb-4">
-                    Founded in 2024, DwellCasa has quickly become Lalitpur's premier luxury hotel destination. Our commitment to excellence in service, attention to detail, and creating unforgettable experiences sets us apart from the rest.
-                </p>
-                <p class="text-gray-600 mb-4">
-                    Located in the vibrant heart of the city, we offer easy access to Lalitpur's most popular attractions while providing a serene oasis of luxury and comfort.
-                </p>
-                <p class="text-gray-700">
-                    Our team of dedicated professionals ensures that every guest receives personalized service and attention throughout their stay.
+                    {{ $webInfo->about_main_description }}
                 </p>
             </div>
             <div class="bg-gradient-to-br from-slate-200 to-slate-300 h-96 rounded-2xl flex items-center justify-center shadow-lg">

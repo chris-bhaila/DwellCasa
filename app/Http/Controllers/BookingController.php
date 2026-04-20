@@ -41,7 +41,7 @@ class BookingController extends Controller
     public function store(StoreBookingRequest $request)
     {
         $status = $request->input('status', 'pending');
-        
+
         if (in_array($status, ['pending', 'confirmed', 'checked_in'])) {
             $error = $this->checkAvailability($request->room_type_id, $request->check_in_date, $request->check_out_date);
             if ($error) {
@@ -112,7 +112,7 @@ class BookingController extends Controller
         foreach ($period as $date) {
             $dateStr = $date->format('Y-m-d');
             $overlappingCount = $bookings->filter(function ($b) use ($dateStr) {
-                return $dateStr >= Carbon::parse($b->check_in_date)->format('Y-m-d') 
+                return $dateStr >= Carbon::parse($b->check_in_date)->format('Y-m-d')
                     && $dateStr < Carbon::parse($b->check_out_date)->format('Y-m-d');
             })->count();
 

@@ -53,10 +53,10 @@
         </div>
         
         <div class="relative z-10 text-center text-white px-6 max-w-5xl" data-aos="fade-up" data-aos-duration="1200">
-            <span class="font-serif uppercase tracking-[0.1em] text-xs md:text-xl mb-6 block font-medium opacity-90">Rooted in Culture, Refined in Comfort</span>
-            <h1 class="font-serif text-5xl font-extrabold md:text-8xl mb-8 italic">Experience <span class="text-[#F0C97A]">Elegance.</span></h1>
+            <span class="font-serif uppercase tracking-[0.1em] text-xs md:text-xl mb-6 block font-medium opacity-90">{{ $webInfo->front_page_sub_heading_1 }}</span>
+            <h1 class="font-serif text-5xl font-extrabold md:text-8xl mb-8 italic">{{ $webInfo->front_page_main_heading }}</h1>
             <p class="text-base md:text-xl font-light max-w-2xl mx-auto mb-12 leading-relaxed opacity-80">
-                A sanctuary of sophisticated comfort nestled in the heart of Lalitpur. Your journey to tranquility starts here.
+                {{ $webInfo->front_page_sub_heading_2 }}
             </p>
             <div class="flex flex-col sm:flex-row gap-6 justify-center items-center">
                 <a href="#rooms" class="w-full sm:w-auto bg-white text-slate-900 px-10 py-4 rounded-full font-bold hover:bg-slate-100 transition-all transform hover:-translate-y-1 shadow-xl">
@@ -117,7 +117,7 @@
                 @foreach($featuredRoomTypes as $roomType)
                 <a href="{{ route('web.rooms.show', $roomType->id) }}" class="block group bg-white rounded-[2.5rem] cursor-pointer overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 border border-slate-100" data-aos="fade-up" data-aos-delay="{{ $loop->index * 150 }}">
                     <div class="relative aspect-[4/5] overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1618773928121-c32242e63f39?auto=format&fit=crop&q=80&w=800" 
+                        <img src="{{ $roomType->thumbnail ? asset('storage/' . $roomType->thumbnail) : 'https://images.unsplash.com/photo-1618773928121-c32242e63f39?auto=format&fit=crop&q=80&w=800' }}" 
                              class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="{{ $roomType->name }}">
                         <div class="absolute top-6 left-6 glass px-5 py-2 rounded-full text-sm font-bold text-slate-900 shadow-sm">
                             Rs.{{ $roomType->price_per_night }} <span class="text-[10px] font-normal text-slate-500 italic">/ night</span>
@@ -183,10 +183,10 @@
         
         <div class="relative z-10 max-w-4xl mx-auto text-center px-6" data-aos="fade-up">
             <h2 class="font-serif font-bold text-5xl md:text-7xl text-white mb-10 italic">
-                Ready for an <br> unforgettable escape?
+                {{ $webInfo->front_page_end_heading }}
             </h2>
             <p class="text-white/60 text-lg md:text-xl mb-14 max-w-xl mx-auto font-light leading-relaxed">
-                Experience the height of luxury. Book directly with us for the best rate guarantee and exclusive spa vouchers.
+                {{ $webInfo->front_page_end_sub_heading }}
             </p>
             <a href="{{ route('booking.create') }}" 
                class="inline-block bg-white text-slate-900 px-14 py-6 rounded-full font-bold text-xl hover:scale-105 transition-transform shadow-2xl hover:bg-blue-50">

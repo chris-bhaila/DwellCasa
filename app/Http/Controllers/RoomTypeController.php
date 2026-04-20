@@ -39,7 +39,15 @@ class RoomTypeController extends Controller
 
     public function store(StoreRoomTypeRequest $request)
     {
-        $roomType = $this->roomTypeRepository->create($request->validated());
+        $data = $request->validated();
+
+        if ($request->hasFile('thumbnail')) {
+            $file = $request->file('thumbnail');
+            $filename = \Illuminate\Support\Str::slug($data['name']) . '_thumbnail.' . $file->getClientOriginalExtension();
+            $data['thumbnail'] = $file->storeAs('room_types', $filename, 'public');
+        }
+
+        $roomType = $this->roomTypeRepository->create($data);
         return response()->json([
             'success' => true,
             'message' => 'Room type created successfully',
@@ -49,11 +57,24 @@ class RoomTypeController extends Controller
 
     public function update(UpdateRoomTypeRequest $request, $id)
     {
-        $roomType = $this->roomTypeRepository->update($id, $request->validated());
+        $data = $request->validated();
+        $roomType = $this->roomTypeRepository->find($id);
+
+        if ($request->hasFile('thumbnail')) {
+            $file = $request->file('thumbnail');
+            $name = $data['name'] ?? $roomType->name;
+            $filename = \Illuminate\Support\Str::slug($name) . '_thumbnail.' . $file->getClientOriginalExtension();
+            if ($roomType->thumbnail && $roomType->thumbnail !== 'room_types/' . $filename) {
+                Storage::disk('public')->delete($roomType->thumbnail);
+            }
+            $data['thumbnail'] = $file->storeAs('room_types', $filename, 'public');
+        }
+
+        $updatedRoomType = $this->roomTypeRepository->update($id, $data);
         return response()->json([
             'success' => true,
             'message' => 'Room type updated successfully',
-            'data' => $roomType
+            'data' => $updatedRoomType
         ], 200);
     }
 
@@ -69,7 +90,7 @@ class RoomTypeController extends Controller
     public function uploadImage(Request $request, $id)
     {
         $request->validate([
-            'image'      => 'required|image|mimes:jpg,jpeg,png,webp|max:5120',
+            'image'      => 'required|image|mimes:jpg,jpeg,png,webp|max:20480',
             'alt_text'   => 'nullable|string|max:255',
             'caption'    => 'nullable|string|max:255',
             'is_featured' => 'boolean',
@@ -112,7 +133,12 @@ class RoomTypeController extends Controller
             Storage::disk('public')->delete($image->filename);
         }
 
-        $image->delete();
+        // Permanently delete the database record
+        if (method_exists($image, 'forceDelete')) {
+            $image->forceDelete();
+        } else {
+            $image->delete();
+        }
 
         return response()->json([
             'success' => true,

@@ -70,28 +70,61 @@ Route::middleware('auth')->prefix('admin')->group(function () {
         return view('admin.room_type.room.edit-room', compact('room', 'roomTypes','amenities'));
     })->name('admin.room_type.room.edit');
 
+    Route::get('/bookings/create', function (\App\Contracts\RoomTypeRepositoryInterface $roomTypeRepository) {
+        $roomTypes = $roomTypeRepository->all();
+        return view('admin.bookings.add-booking', compact('roomTypes'));
+    })->name('admin.bookings.create');
+
     Route::get('/bookings/{id}/edit', function ($id, \App\Contracts\RoomTypeRepositoryInterface $roomTypeRepository) {
         $booking = \App\Models\Booking::with('guest')->findOrFail($id);
         $roomTypes = $roomTypeRepository->all();
-        return view('admin.bookings.edit-booking', compact('booking', 'roomTypes'));
+        
+        $rooms = \App\Models\Room::where('room_type_id', $booking->room_type_id)
+            ->where('status', 'available')
+            ->whereDoesntHave('bookings', function ($query) use ($booking) {
+                $query->whereIn('status', ['confirmed', 'checked_in'])
+                      ->where('id', '!=', $booking->id)
+                      ->where('check_in_date', '<', $booking->check_out_date)
+                      ->where('check_out_date', '>', $booking->check_in_date);
+            })->orderBy('room_number')->get();
+            
+        $users = \App\Models\User::orderBy('name')->get();
+        return view('admin.bookings.edit-booking', compact('booking', 'roomTypes', 'rooms', 'users'));
     })->name('admin.bookings.edit');
 
-    Route::get('/bookings/bookings', function (\App\Contracts\BookingRepositoryInterface $bookingRepository, \App\Contracts\RoomTypeRepositoryInterface $roomTypeRepository) {
-        $bookings = $bookingRepository->all();
-        $roomTypes = $roomTypeRepository->all();
-        return view('admin.bookings.bookings', compact('bookings', 'roomTypes'));
+    Route::get('/bookings/bookings', function (\Illuminate\Http\Request $request) {
+        $filter = $request->query('filter', 'all');
+        $query = \App\Models\Booking::with(['guest', 'roomType']);
+
+        match ($filter) {
+            'upcoming'  => $query->whereIn('status', ['pending', 'confirmed']),
+            'inhouse'   => $query->where('status', 'checked_in'),
+            'completed' => $query->whereIn('status', ['checked_out', 'cancelled']),
+            default     => null
+        };
+
+        $bookings = $query->latest()->get();
+        return view('admin.bookings.bookings', compact('bookings', 'filter'));
     })->name('admin.bookings');
 
     Route::get('/amenities', function (\App\Contracts\AmenityRepositoryInterface $amenityRepository) {
         $amenities = $amenityRepository->all();
         return view('admin.amenities', compact('amenities'));
-    });
+    })->name('admin.amenities');;
 
-    Route::get('/gallery', function () {
-        return view('admin.gallery');
-    });
+    Route::get('/gallery', function (\App\Contracts\RoomTypeRepositoryInterface $roomTypeRepository) {
+        $roomTypes = $roomTypeRepository->all();
+        $images = \App\Models\GalleryImage::latest()->get();
+        return view('admin.gallery', compact('roomTypes', 'images'));
+    })->name('admin.gallery');;
 
-    Route::get('/inquiries', function () {
-        return view('admin.inquiries');
-    });
+    Route::get('/inquiry', function (\App\Contracts\InquiryRepositoryInterface $inquiryRepository) {
+        $inquiries = $inquiryRepository->all();
+        return view('admin.inquiry', compact('inquiries'));
+    })->name('admin.inquiry');
+
+    Route::get('/info', function () {
+        return view('admin.info');
+    })->name('admin.info');
+
 });

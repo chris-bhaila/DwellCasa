@@ -25,6 +25,7 @@ class UpdateRoomTypeRequest extends FormRequest
             'amenities' => 'nullable|array',
             'amenities.*' => 'exists:amenities,id',
             'is_standalone' => 'boolean',
+            'thumbnail' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
         ];
     }
 }

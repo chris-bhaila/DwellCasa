@@ -3,7 +3,7 @@
 namespace App\Providers;
 
 use App\Contracts\AmenityRepositoryInterface;
-use App\Contracts\BookingInquiryRepositoryInterface;
+use App\Contracts\InquiryRepositoryInterface;
 use App\Contracts\BookingRepositoryInterface;
 use App\Contracts\CheckInRepositoryInterface;
 use App\Contracts\CheckOutRepositoryInterface;
@@ -17,7 +17,7 @@ use App\Contracts\RoomTypeRepositoryInterface;
 use App\Contracts\ServiceRepositoryInterface;
 use App\Contracts\UserRepositoryInterface;
 use App\Repositories\AmenityRepository;
-use App\Repositories\BookingInquiryRepository;
+use App\Repositories\InquiryRepository;
 use App\Repositories\BookingRepository;
 use App\Repositories\CheckInRepository;
 use App\Repositories\CheckOutRepository;
@@ -31,6 +31,8 @@ use App\Repositories\RoomTypeRepository;
 use App\Repositories\ServiceRepository;
 use App\Repositories\UserRepository;
 use Illuminate\Support\ServiceProvider;
+use App\Contracts\WebsiteInfoRepositoryInterface;
+use App\Repositories\WebsiteInfoRepository;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -48,11 +50,12 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(GalleryImageRepositoryInterface::class, GalleryImageRepository::class);
         $this->app->bind(HouseRuleRepositoryInterface::class, HouseRuleRepository::class);
         $this->app->bind(GuestRepositoryInterface::class, GuestRepository::class);
-        $this->app->bind(BookingInquiryRepositoryInterface::class, BookingInquiryRepository::class);
+        $this->app->bind(InquiryRepositoryInterface::class, InquiryRepository::class);
         $this->app->bind(PaymentRepositoryInterface::class, PaymentRepository::class);
         $this->app->bind(PropertySettingRepositoryInterface::class, PropertySettingRepository::class);
         $this->app->bind(CheckInRepositoryInterface::class, CheckInRepository::class);
         $this->app->bind(CheckOutRepositoryInterface::class, CheckOutRepository::class);
+        $this->app->bind(WebsiteInfoRepositoryInterface::class, WebsiteInfoRepository::class);
     }
 
     /**

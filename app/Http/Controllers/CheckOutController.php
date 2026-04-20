@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Booking;
+use App\Models\Room;
 use App\Contracts\CheckOutRepositoryInterface;
 use App\Http\Requests\StoreCheckOutRequest;
 use App\Http\Requests\UpdateCheckOutRequest;
@@ -37,20 +39,39 @@ class CheckOutController extends Controller
 
     public function store(StoreCheckOutRequest $request)
     {
-        $checkOut = DB::transaction(function () use ($request) {
-            $checkOut = $this->checkOutRepository->create($request->validated());
+        try {
+            $checkOut = DB::transaction(function () use ($request) {
+                $validated = $request->validated();
 
-            // Update booking status to checked_out
-            $checkOut->booking->update(['status' => 'checked_out']);
+                // 1. Create a record in check_outs table using the repository pattern
+                $checkOutRecord = $this->checkOutRepository->create($validated);
 
-            return $checkOut;
-        });
+                // 2. Update bookings.status to checked_out and set checked_out_at
+                $booking = Booking::findOrFail($validated['booking_id']);
+                $booking->status = 'checked_out';
+                $booking->checked_out_at = $validated['checked_out_at'];
+                $booking->save();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Check-out created successfully',
-            'data' => $checkOut
-        ], 201);
+                // 3. Update rooms.status back to available using the room_id from the booking
+                if ($booking->room_id) {
+                    $room = Room::findOrFail($booking->room_id);
+                    $room->status = 'available';
+                    $room->save();
+                }
+
+                return $checkOutRecord;
+            });
+
+            return response()->json([
+                'message' => 'Guest successfully checked out.',
+                'data' => $checkOut
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Check-out failed due to an internal error.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     public function update(UpdateCheckOutRequest $request, $id)

@@ -3,6 +3,15 @@
 @section('title', 'Book Your Stay - DwellCasa')
 
 @section('content')
+@push('head')
+<style>
+    /* Strikethrough ONLY for fully booked dates in flatpickr */
+    .flatpickr-day.fully-booked-date {
+        text-decoration: line-through;
+        color: #cbd5e1 !important;
+    }
+</style>
+@endpush
 <section class="py-16 md:py-24 bg-[#fbfbf9]">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-16">
@@ -130,7 +139,7 @@
                                 </div>
                             </div>
 
-                            <button type="submit" class="w-full bg-primary text-white px-6 py-4 rounded-xl font-bold tracking-wide uppercase text-sm hover:bg-primary-dark transition-all transform hover:-translate-y-1 shadow-lg">
+                            <button type="submit" class="w-full bg-primary text-white px-6 py-4 rounded-xl font-bold tracking-wide uppercase text-sm hover:bg-primary-dark transition-all transform hover:-translate-y-1 shadow-lg opacity-50 cursor-not-allowed" disabled>
                                 Confirm Booking
                             </button>
                         </div>
@@ -143,20 +152,25 @@
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const checkInInput = document.getElementById('check_in_date');
-        const checkOutInput = document.getElementById('check_out_date');
+        const checkInInput = document.getElementById('check_in_date'); // Original input
+        const checkOutInput = document.getElementById('check_out_date'); // Original input
         const roomTypeSelect = document.getElementById('room_type_id');
 
         const summarySection = document.getElementById('booking-summary');
         const summaryRate = document.getElementById('summary-rate');
         const summaryNights = document.getElementById('summary-nights');
         const summaryTotal = document.getElementById('summary-total');
+        const submitButton = document.querySelector('#main-booking-form button[type="submit"]');
 
-        const inputRatePerNight = document.getElementById('input_rate_per_night');
-        const inputRatePerMonth = document.getElementById('input_rate_per_month');
-        const inputTotalAmount = document.getElementById('input_total_amount');
+        let checkInFlatpickr;
+        let checkOutFlatpickr;
+        let BOOKED_DATES = [];
 
-        function calculateTotal() {
+        function toLocalYMD(date) {
+            return date.toISOString().split('T')[0];
+        }
+
+        async function calculateTotal() {
             if (!checkInInput || !checkOutInput || !roomTypeSelect) return;
 
             const checkInDate = new Date(checkInInput.value);
@@ -166,6 +180,7 @@
             const ratePerMonth = parseFloat(selectedOption.getAttribute('data-price-month')) || 0;
             const stayType = document.querySelector('select[name="stay_type"]').value;
 
+            let isValidSelection = false;
             if (checkInInput.value && checkOutInput.value && checkOutDate > checkInDate) {
                 const diffDays = Math.floor((checkOutDate - checkInDate) / (1000 * 60 * 60 * 24));
 
@@ -183,6 +198,20 @@
                 }
 
                 if (rate > 0) {
+                    // Check if any date in the selected range is fully booked
+                    let isRangeBooked = false;
+                    const current = new Date(checkInDate);
+                    while (current < checkOutDate) {
+                        const dateStr = toLocalYMD(current);
+                        if (BOOKED_DATES.includes(dateStr)) {
+                            isRangeBooked = true;
+                            break;
+                        }
+                        current.setDate(current.getDate() + 1);
+                    }
+                    isValidSelection = !isRangeBooked;
+                }
+                if (isValidSelection) {
                     summarySection.classList.remove('hidden');
                     summaryRate.textContent = 'Rs. ' + rate.toLocaleString();
                     summaryNights.textContent = durationText;
@@ -193,87 +222,162 @@
             } else {
                 summarySection.classList.add('hidden');
             }
-        }
 
-        const stayTypeSelect = document.querySelector('select[name="stay_type"]');
-        [checkInInput, checkOutInput, roomTypeSelect, stayTypeSelect].forEach(el => el?.addEventListener('change', calculateTotal));
-
-        checkInInput?.addEventListener('change', function() {
-            if (this.value) {
-                let [y, m, d] = this.value.split('-');
-                let minDate = new Date(y, m - 1, d);
-                minDate.setDate(minDate.getDate() + 1);
-
-                // Fix formatting padding issue to ensure proper date string format (YYYY-MM-DD)
-                const year = minDate.getFullYear();
-                const month = String(minDate.getMonth() + 1).padStart(2, '0');
-                const day = String(minDate.getDate()).padStart(2, '0');
-                let minDateStr = `${year}-${month}-${day}`;
-
-                checkOutInput.min = minDateStr;
-                if (checkOutInput.value && checkOutInput.value <= this.value) {
-                    checkOutInput.value = minDateStr;
-                    calculateTotal();
-                }
-            }
-        });
-
-        // Trigger calculation on load in case parameters are populated via URL
-        calculateTotal();
-
-        async function fetchUnavailableDates(roomTypeId, month) {
-            if (!roomTypeId) return [];
-            try {
-                const response = await fetch(`/api/room-types/${roomTypeId}/availability?month=${month}`);
-                const json = await response.json();
-                return json.data.fully_booked_dates ?? [];
-            } catch (e) {
-                return [];
+            if (isValidSelection) {
+                submitButton.removeAttribute('disabled');
+                submitButton.classList.remove('opacity-50', 'cursor-not-allowed');
+            } else {
+                submitButton.setAttribute('disabled', 'disabled');
+                submitButton.classList.add('opacity-50', 'cursor-not-allowed');
             }
         }
 
-        document.getElementById('main-booking-form').addEventListener('submit', async function(e) {
-            e.preventDefault(); // Stop immediate submission
-
-            const roomTypeId = roomTypeSelect.value;
-            const checkIn = checkInInput.value;
-            const checkOut = checkOutInput.value;
-
-            if (!checkIn || !checkOut || !roomTypeId) {
-                this.submit();
+        async function fetchAndApplyAvailability(roomTypeId) {
+            if (!roomTypeId) {
+                BOOKED_DATES = [];
+                updateFlatpickrDisableDates();
                 return;
             }
 
-            const start = new Date(checkIn);
-            const end = new Date(checkOut);
-            const current = new Date(start);
-            
-            // Gather all YYYY-MM months involved in the stay
-            const monthsToFetch = new Set();
-            while (current < end) {
-                monthsToFetch.add(current.toISOString().substring(0, 7));
-                current.setDate(current.getDate() + 1);
-            }
+            const today = new Date();
+            const currentMonth = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0');
+            const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1);
+            const nextMonthStr = nextMonth.getFullYear() + '-' + String(nextMonth.getMonth() + 1).padStart(2, '0');
 
             let allUnavailable = [];
-            for (let m of monthsToFetch) {
-                const unav = await fetchUnavailableDates(roomTypeId, m);
-                allUnavailable = allUnavailable.concat(unav);
-            }
+            try {
+                const responseCurrent = await fetch(`/api/room-types/${roomTypeId}/availability?month=${currentMonth}`);
+                const jsonCurrent = await responseCurrent.json();
+                allUnavailable = allUnavailable.concat(jsonCurrent.data.fully_booked_dates ?? []);
 
-            const checkCurrent = new Date(start);
-            while (checkCurrent < end) {
-                const dateStr = checkCurrent.toISOString().split('T')[0];
-                if (allUnavailable.includes(dateStr)) {
-                    alert('Your selected dates include fully booked days. Please choose different dates.');
-                    return;
+                const responseNext = await fetch(`/api/room-types/${roomTypeId}/availability?month=${nextMonthStr}`);
+                const jsonNext = await responseNext.json();
+                allUnavailable = allUnavailable.concat(jsonNext.data.fully_booked_dates ?? []);
+
+            } catch (e) {
+                console.error('Error fetching availability:', e);
+            }
+            BOOKED_DATES = [...new Set(allUnavailable)].sort(); // Remove duplicates and sort
+            updateFlatpickrDisableDates();
+        }
+
+        function updateFlatpickrDisableDates() {
+            if (checkInFlatpickr) {
+                checkInFlatpickr.set('disable', [
+                    function(date) {
+                        return BOOKED_DATES.includes(toLocalYMD(date));
+                    }
+                ]);
+                checkInFlatpickr.redraw(); // Important to redraw the calendar
+            }
+            if (checkOutFlatpickr) {
+                checkOutFlatpickr.set('disable', [
+                    function(date) {
+                        return BOOKED_DATES.includes(toLocalYMD(date));
+                    }
+                ]);
+                checkOutFlatpickr.redraw();
+            }
+            calculateTotal(); // Re-evaluate the summary and button state after dates are updated
+        }
+
+        // Initialize Flatpickr for check-in
+        checkInFlatpickr = flatpickr(checkInInput, {
+            minDate: 'today',
+            dateFormat: 'Y-m-d',
+            disable: [
+                function(date) {
+                    return BOOKED_DATES.includes(toLocalYMD(date));
                 }
-                checkCurrent.setDate(checkCurrent.getDate() + 1);
-            }
+            ], // Initially empty, will be updated
+            disableMobile: true,
+            onDayCreate: function(dObj, dStr, fp, dayElem) {
+                const localDate = toLocalYMD(dayElem.dateObj);
+                if (BOOKED_DATES.includes(localDate)) {
+                    dayElem.classList.add('fully-booked-date');
+                }
+            },
+            onChange: function(selectedDates, dateStr, instance) {
+                const selectedCheckIn = selectedDates[0];
+                if (selectedCheckIn) {
+                    const minCheckoutDate = new Date(selectedCheckIn.getTime() + 86400000);
+                    checkOutFlatpickr.set('minDate', minCheckoutDate);
 
-            this.submit(); // Proceed with submission if clear
+                    let maxCheckoutDate = null;
+                    const checkInYMD = toLocalYMD(selectedCheckIn);
+                    for (let i = 0; i < BOOKED_DATES.length; i++) {
+                        if (BOOKED_DATES[i] > checkInYMD) {
+                            maxCheckoutDate = BOOKED_DATES[i];
+                            break;
+                        }
+                    }
+                    checkOutFlatpickr.set('maxDate', maxCheckoutDate);
+
+                    if (checkOutInput.value && (new Date(checkOutInput.value) < minCheckoutDate || (maxCheckoutDate && new Date(checkOutInput.value) > new Date(maxCheckoutDate)))) {
+                        checkOutFlatpickr.clear();
+                    }
+                } else {
+                    checkOutFlatpickr.set('minDate', 'today');
+                    checkOutFlatpickr.set('maxDate', null);
+                    checkOutFlatpickr.clear();
+                }
+                calculateTotal();
+            }
         });
 
+        // Initialize Flatpickr for check-out
+        checkOutFlatpickr = flatpickr(checkOutInput, {
+            minDate: 'today',
+            dateFormat: 'Y-m-d',
+            disable: [
+                function(date) {
+                    return BOOKED_DATES.includes(toLocalYMD(date));
+                }
+            ], // Initially empty, will be updated
+            disableMobile: true,
+            onDayCreate: function(dObj, dStr, fp, dayElem) {
+                const localDate = toLocalYMD(dayElem.dateObj);
+                if (BOOKED_DATES.includes(localDate)) {
+                    dayElem.classList.add('fully-booked-date');
+                }
+            },
+            onChange: function(selectedDates, dateStr, instance) {
+                calculateTotal();
+            }
+        });
+
+        // Event listeners for changes
+        roomTypeSelect.addEventListener('change', function() {
+            const selectedRoomTypeId = this.value;
+            fetchAndApplyAvailability(selectedRoomTypeId);
+            checkInFlatpickr.clear();
+            checkOutFlatpickr.clear();
+            calculateTotal();
+        });
+
+        document.querySelector('select[name="num_guests"]').addEventListener('change', calculateTotal);
+        document.querySelector('select[name="stay_type"]').addEventListener('change', calculateTotal);
+
+        // Initial fetch and apply availability based on pre-selected room type (if any)
+        const initialRoomTypeId = roomTypeSelect.value;
+        if (initialRoomTypeId) {
+            fetchAndApplyAvailability(initialRoomTypeId);
+        } else {
+            calculateTotal(); // Ensure button is disabled if no room type is selected
+        }
+
+        // Override form submission to use client-side validation first
+        document.getElementById('main-booking-form').addEventListener('submit', function(e) {
+            e.preventDefault(); // Stop immediate submission
+
+            // If the button is disabled, prevent submission
+            if (submitButton.disabled) {
+                alert('Please select valid and available check-in/check-out dates.');
+                return;
+            }
+
+            this.submit(); // Proceed with server-side validation
+        });
     });
 </script>
 @endpush

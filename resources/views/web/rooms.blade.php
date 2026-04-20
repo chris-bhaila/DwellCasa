@@ -18,13 +18,15 @@
                 <div class="block h-56 overflow-hidden bg-slate-200">
                     @php
                         $roomImage = $roomType->galleryImages->first();
-                        $imageUrl = $roomImage
+                        $imageUrl = $roomType->thumbnail 
+                        ? asset('storage/' . $roomType->thumbnail)
+                        : ($roomImage
                         ? (filter_var($roomImage->filename, FILTER_VALIDATE_URL)
                         ? $roomImage->filename
                         : asset('storage/' . ltrim($roomImage->filename, '/')))
-                        : 'https://images.unsplash.com/photo-1618773928121-c32242e63f39?auto=format&fit=crop&q=80&w=800';
+                        : 'https://images.unsplash.com/photo-1618773928121-c32242e63f39?auto=format&fit=crop&q=80&w=800');
                     @endphp
-                    <img src="{{ $imageUrl }}" alt="{{ $roomImage?->alt_text ?? $roomType->name }}"
+                    <img src="{{ $imageUrl }}" alt="{{ $roomType->name }}"
                         class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                 </div>
                 <div class="p-8">

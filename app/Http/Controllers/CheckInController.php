@@ -40,8 +40,11 @@ class CheckInController extends Controller
         $checkIn = DB::transaction(function () use ($request) {
             $checkIn = $this->checkInRepository->create($request->validated());
 
-            // Update booking status to checked_in
-            $checkIn->booking->update(['status' => 'checked_in']);
+            // Update booking status to confirmed and assign the actual room_id
+            $checkIn->booking->update([
+                'status' => 'checked_in',
+                'room_id' => $checkIn->room_id
+            ]);
 
             return $checkIn;
         });

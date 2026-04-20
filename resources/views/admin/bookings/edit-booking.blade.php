@@ -8,7 +8,9 @@
 <div class="flex items-center justify-between mb-8">
     <div class="flex items-center gap-4">
         <a href="{{ route('admin.bookings') }}" class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-slate-500 hover:text-primary shadow-sm border border-slate-100 transition-colors">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
         </a>
         <div>
             <h1 class="text-3xl font-serif font-bold text-slate-900 italic">Edit Booking</h1>
@@ -66,7 +68,7 @@
                                 <select name="room_type_id" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors" required>
                                     <option value="">Select a room...</option>
                                     @foreach($roomTypes ?? [] as $room)
-                                        <option value="{{ $room->id }}" {{ old('room_type_id', $booking->room_type_id) == $room->id ? 'selected' : '' }}>{{ $room->name }}</option>
+                                    <option value="{{ $room->id }}" {{ old('room_type_id', $booking->room_type_id) == $room->id ? 'selected' : '' }}>{{ $room->name }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -131,7 +133,7 @@
                     <h2 class="text-xl font-serif font-bold text-slate-900 italic">Status</h2>
                 </div>
                 <div class="p-6 space-y-6">
-                    <div>
+                    <!-- <div>
                         <label class="block text-sm font-medium text-slate-700 mb-2">Booking Status</label>
                         <select name="status" form="edit-booking-form" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors">
                             <option value="pending" {{ old('status', $booking->status) == 'pending' ? 'selected' : '' }}>Pending</option>
@@ -140,7 +142,7 @@
                             <option value="checked_out" {{ old('status', $booking->status) == 'checked_out' ? 'selected' : '' }}>Checked Out</option>
                             <option value="cancelled" {{ old('status', $booking->status) == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
                         </select>
-                    </div>
+                    </div> -->
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-2">Payment Status</label>
                         <select name="payment_status" form="edit-booking-form" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors">
@@ -157,20 +159,155 @@
                     </div>
                 </div>
             </div>
+            {{-- Sidebar action buttons --}}
+            @if($booking->status === 'pending')
+            <div class="mt-4">
+                <button type="button" onclick="confirmBooking()" class="w-full bg-blue-600 text-white px-4 py-3 rounded-xl font-medium hover:bg-blue-700 transition-all shadow-sm">
+                    Confirm Booking
+                </button>
+            </div>
+            @endif
+
+            @if($booking->status === 'confirmed')
+            <div class="mt-4">
+                <button type="button" onclick="openCheckInModal()" class="w-full bg-green-700 text-white px-4 py-3 rounded-xl font-medium hover:bg-green-800 transition-all shadow-sm">
+                    Check In Guest
+                </button>
+            </div>
+            @endif
+
+            @if($booking->status === 'checked_in')
+            <div class="mt-4">
+                <button type="button" onclick="openCheckOutModal()" class="w-full bg-slate-700 text-white px-4 py-3 rounded-xl font-medium hover:bg-slate-800 transition-all shadow-sm">
+                    Check Out Guest
+                </button>
+            </div>
+            @endif
         </div>
     </div>
 </form>
+
+<!-- Check In Modal -->
+<div id="check-in-modal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/50 backdrop-blur-sm opacity-0 transition-opacity duration-300">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden transform scale-95 transition-transform duration-300">
+        <div class="p-6 border-b border-slate-100 flex justify-between items-center">
+            <h2 class="text-xl font-serif font-bold text-slate-900 italic">Check In Guest</h2>
+            <button type="button" onclick="closeCheckInModal()" class="text-slate-400 hover:text-slate-600 transition-colors">
+                <i class="bi bi-x-lg text-xl"></i>
+            </button>
+        </div>
+        <form id="check-in-form" class="p-6 space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-2">Booking ID</label>
+                <input type="text" value="{{ $booking->booking_ref }}" readonly class="w-full rounded-xl border-slate-200 px-4 py-3 bg-slate-50 text-slate-500 cursor-not-allowed focus:outline-none">
+                <input type="hidden" name="booking_id" value="{{ $booking->id }}">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-2">Assign Room <span class="text-red-500">*</span></label>
+                <select name="room_id" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors" required>
+                    <option value="">Select a room...</option>
+                    @foreach($rooms ?? [] as $room)
+                    <option value="{{ $room->id }}">Room {{ $room->room_number }} ({{ ucfirst($room->status) }})</option>
+                    @endforeach
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-2">Checked In By <span class="text-red-500">*</span></label>
+                <select name="checked_in_by" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors" required>
+                    <option value="">Select staff...</option>
+                    @foreach($users ?? [] as $user)
+                    <option value="{{ $user->id }}" {{ auth()->check() && auth()->id() == $user->id ? 'selected' : '' }}>{{ $user->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="flex items-center gap-6 pt-2">
+                <label class="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" name="early_check_in" value="1" class="rounded text-primary focus:ring-primary w-5 h-5 border-slate-300">
+                    <span class="text-sm font-medium text-slate-700">Early Check-in</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" name="id_verified" value="1" class="rounded text-primary focus:ring-primary w-5 h-5 border-slate-300">
+                    <span class="text-sm font-medium text-slate-700">ID Verified</span>
+                </label>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-2">Notes</label>
+                <textarea name="notes" rows="3" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors" placeholder="Append check-in notes...">{{ $booking->admin_notes }}</textarea>
+            </div>
+            <div class="pt-4 flex justify-end gap-3 border-t border-slate-100 mt-4">
+                <button type="button" onclick="closeCheckInModal()" class="px-6 py-2.5 rounded-xl font-medium text-slate-600 hover:bg-slate-50 transition-colors">Cancel</button>
+                <button type="submit" class="px-6 py-2.5 rounded-xl font-medium bg-primary text-white hover:bg-[#8E795E] transition-colors shadow-sm">Confirm Check In</button>
+            </div>
+        </form>
+    </div>
+</div>
+<!-- Check Out Modal -->
+<div id="check-out-modal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/50 backdrop-blur-sm opacity-0 transition-opacity duration-300">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden transform scale-95 transition-transform duration-300">
+        <div class="p-6 border-b border-slate-100 flex justify-between items-center">
+            <h2 class="text-xl font-serif font-bold text-slate-900 italic">Check Out Guest</h2>
+            <button type="button" onclick="closeCheckOutModal()" class="text-slate-400 hover:text-slate-600 transition-colors">
+                <i class="bi bi-x-lg text-xl"></i>
+            </button>
+        </div>
+        <form id="check-out-form" class="p-6 space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-2">Booking ID</label>
+                <input type="text" value="{{ $booking->booking_ref }}" readonly class="w-full rounded-xl border-slate-200 px-4 py-3 bg-slate-50 text-slate-500 cursor-not-allowed focus:outline-none">
+                <input type="hidden" name="booking_id" value="{{ $booking->id }}">
+                <input type="hidden" name="room_id" value="{{ $booking->room_id }}">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-2">Checked Out By <span class="text-red-500">*</span></label>
+                <select name="checked_out_by" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors" required>
+                    <option value="">Select staff...</option>
+                    @foreach($users ?? [] as $user)
+                    <option value="{{ $user->id }}" {{ auth()->check() && auth()->id() == $user->id ? 'selected' : '' }}>{{ $user->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-2">Room Condition <span class="text-red-500">*</span></label>
+                <select name="room_condition" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors" required>
+                    <option value="good">Good</option>
+                    <option value="needs_cleaning">Needs Cleaning</option>
+                    <option value="damaged">Damaged</option>
+                </select>
+            </div>
+            <div id="damage-notes-wrapper" class="hidden">
+                <label class="block text-sm font-medium text-slate-700 mb-2">Damage Notes <span class="text-red-500">*</span></label>
+                <textarea name="damage_notes" rows="3" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors" placeholder="Describe the damage..."></textarea>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-2">Extra Charges (Rs.)</label>
+                <input type="number" name="extra_charges" step="0.01" min="0" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors" placeholder="0.00">
+            </div>
+            <div class="flex items-center gap-2 pt-2">
+                <input type="checkbox" name="late_check_out" value="1" id="late_check_out" class="rounded text-primary focus:ring-primary w-5 h-5 border-slate-300">
+                <label for="late_check_out" class="text-sm font-medium text-slate-700 cursor-pointer">Late Check-out</label>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-2">Notes</label>
+                <textarea name="notes" rows="3" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors" placeholder="Any checkout notes..."></textarea>
+            </div>
+            <div class="pt-4 flex justify-end gap-3 border-t border-slate-100 mt-4">
+                <button type="button" onclick="closeCheckOutModal()" class="px-6 py-2.5 rounded-xl font-medium text-slate-600 hover:bg-slate-50 transition-colors">Cancel</button>
+                <button type="submit" class="px-6 py-2.5 rounded-xl font-medium bg-slate-700 text-white hover:bg-slate-800 transition-colors shadow-sm">Confirm Check Out</button>
+            </div>
+        </form>
+    </div>
+</div>
 @endsection
 
 @push('scripts')
 <script>
     document.getElementById('edit-booking-form').addEventListener('submit', async function(e) {
         e.preventDefault();
-        
+
         const formData = new FormData(this);
         const data = Object.fromEntries(formData.entries());
         const bookingId = data.id;
-        
+
         try {
             const response = await fetch(`/api/bookings/${bookingId}`, {
                 method: 'PUT',
@@ -198,11 +335,167 @@
         }
     });
 
+    function openCheckInModal() {
+        const modal = document.getElementById('check-in-modal');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        setTimeout(() => {
+            modal.classList.remove('opacity-0');
+            modal.querySelector('div').classList.remove('scale-95');
+            modal.querySelector('div').classList.add('scale-100');
+        }, 10);
+    }
+
+    function closeCheckInModal() {
+        const modal = document.getElementById('check-in-modal');
+        modal.classList.add('opacity-0');
+        modal.querySelector('div').classList.remove('scale-100');
+        modal.querySelector('div').classList.add('scale-95');
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }, 300);
+    }
+
+    document.getElementById('check-in-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const formData = new FormData(this);
+        const data = Object.fromEntries(formData.entries());
+
+        data.early_check_in = formData.get('early_check_in') ? 1 : 0;
+        data.id_verified = formData.get('id_verified') ? 1 : 0;
+        data.checked_in_at = new Date().toISOString().slice(0, 19).replace('T', ' '); // YYYY-MM-DD HH:mm:ss format
+
+        try {
+            const response = await fetch('/api/check-ins', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (response.ok) {
+                window.location.reload(); // Reload immediately to see updated status
+            } else {
+                const error = await response.json();
+                let errorMessage = 'Error during check-in: ' + (error.message || 'Unknown error');
+                if (error.errors) {
+                    errorMessage += '\n' + Object.values(error.errors).flat().join('\n');
+                }
+                alert(errorMessage);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('An error occurred during check-in.');
+        }
+    });
+
+    function openCheckOutModal() {
+        const modal = document.getElementById('check-out-modal');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        setTimeout(() => {
+            modal.classList.remove('opacity-0');
+            modal.querySelector('div').classList.remove('scale-95');
+            modal.querySelector('div').classList.add('scale-100');
+        }, 10);
+    }
+
+    function closeCheckOutModal() {
+        const modal = document.getElementById('check-out-modal');
+        modal.classList.add('opacity-0');
+        modal.querySelector('div').classList.remove('scale-100');
+        modal.querySelector('div').classList.add('scale-95');
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }, 300);
+    }
+
+    // Show damage notes when room condition is damaged
+    document.querySelector('select[name="room_condition"]')?.addEventListener('change', function() {
+        const damageWrapper = document.getElementById('damage-notes-wrapper');
+        if (this.value === 'damaged') {
+            damageWrapper.classList.remove('hidden');
+            damageWrapper.querySelector('textarea').required = true;
+        } else {
+            damageWrapper.classList.add('hidden');
+            damageWrapper.querySelector('textarea').required = false;
+        }
+    });
+
+    document.getElementById('check-out-form')?.addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const formData = new FormData(this);
+        const data = Object.fromEntries(formData.entries());
+
+        data.late_check_out = formData.get('late_check_out') ? 1 : 0;
+        data.checked_out_at = new Date().toISOString().slice(0, 19).replace('T', ' ');
+
+        try {
+            const response = await fetch('/api/check-outs', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (response.ok) {
+                window.location.reload();
+            } else {
+                const error = await response.json();
+                let errorMessage = 'Error during check-out: ' + (error.message || 'Unknown error');
+                if (error.errors) {
+                    errorMessage += '\n' + Object.values(error.errors).flat().join('\n');
+                }
+                alert(errorMessage);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('An error occurred during check-out.');
+        }
+    });
+
+    // Confirm booking (pending → confirmed)
+    async function confirmBooking() {
+        if (!confirm('Are you sure you want to confirm this booking?')) return;
+
+        try {
+            const response = await fetch(`/api/bookings/{{ $booking->id }}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({
+                    status: 'confirmed'
+                })
+            });
+
+            if (response.ok) {
+                window.location.reload();
+            } else {
+                alert('Error confirming booking.');
+            }
+        } catch (error) {
+            alert('An error occurred.');
+        }
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
         const stayTypeSelect = document.querySelector('select[name="stay_type"]');
         const ratePerNightWrapper = document.getElementById('rate-per-night-wrapper');
         const ratePerMonthWrapper = document.getElementById('rate-per-month-wrapper');
-        
+
         if (stayTypeSelect && ratePerNightWrapper && ratePerMonthWrapper) {
             const ratePerNightInput = ratePerNightWrapper.querySelector('input');
             const ratePerMonthInput = ratePerMonthWrapper.querySelector('input');
@@ -211,7 +504,7 @@
                 if (stayTypeSelect.value === 'short_term') {
                     ratePerNightWrapper.classList.remove('hidden');
                     ratePerNightInput.required = true;
-                    
+
                     ratePerMonthWrapper.classList.add('hidden');
                     ratePerMonthInput.required = false;
                 } else { // long_term

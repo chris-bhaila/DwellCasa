@@ -25,6 +25,7 @@ class RoomType extends Model
         'is_active',
         'sort_order',
         'is_standalone',
+        'thumbnail',
     ];
 
     protected $casts = [

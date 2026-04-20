@@ -2,12 +2,22 @@
 
 @section('title', ($roomType->name ?? 'Luxury Suite') . ' - DwellCasa')
 
+@push('head')
+<style>
+    /* Strikethrough ONLY for fully booked dates in flatpickr */
+    .flatpickr-day.fully-booked-date {
+        text-decoration: line-through;
+        color: #cbd5e1 !important;
+    }
+</style>
+@endpush
+
 @section('content')
 <!-- Hero Image Section -->
 <section class="relative h-[60vh] min-h-[400px] flex items-center justify-center overflow-hidden bg-slate-900">
     <div class="absolute inset-0 z-0">
-        <img src="https://images.unsplash.com/photo-1618773928121-c32242e63f39?auto=format&fit=crop&q=80&w=1920"
-            class="w-full h-full object-cover opacity-60" alt="Room Hero">
+        <img src="{{ $roomType->thumbnail ? asset('storage/' . $roomType->thumbnail) : 'https://images.unsplash.com/photo-1618773928121-c32242e63f39?auto=format&fit=crop&q=80&w=1920' }}"
+            class="w-full h-full object-cover opacity-60" alt="{{ $roomType->name ?? 'Room Hero' }}">
         <div class="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-slate-900/60"></div>
     </div>
 
@@ -146,10 +156,9 @@
                         <input type="hidden" name="check_out_date" id="bw-form-checkout">
                         <input type="hidden" name="num_guests" id="bw-form-guests">
 
-                        <button type="submit" id="bw-btn" disabled
-                            class="block w-full bg-primary text-white text-center px-6 py-4 rounded-xl font-bold tracking-wide 
+                        <button type="submit" id="bw-btn"
+                            class="hidden w-full bg-primary text-white text-center px-6 py-4 rounded-xl font-bold tracking-wide 
                        transition-all transform hover:-translate-y-1
-                       disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed disabled:transform-none
                        hover:bg-primary-dark hover:shadow-lg">
                             Reserve Now
                         </button>
@@ -201,7 +210,8 @@
             summary.classList.add('hidden');
             cancelMsg.classList.add('hidden');
             nightsLabel.textContent = '';
-            btn.disabled = true;
+            btn.classList.add('hidden');
+            btn.classList.remove('block');
             return;
         }
 
@@ -223,14 +233,25 @@
 
         summary.classList.remove('hidden');
         cancelMsg.classList.remove('hidden');
-        btn.disabled = false;
+        btn.classList.remove('hidden');
+        btn.classList.add('block');
     }
 
     flatpickr(checkinInput, {
         minDate: 'today',
         dateFormat: 'm/d/Y',
-        disable: BOOKED,
+        disable: [
+            function(date) {
+                return BOOKED.includes(toLocalYMD(date));
+            }
+        ],
         disableMobile: true,
+        onDayCreate: function(dObj, dStr, fp, dayElem) {
+            const localDate = toLocalYMD(dayElem.dateObj);
+            if (BOOKED.includes(localDate)) {
+                dayElem.classList.add('fully-booked-date');
+            }
+        },
         onChange: function (selected) {
             checkInDate = selected[0] || null;
             if (checkInDate && checkOutDate && checkOutDate <= checkInDate) {
@@ -268,7 +289,18 @@
     checkoutPicker = flatpickr(checkoutInput, {
         minDate: 'today',
         dateFormat: 'm/d/Y',
+        disable: [
+            function(date) {
+                return BOOKED.includes(toLocalYMD(date));
+            }
+        ],
         disableMobile: true,
+        onDayCreate: function(dObj, dStr, fp, dayElem) {
+            const localDate = toLocalYMD(dayElem.dateObj);
+            if (BOOKED.includes(localDate)) {
+                dayElem.classList.add('fully-booked-date');
+            }
+        },
         onChange: function (selected) {
             checkOutDate = selected[0] || null;
             updateSummary();

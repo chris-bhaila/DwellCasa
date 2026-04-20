@@ -2,46 +2,60 @@
 
 namespace App\Http\Controllers;
 
-use App\Contracts\GalleryImageRepositoryInterface;
 use App\Http\Requests\StoreGalleryImageRequest;
-use App\Http\Requests\UpdateGalleryImageRequest;
+use App\Models\GalleryImage;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Storage;
 
 class GalleryImageController extends Controller
 {
-    protected $galleryImageRepository;
-
-    public function __construct(GalleryImageRepositoryInterface $galleryImageRepository)
+    /**
+     * Store a newly created gallery image.
+     *
+     * @param  \App\Http\Requests\StoreGalleryImageRequest  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function store(StoreGalleryImageRequest $request): JsonResponse
     {
-        $this->galleryImageRepository = $galleryImageRepository;
+        $validated = $request->validated();
+
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('gallery', 'public');
+            $validated['filename'] = $path;
+        }
+
+        // The 'image' field is a file object and should not be passed to the create method.
+        unset($validated['image']);
+
+        $image = GalleryImage::create($validated);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Image uploaded successfully.',
+            'data' => $image,
+        ], 201);
     }
 
-    public function index()
+    /**
+     * Remove the specified gallery image from storage.
+     *
+     * @param  \App\Models\GalleryImage  $galleryImage
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function destroy(GalleryImage $galleryImage): JsonResponse
     {
-        $images = $this->galleryImageRepository->all();
-        return response()->json(['data' => $images, 'message' => 'Gallery images fetched successfully'], 200);
-    }
+        // Delete the file from storage if it exists
+        if ($galleryImage->filename && Storage::disk('public')->exists($galleryImage->filename)) {
+            Storage::disk('public')->delete($galleryImage->filename);
+        }
 
-    public function show($id)
-    {
-        $image = $this->galleryImageRepository->find($id);
-        return response()->json(['data' => $image, 'message' => 'Gallery image fetched successfully'], 200);
-    }
+        // Permanently delete the database record
+        if (method_exists($galleryImage, 'forceDelete')) {
+            $galleryImage->forceDelete();
+        } else {
+            $galleryImage->delete();
+        }
 
-    public function store(StoreGalleryImageRequest $request)
-    {
-        $image = $this->galleryImageRepository->create($request->validated());
-        return response()->json(['success' => true, 'message' => 'Gallery image created successfully', 'data' => $image], 201);
-    }
-
-    public function update(UpdateGalleryImageRequest $request, $id)
-    {
-        $image = $this->galleryImageRepository->update($id, $request->validated());
-        return response()->json(['success' => true, 'message' => 'Gallery image updated successfully', 'data' => $image], 200);
-    }
-
-    public function destroy($id)
-    {
-        $this->galleryImageRepository->delete($id);
-        return response()->json(['success' => true, 'message' => 'Gallery image deleted successfully'], 200);
+        return response()->json(['success' => true, 'message' => 'Image deleted successfully.'], 200);
     }
 }

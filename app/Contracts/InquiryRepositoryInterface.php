@@ -2,7 +2,7 @@
 
 namespace App\Contracts;
 
-interface BookingInquiryRepositoryInterface
+interface InquiryRepositoryInterface
 {
     public function all();
     public function find($id);

@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'DwellCasa') }} - @yield('title', 'Luxury Hotel Booking')</title>
+    <title>@yield('title', 'DwellCasa - Luxury Hotel Booking')</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -169,7 +169,7 @@
                 <div class="col-span-1 md:col-span-1">
                     <h3 class="text-3xl font-bold mb-6 tracking-tighter">DwellCasa<span class="text-white">.</span></h3>
                     <p class="text-white leading-relaxed font-light">
-                        Redefining the art of hospitality in Lalitpur. Your sanctuary of sophisticated comfort and timeless elegance.
+                        {{ $webInfo->footer_description }}
                     </p>
                 </div>
 
@@ -185,17 +185,17 @@
                 <div>
                     <h4 class="text-xs uppercase tracking-[0.3em] font-bold text-white mb-8">Contact</h4>
                     <ul class="space-y-4 text-white font-light">
-                        <li class="flex items-center gap-3">📍 Lalitpur, Nepal</li>
-                        <li class="flex items-center gap-3">📞 +977 123 456 789</li>
-                        <li class="flex items-center gap-3">✉️ info@dwellcasa.com</li>
+                        <li class="flex items-center gap-3">📍 {{ $webInfo->contact_address }}</li>
+                        <li class="flex items-center gap-3">📞 {{ $webInfo->contact_phone }}</li>
+                        <li class="flex items-center gap-3">✉️ {{ $webInfo->contact_email }}</li>
                     </ul>
                 </div>
 
                 <div>
                     <h4 class="text-xs uppercase tracking-[0.3em] font-bold text-white mb-8">Connect</h4>
                     <div class="flex space-x-6">
-                        <a href="#" class="text-white hover:text-white transition-transform hover:-translate-y-1">Facebook</a>
-                        <a href="#" class="text-white hover:text-white transition-transform hover:-translate-y-1">Instagram</a>
+                        <a href="{{ $webInfo->facebook_link }}" class="text-white hover:text-white transition-transform hover:-translate-y-1">Facebook</a>
+                        <a href="{{ $webInfo->instagram_link }}" class="text-white hover:text-white transition-transform hover:-translate-y-1">Instagram</a>
                     </div>
                 </div>
             </div>

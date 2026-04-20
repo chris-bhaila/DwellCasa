@@ -14,12 +14,12 @@ class StoreGalleryImageRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'image' => 'required|image|mimes:jpg,jpeg,png,webp|max:5120',
+            'image' => 'required|image|mimes:jpg,jpeg,png,webp|max:20480',
             'alt_text' => 'nullable|string|max:255',
             'caption' => 'nullable|string|max:255',
             'category' => 'nullable|string|max:255',
-            'imageable_type' => 'required|string',
-            'imageable_id' => 'required|integer',
+            'imageable_type' => 'nullable|string',
+            'imageable_id' => 'nullable|integer',
             'is_featured' => 'boolean',
             'is_active' => 'boolean',
             'sort_order' => 'integer',

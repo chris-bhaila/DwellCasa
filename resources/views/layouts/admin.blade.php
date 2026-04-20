@@ -46,20 +46,24 @@
                 <i class="bi bi-door-open sidebar-icon text-slate-400 mr-3 text-lg"></i>
                 <span class="font-medium">Rooms</span>
             </a>
-            <a href="/admin/amenities" class="sidebar-link flex items-center px-4 py-3 rounded-lg transition-colors {{ request()->is('admin/amenities*') ? 'active' : '' }}">
+            <a href="{{ route('admin.amenities') }}" class="sidebar-link flex items-center px-4 py-3 rounded-lg transition-colors {{ request()->is('admin/amenities*') ? 'active' : '' }}">
                 <i class="bi bi-gem sidebar-icon text-slate-400 mr-3 text-lg"></i>
                 <span class="font-medium">Amenities</span>
             </a>
-            <a href="/admin/gallery" class="sidebar-link flex items-center px-4 py-3 rounded-lg transition-colors {{ request()->is('admin/gallery*') ? 'active' : '' }}">
+            <a href="{{ route('admin.gallery') }}" class="sidebar-link flex items-center px-4 py-3 rounded-lg transition-colors {{ request()->is('admin/gallery*') ? 'active' : '' }}">
                 <i class="bi bi-images sidebar-icon text-slate-400 mr-3 text-lg"></i>
                 <span class="font-medium">Gallery</span>
             </a>
-            <a href="/admin/inquiries" class="sidebar-link flex items-center px-4 py-3 rounded-lg transition-colors {{ request()->is('admin/inquiries*') ? 'active' : '' }}">
+            <a href="{{ route('admin.inquiry') }}" class="sidebar-link flex items-center px-4 py-3 rounded-lg transition-colors {{ request()->is('admin/inquiry*') ? 'active' : '' }}">
                 <i class="bi bi-chat-left-text sidebar-icon text-slate-400 mr-3 text-lg"></i>
                 <span class="font-medium">Inquiries</span>
             </a>
         </nav>
         <div class="p-4 border-t border-slate-800">
+            <a href="{{ route('admin.info') }}" class="sidebar-link flex items-center px-4 py-3 mb-6 rounded-lg transition-colors {{ request()->is('admin/info*') ? 'active' : '' }}">
+                <i class="bi bi-chat-left-text sidebar-icon text-slate-400 mr-3 text-lg"></i>
+                <span class="font-medium">Website Information</span>
+            </a>
             <div class="flex items-center">
                 <div class="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center font-bold text-white flex-shrink-0">
                     {{ substr(Auth::user()->name, 0, 1) }}
@@ -81,7 +85,7 @@
 
     <!-- Main Content -->
     <div class="flex-1 flex flex-col overflow-hidden w-full">
-        <header class="bg-white border-b border-slate-200 h-20 flex items-center justify-between lg:justify-end px-4 lg:px-8 shadow-sm z-10">
+        <header class="md:hidden bg-white border-b border-slate-200 h-20 flex items-center justify-between lg:justify-end px-4 lg:px-8 shadow-sm z-10">
             <button @click="sidebarOpen = true" class="text-slate-500 hover:text-[#A89070] focus:outline-none lg:hidden">
                 <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>

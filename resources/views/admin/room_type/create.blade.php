@@ -17,7 +17,7 @@
     </div>
 </div>
 
-<form id="add-room-type-form" action="#" method="POST">
+<form id="add-room-type-form" action="#" method="POST" enctype="multipart/form-data">
     @csrf
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -123,8 +123,8 @@
                 </div>
                 <div class="p-6 space-y-4">
                     <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-2">Image URL</label>
-                        <input type="url" name="image" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors" placeholder="https://...">
+                        <label class="block text-sm font-medium text-slate-700 mb-2">Thumbnail</label>
+                        <input type="file" name="thumbnail" accept="image/*" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors">
                     </div>
                 </div>
             </div>
@@ -139,20 +139,17 @@
         e.preventDefault();
         
         const formData = new FormData(this);
-        const data = Object.fromEntries(formData.entries());
-        data.is_active = this.querySelector('#is_active').checked ? 1 : 0;
-        data.is_standalone = this.querySelector('#is_standalone').checked ? 1 : 0;
-        data.amenities = formData.getAll('amenities[]');
+        formData.set('is_active', this.querySelector('#is_active').checked ? 1 : 0);
+        formData.set('is_standalone', this.querySelector('#is_standalone').checked ? 1 : 0);
         
         try {
             const response = await fetch('/api/room-types', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
                     'Accept': 'application/json',
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                 },
-                body: JSON.stringify(data)
+                body: formData
             });
 
             if (response.ok) {
