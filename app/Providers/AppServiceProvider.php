@@ -63,6 +63,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        view()->composer('layouts.app', function ($view) {
+            $view->with('webInfo', \App\Models\WebsiteInfo::first() ?? new \App\Models\WebsiteInfo());
+        });
     }
 }
