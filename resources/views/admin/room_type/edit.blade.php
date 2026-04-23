@@ -43,11 +43,11 @@
                 <div class="p-6 space-y-6">
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-2">Room Type Name <span class="text-red-500">*</span></label>
-                        <input type="text" name="name" value="{{ $roomType->name }}" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors" required>
+                        <input type="text" name="name" value="{{ $roomType->name }}" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors" required>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-2">Description</label>
-                        <textarea name="description" rows="6" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors">{{ $roomType->description }}</textarea>
+                        <textarea name="description" rows="6" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors">{{ $roomType->description }}</textarea>
                     </div>
                 </div>
             </div>
@@ -60,19 +60,19 @@
                 <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-2">Price Per Night (Rs.) <span class="text-red-500">*</span></label>
-                        <input type="number" name="price_per_night" value="{{ round($roomType->price_per_night) }}" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors" required>
+                        <input type="number" name="price_per_night" value="{{ round($roomType->price_per_night) }}" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors" required>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-2">Price Per Month (Rs.) <span class="text-red-500">*</span></label>
-                        <input type="number" name="price_per_month" value="{{ round($roomType->price_per_month) }}" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors" required>
+                        <input type="number" name="price_per_month" value="{{ round($roomType->price_per_month) }}" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors" required>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-2">Max Occupancy <span class="text-red-500">*</span></label>
-                        <input type="number" name="max_occupancy" value="{{ $roomType->max_occupancy }}" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors" required>
+                        <input type="number" name="max_occupancy" value="{{ $roomType->max_occupancy }}" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors" required>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-2">Room Size (Sq. Ft.)</label>
-                        <input type="text" name="size_sqft" value="{{ $roomType->size_sqft }}" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors" placeholder="e.g. 450">
+                        <input type="text" name="size_sqft" value="{{ $roomType->size_sqft }}" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors" placeholder="e.g. 450">
                     </div>
 
                     <!-- <div>
@@ -106,17 +106,24 @@
                 <div class="p-6 border-b border-slate-100">
                     <h2 class="text-xl font-serif font-bold text-slate-900 italic">Room Images</h2>
                 </div>
-                <div class="p-6">
+                <div class="p-6 space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">Upload More Images</label>
+                        <input type="file" name="images[]" accept="image/*" multiple class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors">
+                    </div>
                     @if($roomType->galleryImages && $roomType->galleryImages->count() > 0)
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
                             @foreach($roomType->galleryImages as $index => $image)
-                                <div class="rounded-xl overflow-hidden shadow-sm border border-slate-100 aspect-[4/3]">
+                                <div class="rounded-xl overflow-hidden shadow-sm border border-slate-100 aspect-[4/3] relative group">
                                     <img src="{{ asset('storage/' . $image->filename) }}" alt="{{ $image->alt_text }}" class="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform duration-300" onclick="openLightbox({{ $index }})">
+                                    <button type="button" onclick="deleteGalleryImage({{ $image->id }})" class="absolute top-2 right-2 w-8 h-8 bg-white/90 backdrop-blur text-slate-700 rounded-lg flex items-center justify-center hover:text-red-500 hover:bg-white transition-colors shadow-sm opacity-0 group-hover:opacity-100">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
                                 </div>
                             @endforeach
                         </div>
                     @else
-                        <div class="w-full bg-slate-50 py-8 rounded-xl flex items-center justify-center border border-slate-200 border-dashed">
+                        <div class="w-full bg-slate-50 py-8 rounded-xl flex items-center justify-center border border-slate-200 border-dashed mt-4">
                             <span class="text-slate-500 text-sm">No gallery images uploaded for this room type.</span>
                         </div>
                     @endif
@@ -234,6 +241,30 @@
             alert('An error occurred updating the room type.');
         }
     });
+
+    window.deleteGalleryImage = async function(imageId) {
+        if (!confirm('Are you sure you want to delete this image?')) return;
+
+        try {
+            const response = await fetch(`/room-types/{{ $roomType->id }}/images/${imageId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                }
+            });
+
+            if (response.ok) {
+                window.location.reload();
+            } else {
+                const error = await response.json();
+                alert('Error deleting image: ' + (error.message || 'Unknown error'));
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('An error occurred deleting the image.');
+        }
+    };
 
     // Lightbox Logic
     const galleryImages = @json($roomType->galleryImages ?? []);

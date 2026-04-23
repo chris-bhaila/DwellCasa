@@ -68,7 +68,7 @@ $roomTypes = collect([
             <!-- Stats Row -->
             <div class="grid grid-cols-2 gap-4 py-4 border-t border-slate-100 mb-4">
                 <div class="text-center">
-                    <span class="block text-2xl font-bold text-slate-900">{{ $roomType->rooms_count ?? 0 }}</span>
+                    <span class="block text-2xl font-bold text-slate-900">{{ $roomType->rooms->count() ?? 0 }}</span>
                     <span class="text-[10px] text-slate-400 uppercase tracking-widest font-bold">Total Rooms</span>
                 </div>
                 <div class="text-center border-l border-slate-100">
@@ -138,6 +138,8 @@ $roomTypes = collect([
                         <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">Occupied</span>
                         @elseif($room->status === 'maintenance')
                         <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-orange-50 text-orange-700 border border-orange-200">Maintenance</span>
+                        @elseif($room->status === 'out_of_service')
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-orange-50 text-orange-700 border border-orange-200">Out of Service</span>
                         @else
                         <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-50 text-slate-700 border border-slate-200">{{ ucfirst($room->status) }}</span>
                         @endif

@@ -33,7 +33,9 @@ class RoomController extends Controller
         $roomType = $this->roomTypeRepository->find($id);
         abort_if(!$roomType, 404);
         
-        $totalRooms = \App\Models\Room::where('room_type_id', $id)->count();
+        $totalRooms = \App\Models\Room::where('room_type_id', $id)
+            ->whereNotIn('status', ['maintenance', 'out_of_service'])
+            ->count();
 
         $bookedDates = [];
         if ($totalRooms === 0) {

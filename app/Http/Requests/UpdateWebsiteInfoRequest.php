@@ -33,6 +33,9 @@ class UpdateWebsiteInfoRequest extends FormRequest
             'facebook_link'             => 'nullable|url|max:255',
             'instagram_link'            => 'nullable|url|max:255',
             'footer_description'        => 'nullable|string',
+            'homepage_main_image'       => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
+            'homepage_end_image'        => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
+            'about_image'               => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
         ];
     }
 }

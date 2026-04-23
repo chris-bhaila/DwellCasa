@@ -27,6 +27,33 @@ Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap')
 Route::get('/robots.txt', [RobotsController::class, 'index'])->name('robots');
 Route::post('/room-types/{id}/images', [RoomTypeController::class, 'uploadImage'])->name('room-types.images.upload');
 Route::delete('/room-types/{id}/images/{imageId}', [RoomTypeController::class, 'deleteImage'])->name('room-types.images.delete');
+Route::get('/review/{token}', function ($token) {
+    $review = \App\Models\Review::where('review_token', $token)
+        ->where('token_used', false)
+        ->firstOrFail();
+    return view('web.review', compact('review'));
+})->name('review.form');
+
+Route::post('/review/{token}', function (\Illuminate\Http\Request $request, $token) {
+    $request->validate([
+        'rating' => 'required|integer|min:1|max:5',
+        'title'  => 'nullable|string|max:255',
+        'body'   => 'required|string',
+    ]);
+
+    $review = \App\Models\Review::where('review_token', $token)
+        ->where('token_used', false)
+        ->firstOrFail();
+
+    $review->update([
+        'rating'     => $request->rating,
+        'title'      => $request->title,
+        'body'       => $request->body,
+        'token_used' => true,
+    ]);
+
+    return redirect()->route('home')->with('success', 'Thank you for your review!');
+})->name('review.store');
 
 //Admin Routes
 Route::get('/admin/login', [AuthController::class, 'showLoginForm'])->name('login');
@@ -34,8 +61,20 @@ Route::post('/admin/login', [AuthController::class, 'login'])->name('admin.login
 Route::post('/admin/logout', [AuthController::class, 'logout'])->name('admin.logout');
 
 Route::middleware('auth')->prefix('admin')->group(function () {
-    Route::get('/', function () {
-        return view('admin.home');
+    Route::get('/', function (
+        \App\Contracts\RoomRepositoryInterface $roomRepository,
+        \App\Contracts\RoomTypeRepositoryInterface $roomTypeRepository,
+        \App\Contracts\CheckInRepositoryInterface $checkInRepository
+    ) {
+        $rooms = $roomRepository->all();
+        $roomTypes = $roomTypeRepository->all();
+        $checkIns = $checkInRepository->all();
+        $bookings = \App\Models\Booking::with(['guest', 'roomType'])
+            ->latest()
+            ->take(5)
+            ->get();
+
+        return view('admin.home', compact('rooms', 'roomTypes', 'checkIns', 'bookings'));
     })->name('admin');
 
     Route::get('/room_type/index', function (\App\Contracts\RoomTypeRepositoryInterface $roomTypeRepository) {
@@ -52,13 +91,13 @@ Route::middleware('auth')->prefix('admin')->group(function () {
     Route::get('/room-types/{id}', function ($id, \App\Contracts\RoomTypeRepositoryInterface $roomTypeRepository) {
         $roomType = $roomTypeRepository->find($id);
         abort_if(!$roomType, 404);
-        
+
         $amenities = \App\Models\Amenity::where('is_active', true)->get();
         return view('admin.room_type.edit', compact('roomType', 'amenities'));
     })->name('admin.room_type.edit');
 
     Route::get('/room_type/room/add-room', function (\App\Contracts\AmenityRepositoryInterface $amenityRepository) {
-        $roomTypes = \App\Models\RoomType::where('is_active', true)->orderBy('name')->get();
+        $roomTypes = \App\Models\RoomType::withCount('rooms')->where('is_active', true)->orderBy('name')->get();
         $amenities = $amenityRepository->all();
         return view('admin.room_type.room.add-room', compact('roomTypes', 'amenities'));
     })->name('admin.room_type.room.add-room');
@@ -66,8 +105,8 @@ Route::middleware('auth')->prefix('admin')->group(function () {
     Route::get('/room_type/room/{id}/edit', function ($id, \App\Contracts\AmenityRepositoryInterface $amenityRepository) {
         $room = \App\Models\Room::findOrFail($id);
         $amenities = $amenityRepository->all();
-        $roomTypes = \App\Models\RoomType::where('is_active', true)->orderBy('name')->get();
-        return view('admin.room_type.room.edit-room', compact('room', 'roomTypes','amenities'));
+        $roomTypes = \App\Models\RoomType::withCount('rooms')->where('is_active', true)->orderBy('name')->get();
+        return view('admin.room_type.room.edit-room', compact('room', 'roomTypes', 'amenities'));
     })->name('admin.room_type.room.edit');
 
     Route::get('/bookings/create', function (\App\Contracts\RoomTypeRepositoryInterface $roomTypeRepository) {
@@ -78,16 +117,16 @@ Route::middleware('auth')->prefix('admin')->group(function () {
     Route::get('/bookings/{id}/edit', function ($id, \App\Contracts\RoomTypeRepositoryInterface $roomTypeRepository) {
         $booking = \App\Models\Booking::with('guest')->findOrFail($id);
         $roomTypes = $roomTypeRepository->all();
-        
+
         $rooms = \App\Models\Room::where('room_type_id', $booking->room_type_id)
             ->where('status', 'available')
             ->whereDoesntHave('bookings', function ($query) use ($booking) {
                 $query->whereIn('status', ['confirmed', 'checked_in'])
-                      ->where('id', '!=', $booking->id)
-                      ->where('check_in_date', '<', $booking->check_out_date)
-                      ->where('check_out_date', '>', $booking->check_in_date);
+                    ->where('id', '!=', $booking->id)
+                    ->where('check_in_date', '<', $booking->check_out_date)
+                    ->where('check_out_date', '>', $booking->check_in_date);
             })->orderBy('room_number')->get();
-            
+
         $users = \App\Models\User::orderBy('name')->get();
         return view('admin.bookings.edit-booking', compact('booking', 'roomTypes', 'rooms', 'users'));
     })->name('admin.bookings.edit');
@@ -103,6 +142,7 @@ Route::middleware('auth')->prefix('admin')->group(function () {
             default     => null
         };
 
+        $query->orderByRaw("CASE WHEN status IN ('checked_out', 'cancelled') THEN 1 ELSE 0 END ASC");
         $bookings = $query->latest()->get();
         return view('admin.bookings.bookings', compact('bookings', 'filter'));
     })->name('admin.bookings');
@@ -127,4 +167,13 @@ Route::middleware('auth')->prefix('admin')->group(function () {
         return view('admin.info');
     })->name('admin.info');
 
+    Route::get('/inventory', function (\App\Contracts\InventoryRepositoryInterface $inventoryRepository) {
+        $inventory = $inventoryRepository->all();
+        return view('admin.inventory', compact('inventory'));
+    })->name('admin.inventory');
+
+    Route::get('/reviews', function (\App\Contracts\ReviewRepositoryInterface $reviewRepository) {
+        $reviews = $reviewRepository->all();
+        return view('admin.reviews', compact('reviews'));
+    })->name('admin.reviews');
 });

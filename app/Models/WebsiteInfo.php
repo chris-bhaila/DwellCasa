@@ -31,6 +31,9 @@ class WebsiteInfo extends Model
         'facebook_link',
         'instagram_link',
         'footer_description',
+        'homepage_main_image',
+        'homepage_end_image',
+        'about_image',
     ];
 
     protected $casts = [

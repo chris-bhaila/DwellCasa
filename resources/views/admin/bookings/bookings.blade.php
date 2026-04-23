@@ -86,12 +86,16 @@
                             @else
                             <div class="font-medium text-slate-400 italic text-xs">Not set</div>
                             @endif
-                            @if($booking->payment_status === 'paid')
-                            <span class="text-xs text-green-600 font-medium flex items-center mt-1"><span class="w-1.5 h-1.5 rounded-full bg-green-500 mr-1.5"></span>Paid</span>
+                            @if($booking->payment_status === 'fully_paid')
+                            <span class="text-xs text-green-600 font-medium flex items-center mt-1"><span class="w-1.5 h-1.5 rounded-full bg-green-500 mr-1.5"></span>Fully Paid</span>
+                            @elseif($booking->payment_status === 'deposit_paid')
+                            <span class="text-xs text-blue-600 font-medium flex items-center mt-1"><span class="w-1.5 h-1.5 rounded-full bg-blue-500 mr-1.5"></span>Deposit Paid</span>
+                            @elseif($booking->payment_status === 'partially_paid')
+                            <span class="text-xs text-orange-600 font-medium flex items-center mt-1"><span class="w-1.5 h-1.5 rounded-full bg-orange-500 mr-1.5"></span>Partially Paid</span>
                             @elseif($booking->payment_status === 'refunded')
                             <span class="text-xs text-slate-500 font-medium flex items-center mt-1"><span class="w-1.5 h-1.5 rounded-full bg-slate-400 mr-1.5"></span>Refunded</span>
                             @else
-                            <span class="text-xs text-red-500 font-medium flex items-center mt-1"><span class="w-1.5 h-1.5 rounded-full bg-red-500 mr-1.5"></span>Unpaid</span>
+                            <span class="text-xs text-red-600 font-medium flex items-center mt-1"><span class="w-1.5 h-1.5 rounded-full bg-red-500 mr-1.5"></span>Unpaid</span>
                             @endif
                         </td>
                         <td class="p-4">

@@ -23,7 +23,7 @@ class UpdateBookingRequest extends FormRequest
     {
         return [
             'guest_id' => 'sometimes|nullable|exists:guests,id',
-            'booking_ref' => 'sometimes|required|string|max:255|unique:bookings,booking_ref,' . $this->route('booking'),
+            'booking_ref' => 'sometimes|required|string|max:255|unique:bookings,booking_ref,' . $this->route('id'),
             'guest_name' => 'sometimes|required|string|max:255',
             'guest_email' => 'sometimes|required|email|max:255',
             'guest_phone' => 'nullable|string|max:20',
@@ -37,10 +37,10 @@ class UpdateBookingRequest extends FormRequest
             'total_amount' => 'nullable|numeric|min:0',
             'deposit_amount' => 'nullable|numeric|min:0',
             'amount_paid' => 'nullable|numeric|min:0',
-            'payment_status' => 'nullable|string',
+            'payment_status' => 'nullable|in:unpaid,deposit_paid,partially_paid,fully_paid,refunded',
             'rate_per_night' => 'sometimes|required_if:stay_type,short_term|nullable|numeric|min:0',
             'rate_per_month' => 'sometimes|required_if:stay_type,long_term|nullable|numeric|min:0',
-            'status' => 'nullable|string',
+            'status' => 'nullable|in:pending,confirmed,checked_in,checked_out,cancelled,no_show',
             'special_requests' => 'nullable|string',
             'admin_notes' => 'nullable|string',
         ];

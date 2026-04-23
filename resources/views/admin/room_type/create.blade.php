@@ -83,6 +83,19 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Gallery Images -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                <div class="p-6 border-b border-slate-100">
+                    <h2 class="text-xl font-serif font-bold text-slate-900 italic">Gallery Images</h2>
+                </div>
+                <div class="p-6 space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">Upload Multiple Images</label>
+                        <input type="file" name="images[]" accept="image/*" multiple class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors">
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Sidebar (Images & Status) -->

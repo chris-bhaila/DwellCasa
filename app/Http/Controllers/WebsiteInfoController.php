@@ -26,7 +26,16 @@ class WebsiteInfoController extends Controller
 
     public function update(UpdateWebsiteInfoRequest $request)
     {
-        $info = $this->websiteInfoRepository->update($request->validated());
+        $data = $request->validated();
+
+        $imageFields = ['homepage_main_image', 'homepage_end_image', 'about_image'];
+        foreach ($imageFields as $field) {
+            if ($request->hasFile($field)) {
+                $data[$field] = $request->file($field)->store('website', 'public');
+            }
+        }
+
+        $info = $this->websiteInfoRepository->update($data);
         return response()->json([
             'success' => true,
             'message' => 'Website info updated successfully',

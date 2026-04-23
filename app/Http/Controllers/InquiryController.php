@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Contracts\InquiryRepositoryInterface;
 use App\Http\Requests\StoreInquiryRequest;
 use App\Http\Requests\UpdateInquiryRequest;
+use App\Mail\InquiryReplyMail;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\Request;
 
 class InquiryController extends Controller
@@ -52,6 +54,31 @@ class InquiryController extends Controller
             'message' => 'Inquiry updated successfully',
             'data' => $inquiry
         ], 200);
+    }
+
+    public function reply(Request $request, $id)
+    {
+        $request->validate([
+            'subject' => 'required|string|max:255',
+            'message' => 'required|string',
+        ]);
+
+        $inquiry = $this->inquiryRepository->find($id);
+
+        try {
+            Mail::to($inquiry->email)->send(new InquiryReplyMail($inquiry, $request->subject, $request->message));
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Reply sent successfully'
+            ], 200);
+        } catch (\Exception $e) {
+            \Log::error('Inquiry reply email failed: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to send reply'
+            ], 500);
+        }
     }
 
     public function destroy($id)

@@ -47,8 +47,8 @@
 
     <section class="relative min-h-[85vh] flex items-center justify-center overflow-hidden bg-slate-900">
         <div class="absolute inset-0 z-0">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/6/68/Pashupatinaath0587.JPG" 
-                 class="hero-zoom w-full h-full object-cover opacity-50" alt="DwellCasa Interior">
+            <img src="{{ $webInfo->homepage_main_image ? asset('storage/' . $webInfo->homepage_main_image) : 'https://upload.wikimedia.org/wikipedia/commons/6/68/Pashupatinaath0587.JPG' }}" 
+                 class="hero-zoom w-full h-full object-cover opacity-50" alt="DwellCasa">
             <div class="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-slate-900/60"></div>
         </div>
         
@@ -176,8 +176,8 @@
 
     <section class="relative py-32 md:py-48 overflow-hidden bg-black/75">
         <div class="absolute inset-0 z-0">
-            <img src="https://cdn1.prayagsamagam.com/media/2025/05/20170044/3-42.webp" 
-                 class="w-full h-full object-cover opacity-30" alt="Footer Background">
+            <img src="{{ $webInfo->homepage_end_image ? asset('storage/' . $webInfo->homepage_end_image) : 'https://cdn1.prayagsamagam.com/media/2025/05/20170044/3-42.webp' }}" 
+                 class="w-full h-full object-cover opacity-30" alt="DwellCasa">
             <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
         </div>
         

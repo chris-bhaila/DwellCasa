@@ -7,8 +7,10 @@ use App\Http\Requests\StoreRoomTypeRequest;
 use App\Http\Requests\UpdateRoomTypeRequest;
 use App\Models\GalleryImage;
 use App\Models\Booking;
+use App\Models\RoomType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+
 
 class RoomTypeController extends Controller
 {
@@ -48,6 +50,20 @@ class RoomTypeController extends Controller
         }
 
         $roomType = $this->roomTypeRepository->create($data);
+
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $file) {
+                $path = $file->store('gallery', 'public');
+                \App\Models\GalleryImage::create([
+                    'filename'       => $path,
+                    'category'       => 'rooms',
+                    'imageable_type' => \App\Models\RoomType::class,
+                    'imageable_id'   => $roomType->id,
+                    'is_active'      => true,
+                ]);
+            }
+        }
+
         return response()->json([
             'success' => true,
             'message' => 'Room type created successfully',
@@ -71,6 +87,20 @@ class RoomTypeController extends Controller
         }
 
         $updatedRoomType = $this->roomTypeRepository->update($id, $data);
+
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $file) {
+                $path = $file->store('gallery', 'public');
+                \App\Models\GalleryImage::create([
+                    'filename'       => $path,
+                    'category'       => 'rooms',
+                    'imageable_type' => \App\Models\RoomType::class,
+                    'imageable_id'   => $roomType->id,
+                    'is_active'      => true,
+                ]);
+            }
+        }
+
         return response()->json([
             'success' => true,
             'message' => 'Room type updated successfully',
@@ -152,7 +182,9 @@ class RoomTypeController extends Controller
             'month' => 'required|date_format:Y-m',
         ]);
 
-        $roomType = RoomType::withCount('rooms')->findOrFail($id);
+        $roomType = RoomType::withCount(['rooms' => function ($query) {
+            $query->whereNotIn('status', ['maintenance', 'out_of_service']);
+        }])->findOrFail($id);
         $totalRooms = $roomType->rooms_count;
 
         // Parse month range

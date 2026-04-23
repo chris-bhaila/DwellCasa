@@ -41,10 +41,9 @@
                     <select name="room_type_id" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors">
                         <option value="">Select a room type...</option>
                         @foreach($roomTypes ?? [] as $roomType)
-                        @if ($roomType->is_standalone == 0)
+                        @if ($roomType->is_standalone == 0 || $roomType->rooms_count == 0 || $room->room_type_id == $roomType->id)
                         <option value="{{ $roomType->id }}" {{ $room->room_type_id == $roomType->id ? 'selected' : '' }}>{{ $roomType->name }}</option>
                         @endif
-
                         @endforeach
                     </select>
                 </div>

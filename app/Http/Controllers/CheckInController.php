@@ -46,6 +46,11 @@ class CheckInController extends Controller
                 'room_id' => $checkIn->room_id
             ]);
 
+            // Update room status to occupied
+            if ($checkIn->room_id) {
+                \App\Models\Room::where('id', $checkIn->room_id)
+                    ->update(['status' => 'occupied']);
+            }
             return $checkIn;
         });
 

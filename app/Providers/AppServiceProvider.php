@@ -33,6 +33,10 @@ use App\Repositories\UserRepository;
 use Illuminate\Support\ServiceProvider;
 use App\Contracts\WebsiteInfoRepositoryInterface;
 use App\Repositories\WebsiteInfoRepository;
+use App\Contracts\InventoryRepositoryInterface;
+use App\Repositories\InventoryRepository;
+use App\Contracts\ReviewRepositoryInterface;
+use App\Repositories\ReviewRepository;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -56,6 +60,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(CheckInRepositoryInterface::class, CheckInRepository::class);
         $this->app->bind(CheckOutRepositoryInterface::class, CheckOutRepository::class);
         $this->app->bind(WebsiteInfoRepositoryInterface::class, WebsiteInfoRepository::class);
+        $this->app->bind(InventoryRepositoryInterface::class, InventoryRepository::class);
+        $this->app->bind(ReviewRepositoryInterface::class, ReviewRepository::class);
     }
 
     /**

@@ -19,6 +19,7 @@ class StoreInquiryRequest extends FormRequest
             'phone'        => 'nullable|string|max:20',
             'inquiry_type' => 'required|in:general,booking,amenities,pricing,other',
             'message'      => 'required|string',
+            'status'       => 'sometimes|in:unreplied,replied',
         ];
     }
 }

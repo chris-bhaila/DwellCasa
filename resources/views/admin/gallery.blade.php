@@ -27,21 +27,36 @@ $categories = ['interior', 'exterior', 'dining', 'amenities', 'other'];
 
 <!-- Filters -->
 <div class="flex flex-wrap gap-2 mb-8">
-    <button class="filter-btn active px-4 py-2 rounded-full text-sm font-medium transition-colors bg-slate-800 text-white" data-filter="all">All</button>
+    <button class="filter-btn active px-4 py-2 rounded-full text-sm font-medium transition-colors bg-slate-800 text-white border border-slate-800 hover:bg-slate-700 cursor-pointer" data-filter="all">All</button>
     @foreach($categories as $category)
-    <button class="filter-btn px-4 py-2 rounded-full text-sm font-medium transition-colors bg-white border border-slate-200 text-slate-600 hover:bg-slate-50" data-filter="{{ $category }}">{{ ucfirst($category) }}</button>
+    <button class="filter-btn px-4 py-2 rounded-full text-sm font-medium transition-colors bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 cursor-pointer" data-filter="{{ $category }}">{{ ucfirst($category) }}</button>
+    @endforeach
+    @foreach($roomTypes as $roomType)
+    <button class="filter-btn px-4 py-2 rounded-full text-sm font-medium transition-colors bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 cursor-pointer" data-filter="room_type_{{ $roomType->id }}">{{ $roomType->name }}</button>
     @endforeach
 </div>
 
 <!-- Gallery Grid -->
 <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6" id="gallery-grid">
     @forelse($images as $index => $image)
-    <div class="gallery-item group relative rounded-2xl overflow-hidden shadow-sm border border-slate-100 bg-slate-100 aspect-[4/3]" data-category="{{ strtolower($image->category) }}" data-index="{{ $index }}">
+    @php
+        $itemCategory = strtolower($image->category);
+        if ($itemCategory === 'rooms' && $image->imageable_type === 'App\\Models\\RoomType') {
+            $itemCategory = 'room_type_' . $image->imageable_id;
+        }
+    @endphp
+    <div class="gallery-item group relative rounded-2xl overflow-hidden shadow-sm border border-slate-100 bg-slate-100 aspect-[4/3]" data-category="{{ $itemCategory }}" data-index="{{ $index }}">
         <img src="{{ asset('storage/' . $image->filename) }}" alt="{{ $image->alt_text }}" class="w-full h-full object-cover cursor-pointer transition-transform duration-500 group-hover:scale-105" onclick="openLightbox({{ $index }})">
 
         <!-- Overlay -->
         <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none flex flex-col justify-end p-4">
-            <span class="text-xs font-bold text-primary uppercase tracking-wider mb-1">{{ ucfirst($image->category) }}</span>
+            <span class="text-xs font-bold text-primary uppercase tracking-wider mb-1">
+                @if(strtolower($image->category) === 'rooms' && $image->imageable_type === 'App\\Models\\RoomType')
+                    {{ collect($roomTypes)->firstWhere('id', $image->imageable_id)?->name ?? 'Room' }}
+                @else
+                    {{ ucfirst($image->category) }}
+                @endif
+            </span>
             <p class="text-white text-sm font-medium line-clamp-1">{{ $image->caption ?? $image->alt_text }}</p>
         </div>
 
@@ -204,6 +219,7 @@ $categories = ['interior', 'exterior', 'dining', 'amenities', 'other'];
 
     // Data
     const images = @json($images -> values());
+    const roomTypes = @json(collect($roomTypes)->keyBy('id'));
     let currentFilteredImages = [...images];
     let currentIndex = 0;
 
@@ -223,11 +239,11 @@ $categories = ['interior', 'exterior', 'dining', 'amenities', 'other'];
         btn.addEventListener('click', () => {
             // Update active state classes
             filterBtns.forEach(b => {
-                b.classList.remove('bg-slate-800', 'text-white');
-                b.classList.add('bg-white', 'text-slate-600', 'border-slate-200');
+                b.classList.remove('bg-slate-800', 'text-white', 'border-slate-800', 'hover:bg-slate-700');
+                b.classList.add('bg-white', 'text-slate-600', 'border-slate-200', 'hover:bg-slate-50');
             });
-            btn.classList.remove('bg-white', 'text-slate-600', 'border-slate-200');
-            btn.classList.add('bg-slate-800', 'text-white');
+            btn.classList.remove('bg-white', 'text-slate-600', 'border-slate-200', 'hover:bg-slate-50');
+            btn.classList.add('bg-slate-800', 'text-white', 'border-slate-800', 'hover:bg-slate-700');
 
             const filter = btn.dataset.filter;
 
@@ -245,7 +261,13 @@ $categories = ['interior', 'exterior', 'dining', 'amenities', 'other'];
             if (filter === 'all') {
                 currentFilteredImages = [...images];
             } else {
-                currentFilteredImages = images.filter(img => img.category.toLowerCase() === filter.toLowerCase());
+                currentFilteredImages = images.filter(img => {
+                    let imgCat = (img.category || '').toLowerCase();
+                    if (imgCat === 'rooms' && img.imageable_type === 'App\\Models\\RoomType') {
+                        imgCat = 'room_type_' + img.imageable_id;
+                    }
+                    return imgCat === filter.toLowerCase();
+                });
             }
         });
     });
@@ -298,7 +320,11 @@ $categories = ['interior', 'exterior', 'dining', 'amenities', 'other'];
         lightboxImg.src = '{{ asset("storage") }}/' + img.filename;
         lightboxImg.alt = img.alt_text || 'Gallery Image';
         lightboxCaption.textContent = img.caption || img.alt_text || '';
-        lightboxCategory.textContent = img.category;
+        if ((img.category || '').toLowerCase() === 'rooms' && img.imageable_type === 'App\\Models\\RoomType') {
+            lightboxCategory.textContent = roomTypes[img.imageable_id] ? roomTypes[img.imageable_id].name : 'Room';
+        } else {
+            lightboxCategory.textContent = img.category || '';
+        }
         lightboxCounter.textContent = `${currentIndex + 1} / ${currentFilteredImages.length}`;
     }
 

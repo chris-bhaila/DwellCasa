@@ -11,9 +11,8 @@
     </div>
 </div>
 
-<form id="website-info-form" action="#" method="POST" class="space-y-8">
+<form id="website-info-form" action="#" method="POST" class="space-y-8" enctype="multipart/form-data">
     @csrf
-    @method('PUT')
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
         
@@ -24,23 +23,23 @@
             <div class="space-y-5">
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-2">Main Heading</label>
-                    <input type="text" name="front_page_main_heading" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary">
+                    <input type="text" name="front_page_main_heading" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-2">Sub Heading 1</label>
-                    <input type="text" name="front_page_sub_heading_1" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary">
+                    <input type="text" name="front_page_sub_heading_1" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-2">Sub Heading 2</label>
-                    <input type="text" name="front_page_sub_heading_2" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary">
+                    <input type="text" name="front_page_sub_heading_2" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-2">End Section Heading</label>
-                    <input type="text" name="front_page_end_heading" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary">
+                    <input type="text" name="front_page_end_heading" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-2">End Section Sub Heading</label>
-                    <input type="text" name="front_page_end_sub_heading" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary">
+                    <input type="text" name="front_page_end_sub_heading" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary">
                 </div>
             </div>
         </div>
@@ -52,15 +51,15 @@
             <div class="space-y-5">
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-2">Heading</label>
-                    <input type="text" name="about_heading" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary">
+                    <input type="text" name="about_heading" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-2">Sub Description</label>
-                    <textarea name="about_sub_description" rows="3" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary"></textarea>
+                    <textarea name="about_sub_description" rows="3" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary"></textarea>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-2">Main Description</label>
-                    <textarea name="about_main_description" rows="5" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary"></textarea>
+                    <textarea name="about_main_description" rows="5" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary"></textarea>
                 </div>
             </div>
         </div>
@@ -72,11 +71,11 @@
             <div class="space-y-5">
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-2">Heading</label>
-                    <input type="text" name="gallery_heading" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary">
+                    <input type="text" name="gallery_heading" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-2">Sub Heading</label>
-                    <input type="text" name="gallery_sub_heading" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary">
+                    <input type="text" name="gallery_sub_heading" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary">
                 </div>
             </div>
         </div>
@@ -88,31 +87,54 @@
             <div class="space-y-5">
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-2">Contact Sub Heading</label>
-                    <input type="text" name="contact_sub_heading" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary">
+                    <input type="text" name="contact_sub_heading" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-2">Address</label>
-                    <input type="text" name="contact_address" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary">
+                    <input type="text" name="contact_address" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary">
                 </div>
                 <div class="grid grid-cols-2 gap-5">
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-2">Phone</label>
-                        <input type="text" name="contact_phone" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary">
+                        <input type="text" name="contact_phone" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-2">Email</label>
-                        <input type="email" name="contact_email" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary">
+                        <input type="email" name="contact_email" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary">
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-5">
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-2">Check-in Time</label>
-                        <input type="time" name="check_in" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary">
+                        <input type="time" name="check_in" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-2">Check-out Time</label>
-                        <input type="time" name="check_out" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary">
+                        <input type="time" name="check_out" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary">
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Website Images -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 lg:col-span-2">
+            <h2 class="text-xl font-serif font-bold text-slate-900 italic mb-6 border-b border-slate-100 pb-4">Website Images</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Homepage Main Image</label>
+                    <img id="homepage_main_image_preview" src="" class="hidden w-full h-32 object-cover rounded-xl mb-3 border border-slate-200">
+                    <input type="file" name="homepage_main_image" accept="image/*" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Homepage End Image</label>
+                    <img id="homepage_end_image_preview" src="" class="hidden w-full h-32 object-cover rounded-xl mb-3 border border-slate-200">
+                    <input type="file" name="homepage_end_image" accept="image/*" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">About Page Image</label>
+                    <img id="about_image_preview" src="" class="hidden w-full h-32 object-cover rounded-xl mb-3 border border-slate-200">
+                    <input type="file" name="about_image" accept="image/*" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary">
                 </div>
             </div>
         </div>
@@ -125,16 +147,16 @@
                 <div class="space-y-5">
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-2">Facebook Link</label>
-                        <input type="url" name="facebook_link" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary">
+                        <input type="url" name="facebook_link" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-2">Instagram Link</label>
-                        <input type="url" name="instagram_link" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary">
+                        <input type="url" name="instagram_link" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary">
                     </div>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-2">Footer Description</label>
-                    <textarea name="footer_description" rows="5" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary"></textarea>
+                    <textarea name="footer_description" rows="5" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary"></textarea>
                 </div>
             </div>
         </div>
@@ -166,9 +188,15 @@ document.addEventListener('DOMContentLoaded', async function() {
                     // Format time down to H:i to match the 'time' input parsing and validation rules
                     if (input.type === 'time' && data[key]) {
                         input.value = data[key].substring(0, 5);
-                    } else {
+                    } else if (input.type !== 'file') {
                         input.value = data[key] || '';
                     }
+                }
+
+                const preview = document.getElementById(key + '_preview');
+                if (preview && data[key]) {
+                    preview.src = '/storage/' + data[key];
+                    preview.classList.remove('hidden');
                 }
             });
         }
@@ -186,25 +214,24 @@ document.getElementById('website-info-form').addEventListener('submit', async fu
     submitBtn.disabled = true;
 
     const formData = new FormData(this);
-    const data = Object.fromEntries(formData.entries());
 
     // API requires time formats to be H:i
-    if (data.check_in) data.check_in = data.check_in.substring(0, 5);
-    if (data.check_out) data.check_out = data.check_out.substring(0, 5);
+    if (formData.get('check_in')) formData.set('check_in', formData.get('check_in').substring(0, 5));
+    if (formData.get('check_out')) formData.set('check_out', formData.get('check_out').substring(0, 5));
 
     try {
         const response = await fetch('/api/website-info', {
-            method: 'PUT',
+            method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
                 'Accept': 'application/json',
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
             },
-            body: JSON.stringify(data)
+            body: formData
         });
 
         if (response.ok) {
             alert('Website information updated successfully.');
+            window.location.reload();
         } else {
             const error = await response.json();
             let errorMsg = 'Error saving changes: ' + (error.message || 'Unknown error');

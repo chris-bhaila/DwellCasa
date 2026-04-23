@@ -38,15 +38,15 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <label class="block text-sm font-medium text-slate-700 mb-2">Guest Name <span class="text-red-500">*</span></label>
-                                <input type="text" name="guest_name" value="{{ old('guest_name', $booking->guest->full_name ?? $booking->guest_name) }}" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors" required>
+                                <input type="text" name="guest_name" value="{{ old('guest_name', $booking->guest->full_name ?? $booking->guest_name) }}" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors" required>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-slate-700 mb-2">Guest Email <span class="text-red-500">*</span></label>
-                                <input type="email" name="guest_email" value="{{ old('guest_email', $booking->guest->email ?? $booking->guest_email) }}" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors" required>
+                                <input type="email" name="guest_email" value="{{ old('guest_email', $booking->guest->email ?? $booking->guest_email) }}" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors" required>
                             </div>
                             <div class="md:col-span-2">
                                 <label class="block text-sm font-medium text-slate-700 mb-2">Guest Phone Number</label>
-                                <input type="text" name="guest_phone" value="{{ old('guest_phone', $booking->guest->phone ?? $booking->guest_phone) }}" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors">
+                                <input type="text" name="guest_phone" value="{{ old('guest_phone', $booking->guest->phone ?? $booking->guest_phone) }}" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors">
                             </div>
                         </div>
                     </div>
@@ -57,28 +57,28 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <label class="block text-sm font-medium text-slate-700 mb-2">Check In <span class="text-red-500">*</span></label>
-                                <input type="date" name="check_in_date" value="{{ old('check_in_date', \Carbon\Carbon::parse($booking->check_in_date)->format('Y-m-d')) }}" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors" required>
+                                <input type="date" name="check_in_date" value="{{ old('check_in_date', \Carbon\Carbon::parse($booking->check_in_date)->format('Y-m-d')) }}" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors" required>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-slate-700 mb-2">Check Out <span class="text-red-500">*</span></label>
-                                <input type="date" name="check_out_date" value="{{ old('check_out_date', \Carbon\Carbon::parse($booking->check_out_date)->format('Y-m-d')) }}" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors" required>
+                                <input type="date" name="check_out_date" value="{{ old('check_out_date', \Carbon\Carbon::parse($booking->check_out_date)->format('Y-m-d')) }}" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors" required>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-slate-700 mb-2">Room Type <span class="text-red-500">*</span></label>
-                                <select name="room_type_id" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors" required>
+                                <select name="room_type_id" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors" required>
                                     <option value="">Select a room...</option>
                                     @foreach($roomTypes ?? [] as $room)
-                                    <option value="{{ $room->id }}" {{ old('room_type_id', $booking->room_type_id) == $room->id ? 'selected' : '' }}>{{ $room->name }}</option>
+                                <option value="{{ $room->id }}" data-price-night="{{ $room->price_per_night }}" data-price-month="{{ $room->price_per_month }}" {{ old('room_type_id', $booking->room_type_id) == $room->id ? 'selected' : '' }}>{{ $room->name }}</option>
                                     @endforeach
                                 </select>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-slate-700 mb-2">Guests</label>
-                                <input type="number" name="num_guests" min="1" value="{{ old('num_guests', $booking->num_guests) }}" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors" required>
+                                <input type="number" name="num_guests" min="1" value="{{ old('num_guests', $booking->num_guests) }}" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors" required>
                             </div>
                             <div class="md:col-span-2">
                                 <label class="block text-sm font-medium text-slate-700 mb-2">Special Requests</label>
-                                <textarea name="special_requests" rows="3" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors" placeholder="e.g. extra pillows, late check-in...">{{ old('special_requests', $booking->special_requests) }}</textarea>
+                                <textarea name="special_requests" rows="3" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors" placeholder="e.g. extra pillows, late check-in...">{{ old('special_requests', $booking->special_requests) }}</textarea>
                             </div>
                         </div>
                     </div>
@@ -96,28 +96,28 @@
                             </div>
                             <div id="rate-per-night-wrapper">
                                 <label class="block text-sm font-medium text-slate-700 mb-2">Rate Per Night <span class="text-red-500">*</span></label>
-                                <input type="number" name="rate_per_night" value="{{ old('rate_per_night', $booking->rate_per_night) }}" step="0.01" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors">
+                                <input type="number" name="rate_per_night" value="{{ old('rate_per_night', !is_null($booking->rate_per_night) ? round($booking->rate_per_night) : '') }}" step="1" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors">
                             </div>
                             <div id="rate-per-month-wrapper" class="hidden">
                                 <label class="block text-sm font-medium text-slate-700 mb-2">Rate Per Month <span class="text-red-500">*</span></label>
-                                <input type="number" name="rate_per_month" value="{{ old('rate_per_month', $booking->rate_per_month) }}" step="0.01" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors">
+                                <input type="number" name="rate_per_month" value="{{ old('rate_per_month', !is_null($booking->rate_per_month) ? round($booking->rate_per_month) : '') }}" step="1" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-slate-700 mb-2">Total Amount <span class="text-red-500">*</span></label>
-                                <input type="number" name="total_amount" value="{{ old('total_amount', $booking->total_amount) }}" step="0.01" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors" required>
+                                <input type="number" name="total_amount" value="{{ old('total_amount', !is_null($booking->total_amount) ? round($booking->total_amount) : '') }}" step="1" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors" required>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-slate-700 mb-2">Deposit Amount</label>
-                                <input type="number" name="deposit_amount" value="{{ old('deposit_amount', $booking->deposit_amount) }}" step="0.01" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors">
+                                <input type="number" name="deposit_amount" value="{{ old('deposit_amount', !is_null($booking->deposit_amount) ? round($booking->deposit_amount) : '') }}" step="1" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-slate-700 mb-2">Amount Paid</label>
-                                <input type="number" name="amount_paid" value="{{ old('amount_paid', $booking->amount_paid) }}" step="0.01" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors">
+                                <input type="number" name="amount_paid" value="{{ old('amount_paid', !is_null($booking->amount_paid) ? round($booking->amount_paid) : '') }}" step="1" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors">
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="mt-8 pt-6 border-t border-slate-100 flex justify-end gap-4 p-6">
+                <div class="pt-6 border-t border-slate-100 flex justify-end gap-4 p-6">
                     <a href="{{ route('admin.bookings') }}" class="text-sm font-medium text-slate-600 hover:text-slate-900 px-6 py-3">Cancel</a>
                     <button type="submit" class="bg-primary text-white px-8 py-3 rounded-xl font-medium hover:bg-[#8E795E] transition-all shadow-sm">
                         Save Changes
@@ -145,7 +145,7 @@
                     </div> -->
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-2">Payment Status</label>
-                        <select name="payment_status" form="edit-booking-form" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors">
+                        <select name="payment_status" form="edit-booking-form" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors">
                             <option value="unpaid" {{ old('payment_status', $booking->payment_status) == 'unpaid' ? 'selected' : '' }}>Unpaid</option>
                             <option value="deposit_paid" {{ old('payment_status', $booking->payment_status) == 'deposit_paid' ? 'selected' : '' }}>Deposit Paid</option>
                             <option value="partially_paid" {{ old('payment_status', $booking->payment_status) == 'partially_paid' ? 'selected' : '' }}>Partially Paid</option>
@@ -155,7 +155,7 @@
                     </div>
                     <div class="pt-6 border-t border-slate-100">
                         <label class="block text-sm font-medium text-slate-700 mb-2">Admin Notes (Internal)</label>
-                        <textarea name="admin_notes" form="edit-booking-form" rows="4" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors" placeholder="Internal notes about this booking...">{{ old('admin_notes', $booking->admin_notes) }}</textarea>
+                        <textarea name="admin_notes" form="edit-booking-form" rows="4" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors" placeholder="Internal notes about this booking...">{{ old('admin_notes', $booking->admin_notes) }}</textarea>
                     </div>
                 </div>
             </div>
@@ -280,7 +280,7 @@
             </div>
             <div>
                 <label class="block text-sm font-medium text-slate-700 mb-2">Extra Charges (Rs.)</label>
-                <input type="number" name="extra_charges" step="0.01" min="0" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors" placeholder="0.00">
+                <input type="number" name="extra_charges" step="1" min="0" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors" placeholder="0">
             </div>
             <div class="flex items-center gap-2 pt-2">
                 <input type="checkbox" name="late_check_out" value="1" id="late_check_out" class="rounded text-primary focus:ring-primary w-5 h-5 border-slate-300">
@@ -493,31 +493,70 @@
 
     document.addEventListener('DOMContentLoaded', function() {
         const stayTypeSelect = document.querySelector('select[name="stay_type"]');
+        const roomTypeSelect = document.querySelector('select[name="room_type_id"]');
+        const checkInInput = document.querySelector('input[name="check_in_date"]');
+        const checkOutInput = document.querySelector('input[name="check_out_date"]');
+        
         const ratePerNightWrapper = document.getElementById('rate-per-night-wrapper');
         const ratePerMonthWrapper = document.getElementById('rate-per-month-wrapper');
+        const ratePerNightInput = document.querySelector('input[name="rate_per_night"]');
+        const ratePerMonthInput = document.querySelector('input[name="rate_per_month"]');
+        const totalAmountInput = document.querySelector('input[name="total_amount"]');
 
-        if (stayTypeSelect && ratePerNightWrapper && ratePerMonthWrapper) {
-            const ratePerNightInput = ratePerNightWrapper.querySelector('input');
-            const ratePerMonthInput = ratePerMonthWrapper.querySelector('input');
+        function calculateTotal() {
+            if (!roomTypeSelect.value) return;
 
-            function toggleRateFields() {
+            const selectedRoom = roomTypeSelect.options[roomTypeSelect.selectedIndex];
+            const priceNight = parseFloat(selectedRoom.dataset.priceNight) || 0;
+            const priceMonth = parseFloat(selectedRoom.dataset.priceMonth) || 0;
+
+            if (stayTypeSelect.value === 'short_term') {
+                ratePerNightInput.value = Math.round(priceNight);
+                
+                const checkInDate = new Date(checkInInput.value);
+                const checkOutDate = new Date(checkOutInput.value);
+                
+                if (checkInInput.value && checkOutInput.value && checkOutDate > checkInDate) {
+                    const diffTime = Math.abs(checkOutDate - checkInDate);
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    totalAmountInput.value = Math.round(priceNight * diffDays);
+                }
+            } else { // long_term
+                ratePerMonthInput.value = Math.round(priceMonth);
+                totalAmountInput.value = Math.round(priceMonth);
+            }
+        }
+
+        if (stayTypeSelect && ratePerNightWrapper && ratePerMonthWrapper && roomTypeSelect) {
+            function toggleRateFields(isInitialLoad = false) {
                 if (stayTypeSelect.value === 'short_term') {
                     ratePerNightWrapper.classList.remove('hidden');
                     ratePerNightInput.required = true;
 
                     ratePerMonthWrapper.classList.add('hidden');
                     ratePerMonthInput.required = false;
+                    if (!isInitialLoad) ratePerMonthInput.value = '';
                 } else { // long_term
                     ratePerNightWrapper.classList.add('hidden');
                     ratePerNightInput.required = false;
+                    if (!isInitialLoad) ratePerNightInput.value = '';
 
                     ratePerMonthWrapper.classList.remove('hidden');
                     ratePerMonthInput.required = true;
                 }
+                if (!isInitialLoad) {
+                    calculateTotal();
+                }
             }
 
-            toggleRateFields();
-            stayTypeSelect.addEventListener('change', toggleRateFields);
+            // Pass true on initial load so it doesn't overwrite existing DB values
+            toggleRateFields(true);
+            
+            stayTypeSelect.addEventListener('change', () => toggleRateFields(false));
+            
+            roomTypeSelect.addEventListener('change', calculateTotal);
+            checkInInput.addEventListener('change', calculateTotal);
+            checkOutInput.addEventListener('change', calculateTotal);
         }
     });
 </script>

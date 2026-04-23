@@ -128,7 +128,7 @@
                 x-transition:leave="transition ease-in duration-200 transform"
                 x-transition:leave-start="translate-x-0"
                 x-transition:leave-end="translate-x-full"
-                class="fixed inset-0 z-[200] bg-[var(--primary-accent)] flex flex-col justify-center items-center text-center p-6" x-cloak>
+                class="fixed inset-0 z-[200] bg-primary flex flex-col justify-center items-center text-center p-6" x-cloak>
 
                 <button @click="mobileMenu = false" class="absolute top-8 right-8 text-white/50 hover:text-white">
                     <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -158,7 +158,7 @@
             @endif
         </div>
 
-        <div class="{{ request()->routeIs('home') ? '' : 'pt-32' }}">
+        <div class="{{ request()->routeIs('home') ? '' : 'pt-16' }}">
             @yield('content')
         </div>
     </main>

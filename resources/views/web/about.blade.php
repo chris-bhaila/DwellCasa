@@ -3,7 +3,7 @@
 @section('title', 'About Us - DwellCasa')
 
 @section('content')
-<section class="pb-20 bg-[#fbfbf9]">
+<section class="pt-10 pb-20 bg-[#fbfbf9]">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-12">
             <h1 class="text-5xl md:text-6xl font-serif italic font-bold text-slate-900 mb-4">{{ $webInfo->about_heading }}</h1>
@@ -19,8 +19,12 @@
                     {{ $webInfo->about_main_description }}
                 </p>
             </div>
-            <div class="bg-gradient-to-br from-slate-200 to-slate-300 h-96 rounded-2xl flex items-center justify-center shadow-lg">
-                <span class="text-slate-600 font-medium">Hotel Image</span>
+            <div class="bg-gradient-to-br from-slate-200 to-slate-300 h-96 rounded-2xl flex items-center justify-center shadow-lg overflow-hidden">
+                @if($webInfo->about_image)
+                    <img src="{{ asset('storage/' . $webInfo->about_image) }}" alt="About DwellCasa" class="w-full h-full object-cover">
+                @else
+                    <span class="text-slate-600 font-medium">Hotel Image</span>
+                @endif
             </div>
         </div>
 

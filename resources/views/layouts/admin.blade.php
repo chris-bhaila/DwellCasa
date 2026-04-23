@@ -58,6 +58,14 @@
                 <i class="bi bi-chat-left-text sidebar-icon text-slate-400 mr-3 text-lg"></i>
                 <span class="font-medium">Inquiries</span>
             </a>
+            <a href="{{ route('admin.inventory') }}" class="sidebar-link flex items-center px-4 py-3 rounded-lg transition-colors {{ request()->routeIs('admin.inventory*') ? 'active' : '' }}">
+                <i class="bi bi-box-seam sidebar-icon text-slate-400 mr-3 text-lg"></i>
+                <span class="font-medium">Inventory</span>
+            </a>
+            <a href="{{ route('admin.reviews') }}" class="sidebar-link flex items-center px-4 py-3 rounded-lg transition-colors {{ request()->routeIs('admin.reviews*') ? 'active' : '' }}">
+                <i class="bi bi-star-half sidebar-icon text-slate-400 mr-3 text-lg"></i>
+                <span class="font-medium">Reviews</span>
+            </a>
         </nav>
         <div class="p-4 border-t border-slate-800">
             <a href="{{ route('admin.info') }}" class="sidebar-link flex items-center px-4 py-3 mb-6 rounded-lg transition-colors {{ request()->is('admin/info*') ? 'active' : '' }}">

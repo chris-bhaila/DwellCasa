@@ -15,6 +15,7 @@ class Inquiry extends Model
         'phone',
         'inquiry_type',
         'message',
+        'status',
     ];
 
     protected $casts = [

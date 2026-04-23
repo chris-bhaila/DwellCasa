@@ -9,6 +9,10 @@ use App\Http\Requests\StoreCheckOutRequest;
 use App\Http\Requests\UpdateCheckOutRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Models\Review;
+use App\Mail\ReviewRequestMail;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 
 class CheckOutController extends Controller
 {
@@ -42,34 +46,62 @@ class CheckOutController extends Controller
         try {
             $checkOut = DB::transaction(function () use ($request) {
                 $validated = $request->validated();
-
-                // 1. Create a record in check_outs table using the repository pattern
+    
+                // 1. Create check_out record
                 $checkOutRecord = $this->checkOutRepository->create($validated);
-
-                // 2. Update bookings.status to checked_out and set checked_out_at
-                $booking = Booking::findOrFail($validated['booking_id']);
+    
+                // 2. Update booking status
+                $booking = Booking::with(['guest', 'roomType'])->findOrFail($validated['booking_id']);
                 $booking->status = 'checked_out';
                 $booking->checked_out_at = $validated['checked_out_at'];
                 $booking->save();
-
-                // 3. Update rooms.status back to available using the room_id from the booking
+    
+                // 3. Update room status back to available
                 if ($booking->room_id) {
                     $room = Room::findOrFail($booking->room_id);
                     $room->status = 'available';
                     $room->save();
                 }
-
+    
+                // 4. Generate review token and create pending review record
+                if ($booking->guest && $booking->room_type_id) {
+                    $token = Str::uuid()->toString();
+    
+                    Review::create([
+                        'name'         => $booking->guest->full_name,
+                        'email'        => $booking->guest->email,
+                        'booking_id'   => $booking->id,
+                        'room_type_id' => $booking->room_type_id,
+                        'guest_id'     => $booking->guest_id,
+                        'type'         => 'room_type',
+                        'status'       => 'pending',
+                        'review_token' => $token,
+                        'token_used'   => false,
+                        'rating'       => 0, // placeholder until guest submits
+                        'body'         => '', // placeholder until guest submits
+                    ]);
+    
+                    // 5. Send review request email
+                    try {
+                        Mail::to($booking->guest->email)
+                            ->send(new ReviewRequestMail($booking, $token));
+                    } catch (\Exception $e) {
+                        \Log::error('Review request email failed: ' . $e->getMessage());
+                    }
+                }
+    
                 return $checkOutRecord;
             });
-
+    
             return response()->json([
                 'message' => 'Guest successfully checked out.',
-                'data' => $checkOut
+                'data'    => $checkOut
             ], 201);
+    
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Check-out failed due to an internal error.',
-                'error' => $e->getMessage()
+                'error'   => $e->getMessage()
             ], 500);
         }
     }

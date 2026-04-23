@@ -53,15 +53,15 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div class="md:col-span-2">
                                 <label class="block text-xs font-bold tracking-widest uppercase text-slate-500 mb-2">Full Name *</label>
-                                <input type="text" name="guest_name" value="{{ old('guest_name') }}" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white transition-all" required>
+                                <input type="text" name="guest_name" value="{{ old('guest_name') }}" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white transition-all" pattern="^[a-zA-Z\s]{2,255}$" title="Please enter a valid name (letters and spaces only)" required>
                             </div>
                             <div>
                                 <label class="block text-xs font-bold tracking-widest uppercase text-slate-500 mb-2">Email *</label>
-                                <input type="email" name="guest_email" value="{{ old('guest_email') }}" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white transition-all" required>
+                                <input type="email" name="guest_email" value="{{ old('guest_email') }}" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white transition-all" pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$" title="Please enter a valid email address" required>
                             </div>
                             <div>
                                 <label class="block text-xs font-bold tracking-widest uppercase text-slate-500 mb-2">Phone</label>
-                                <input type="tel" name="guest_phone" value="{{ old('guest_phone') }}" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white transition-all">
+                                <input type="tel" name="guest_phone" value="{{ old('guest_phone') }}" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white transition-all" pattern="^\+?[0-9\s\-]{7,15}$" title="Please enter a valid phone number">
                             </div>
                         </div>
                     </div>
@@ -83,7 +83,7 @@
                             <div class="space-y-4 mb-8">
                                 <div>
                                     <label class="block text-[10px] font-bold tracking-widest uppercase text-slate-400 mb-1">Room Type</label>
-                                    <select id="room_type_id" name="room_type_id" class="w-full text-sm font-semibold text-slate-900 bg-slate-50 border border-slate-200 rounded-lg p-3 focus:ring-primary focus:border-primary" required>
+                                    <select id="room_type_id" name="room_type_id" class="w-full text-sm font-semibold text-slate-500 bg-slate-100 border border-slate-200 rounded-lg p-3 pointer-events-none cursor-not-allowed" tabindex="-1" required>
                                         <option value="" data-price="0" data-price-month="0">Select Room Type</option>
                                         @foreach($roomTypes as $roomType)
                                         <option value="{{ $roomType->id }}" data-price="{{ $roomType->price_per_night }}" data-price-month="{{ $roomType->price_per_month ?? 0 }}" {{ old('room_type_id', request('room_type_id')) == $roomType->id ? 'selected' : '' }}>
@@ -96,18 +96,18 @@
                                 <div class="grid grid-cols-2 gap-4">
                                     <div>
                                         <label class="block text-[10px] font-bold tracking-widest uppercase text-slate-400 mb-1">Check-in</label>
-                                        <input type="date" id="check_in_date" name="check_in_date" value="{{ old('check_in_date', request('check_in_date')) }}" class="w-full text-sm font-semibold text-slate-900 bg-slate-50 border border-slate-200 rounded-lg p-3 focus:ring-primary focus:border-primary" required>
+                                        <input type="date" id="check_in_date" name="check_in_date" value="{{ old('check_in_date', request('check_in_date')) }}" class="w-full text-sm font-semibold text-slate-500 bg-slate-100 border border-slate-200 rounded-lg p-3 pointer-events-none cursor-not-allowed" required readonly>
                                     </div>
                                     <div>
                                         <label class="block text-[10px] font-bold tracking-widest uppercase text-slate-400 mb-1">Check-out</label>
-                                        <input type="date" id="check_out_date" name="check_out_date" value="{{ old('check_out_date', request('check_out_date')) }}" class="w-full text-sm font-semibold text-slate-900 bg-slate-50 border border-slate-200 rounded-lg p-3 focus:ring-primary focus:border-primary" required>
+                                        <input type="date" id="check_out_date" name="check_out_date" value="{{ old('check_out_date', request('check_out_date')) }}" class="w-full text-sm font-semibold text-slate-500 bg-slate-100 border border-slate-200 rounded-lg p-3 pointer-events-none cursor-not-allowed" required readonly>
                                     </div>
                                 </div>
 
                                 <div class="grid grid-cols-2 gap-4">
                                     <div>
                                         <label class="block text-[10px] font-bold tracking-widest uppercase text-slate-400 mb-1">Guests</label>
-                                        <select name="num_guests" class="w-full text-sm font-semibold text-slate-900 bg-slate-50 border border-slate-200 rounded-lg p-3 focus:ring-primary focus:border-primary" required>
+                                        <select name="num_guests" class="w-full text-sm font-semibold text-slate-500 bg-slate-100 border border-slate-200 rounded-lg p-3 pointer-events-none cursor-not-allowed" tabindex="-1" required>
                                             @for($i = 1; $i <= 4; $i++)
                                                 <option value="{{ $i }}" {{ old('num_guests', request('num_guests')) == $i ? 'selected' : '' }}>{{ $i }} Guest{{ $i > 1 ? 's' : '' }}</option>
                                                 @endfor
@@ -115,7 +115,7 @@
                                     </div>
                                     <div>
                                         <label class="block text-[10px] font-bold tracking-widest uppercase text-slate-400 mb-1">Stay Type</label>
-                                        <select name="stay_type" class="w-full text-sm font-semibold text-slate-900 bg-slate-50 border border-slate-200 rounded-lg p-3 focus:ring-primary focus:border-primary" required>
+                                        <select name="stay_type" class="w-full text-sm font-semibold text-slate-500 bg-slate-100 border border-slate-200 rounded-lg p-3 pointer-events-none cursor-not-allowed" tabindex="-1" required>
                                             <option value="short_term" {{ old('stay_type', request('stay_type')) == 'short_term' ? 'selected' : '' }}>Short Term</option>
                                             <option value="long_term" {{ old('stay_type', request('stay_type')) == 'long_term' ? 'selected' : '' }}>Long Term</option>
                                         </select>
@@ -285,6 +285,7 @@
         checkInFlatpickr = flatpickr(checkInInput, {
             minDate: 'today',
             dateFormat: 'Y-m-d',
+            clickOpens: false,
             disable: [
                 function(date) {
                     return BOOKED_DATES.includes(toLocalYMD(date));
@@ -329,6 +330,7 @@
         checkOutFlatpickr = flatpickr(checkOutInput, {
             minDate: 'today',
             dateFormat: 'Y-m-d',
+            clickOpens: false,
             disable: [
                 function(date) {
                     return BOOKED_DATES.includes(toLocalYMD(date));

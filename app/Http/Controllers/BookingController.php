@@ -10,6 +10,8 @@ use App\Models\RoomType;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use Illuminate\Http\Request;
+use App\Mail\BookingConfirmationMail;
+use Illuminate\Support\Facades\Mail;
 
 class BookingController extends Controller
 {
@@ -60,6 +62,7 @@ class BookingController extends Controller
     public function update(UpdateBookingRequest $request, $id)
     {
         $booking = Booking::findOrFail($id);
+        $oldStatus = $booking->status;
         $roomTypeId = $request->input('room_type_id', $booking->room_type_id);
         $checkIn = $request->input('check_in_date', $booking->check_in_date);
         $checkOut = $request->input('check_out_date', $booking->check_out_date);
@@ -73,6 +76,15 @@ class BookingController extends Controller
         }
 
         $updatedBooking = $this->bookingRepository->update($id, $request->validated());
+        if ($oldStatus !== 'confirmed' && $updatedBooking->status === 'confirmed') {
+            try {
+                Mail::to($updatedBooking->guest->email)
+                    ->send(new BookingConfirmationMail($updatedBooking));
+            } catch (\Exception $e) {
+                // Log the error but don't fail the update
+                \Log::error('Booking confirmation email failed: ' . $e->getMessage());
+            }
+        }
         return response()->json([
             'success' => true,
             'message' => 'Booking updated successfully',
@@ -91,7 +103,9 @@ class BookingController extends Controller
 
     private function checkAvailability($roomTypeId, $checkIn, $checkOut, $excludeBookingId = null)
     {
-        $roomType = RoomType::withCount('rooms')->findOrFail($roomTypeId);
+        $roomType = RoomType::withCount(['rooms' => function ($query) {
+            $query->whereNotIn('status', ['maintenance', 'out_of_service']);
+        }])->findOrFail($roomTypeId);
 
         if ($roomType->rooms_count === 0) {
             return 'Sorry, no physical rooms have been added for this room type yet.';

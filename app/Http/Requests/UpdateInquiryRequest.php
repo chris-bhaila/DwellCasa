@@ -19,6 +19,7 @@ class UpdateInquiryRequest extends FormRequest
             'phone'        => 'nullable|string|max:20',
             'inquiry_type' => 'sometimes|in:general,booking,amenities,pricing,other',
             'message'      => 'sometimes|string',
+            'status'       => 'sometimes|in:unreplied,replied',
         ];
     }
 }
