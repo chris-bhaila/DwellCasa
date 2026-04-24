@@ -7,11 +7,23 @@
 @push('head')
 <style>
     /* Typography & Core Styling */
-    .font-serif { font-family: 'Cormorant Garamond', serif; }
-    .font-sans { font-family: 'DM Sans', sans-serif; }
-    
-    html { scroll-behavior: smooth; }
-    body { font-family: 'DM Sans', sans-serif; background-color: #fbfbf9; overflow-x: hidden; }
+    .font-serif {
+        font-family: 'Cormorant Garamond', serif;
+    }
+
+    .font-sans {
+        font-family: 'DM Sans', sans-serif;
+    }
+
+    html {
+        scroll-behavior: smooth;
+    }
+
+    body {
+        font-family: 'DM Sans', sans-serif;
+        background-color: #fbfbf9;
+        overflow-x: hidden;
+    }
 
     /* Glassmorphism Effect */
     .glass {
@@ -25,20 +37,57 @@
     .hero-zoom {
         animation: slowZoom 20s infinite alternate ease-in-out;
     }
+
     @keyframes slowZoom {
-        from { transform: scale(1); }
-        to { transform: scale(1.1); }
+        from {
+            transform: scale(1);
+        }
+
+        to {
+            transform: scale(1.1);
+        }
     }
 
     /* Custom Scrollbar for Luxury Feel */
-    ::-webkit-scrollbar { width: 8px; }
-    ::-webkit-scrollbar-track { background: #f1f1f1; }
-    ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
+    ::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #1e293b;
+        border-radius: 10px;
+    }
 
     /* Remove default date styling for cleaner UI */
     input[type="date"]::-webkit-calendar-picker-indicator {
         cursor: pointer;
         opacity: 0.6;
+    }
+
+    /* Reviews Marquee */
+    .marquee-track {
+        flex-shrink: 0;
+        display: flex;
+        min-width: 100%;
+        animation: scrollLeft 40s linear infinite;
+    }
+
+    .marquee-container:hover .marquee-track {
+        animation-play-state: paused;
+    }
+
+    @keyframes scrollLeft {
+        from {
+            transform: translateX(0);
+        }
+
+        to {
+            transform: translateX(-100%);
+        }
     }
 </style>
 @endpush
@@ -47,11 +96,11 @@
 
     <section class="relative min-h-[85vh] flex items-center justify-center overflow-hidden bg-slate-900">
         <div class="absolute inset-0 z-0">
-            <img src="{{ $webInfo->homepage_main_image ? asset('storage/' . $webInfo->homepage_main_image) : 'https://upload.wikimedia.org/wikipedia/commons/6/68/Pashupatinaath0587.JPG' }}" 
-                 class="hero-zoom w-full h-full object-cover opacity-50" alt="DwellCasa">
+            <img src="{{ $webInfo->homepage_main_image ? asset('storage/' . $webInfo->homepage_main_image) : 'https://upload.wikimedia.org/wikipedia/commons/6/68/Pashupatinaath0587.JPG' }}"
+                class="hero-zoom w-full h-full object-cover opacity-50" alt="DwellCasa">
             <div class="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-slate-900/60"></div>
         </div>
-        
+
         <div class="relative z-10 text-center text-white px-6 max-w-5xl" data-aos="fade-up" data-aos-duration="1200">
             <span class="font-serif uppercase tracking-[0.1em] text-xs md:text-xl mb-6 block font-medium opacity-90">{{ $webInfo->front_page_sub_heading_1 }}</span>
             <h1 class="font-serif text-5xl font-extrabold md:text-8xl mb-8 italic">{{ $webInfo->front_page_main_heading }}</h1>
@@ -85,7 +134,7 @@
                         <label class="block text-[10px] uppercase tracking-widest text-slate-400 mb-1 font-bold">Room Type</label>
                         <select name="room_type_id" class="bg-transparent border-none p-0 focus:ring-0 text-sm font-semibold w-full text-slate-800 appearance-none cursor-pointer">
                             @foreach($featuredRoomTypes as $roomType)
-                                <option value="{{ $roomType->id }}">{{ $roomType->name }}</option>
+                            <option value="{{ $roomType->id }}">{{ $roomType->name }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -117,21 +166,14 @@
                 @foreach($featuredRoomTypes as $roomType)
                 <a href="{{ route('web.rooms.show', $roomType->id) }}" class="block group bg-white rounded-[2.5rem] cursor-pointer overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 border border-slate-100" data-aos="fade-up" data-aos-delay="{{ $loop->index * 150 }}">
                     <div class="relative aspect-[4/5] overflow-hidden">
-                        <img src="{{ $roomType->thumbnail ? asset('storage/' . $roomType->thumbnail) : 'https://images.unsplash.com/photo-1618773928121-c32242e63f39?auto=format&fit=crop&q=80&w=800' }}" 
-                             class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="{{ $roomType->name }}">
+                        <img src="{{ $roomType->thumbnail ? asset('storage/' . $roomType->thumbnail) : 'https://images.unsplash.com/photo-1618773928121-c32242e63f39?auto=format&fit=crop&q=80&w=800' }}"
+                            class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="{{ $roomType->name }}">
                         <div class="absolute top-6 left-6 glass px-5 py-2 rounded-full text-sm font-bold text-slate-900 shadow-sm">
                             Rs.{{ $roomType->price_per_night }} <span class="text-[10px] font-normal text-slate-500 italic">/ night</span>
                         </div>
                     </div>
                     <div class="p-10">
                         <h3 class="font-serif text-3xl font-bold text-black mb-3 group-hover:text-primary transition-colors">{{ $roomType->name }}</h3>
-                        <div class="flex flex-wrap gap-4 text-[10px] text-slate-400 mb-8 uppercase tracking-[0.2em] font-bold">
-                            <span>45 m²</span>
-                            <span class="text-slate-200">•</span>
-                            <span>City View</span>
-                            <span class="text-slate-200">•</span>
-                            <span>King Bed</span>
-                        </div>
                         <span class="inline-flex items-center gap-2 font-bold text-slate-900 group-hover:gap-4 transition-all">
                             Explore Room <span>→</span>
                         </span>
@@ -142,45 +184,99 @@
         </div>
     </section>
 
-    <section class="py-24 bg-white">
-        <div class="max-w-7xl mx-auto px-6">
-            <div class="text-center mb-6" data-aos="fade-up">
-                <span class="uppercase tracking-[0.1em] text-md text-primary font-bold mb-4 block">World Class Facilities</span>
-                <h2 class="font-serif font-bold text-4xl md:text-5xl text-black italic">Unrivaled Excellence</h2>
+    <section class="py-24 bg-white overflow-hidden">
+        <div class="max-w-7xl mx-auto px-6 mb-16">
+            <div class="text-center" data-aos="fade-up">
+                <span class="uppercase tracking-[0.1em] text-md text-primary font-bold mb-4 block">Guest Experiences</span>
+                <h2 class="font-serif font-bold text-4xl md:text-5xl text-black italic">What They Say</h2>
                 <div class="w-24 h-1 bg-black mx-auto mt-8"></div>
             </div>
+        </div>
 
-            <div class="grid grid-cols-2 md:grid-cols-6 gap-12">
-                @foreach($amenities as $amenity)
-                <div class="group text-center p-10 rounded-[3rem] hover:bg-slate-50 transition-all duration-300 cursor-pointer" data-aos="zoom-in">
-                    <div class="w-16 h-16 text-black bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-8 group-hover:bg-slate-900 group-hover:text-white transition-all transform group-hover:rotate-[10deg] shadow-inner">
-                        <span class="text-2xl flex items-center justify-center">
-                            @if($amenity->icon)
-                                @if(str_contains($amenity->icon, '<'))
-                                    {!! $amenity->icon !!}
-                                @else
-                                    <i data-lucide="{{ $amenity->icon }}" class="w-8 h-8"></i>
-                                @endif
-                            @else
-                                ✨
-                            @endif
-                        </span>
+        @php
+        $reviews = \App\Models\Review::where('status', 'approved')
+        ->orderByDesc('rating')
+        ->latest()
+        ->take(5)
+        ->get();
+        @endphp
+
+        @if($reviews->count() > 0)
+        <div class="marquee-container flex overflow-hidden w-full relative group">
+            <!-- Fade gradients to blend sides into background -->
+            <div class="absolute inset-y-0 left-0 w-16 md:w-32 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none"></div>
+            <div class="absolute inset-y-0 right-0 w-16 md:w-32 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none"></div>
+
+            <!-- Track 1 -->
+            <div class="marquee-track flex gap-6 md:gap-8 px-3 md:px-4">
+                @foreach($reviews as $review)
+                <div class="flex-none w-[90vw] md:w-[30rem] bg-slate-50 p-10 rounded-[2rem] shadow-sm border border-slate-100 flex flex-col justify-between transform transition-transform duration-300 hover:-translate-y-2">
+                    <div>
+                        <div class="flex items-center mb-4">
+                            @for($i = 1; $i <= 5; $i++)
+                                <span class="text-3xl {{ $i <= $review->rating ? 'text-yellow-400' : 'text-slate-200' }}">★</span>
+                                @endfor
+                        </div>
+                        @if($review->type === 'room_type' && $review->roomType)
+                        <p class="text-xs text-[#A89070] font-bold uppercase tracking-widest mb-2">Stayed in {{ $review->roomType->name }}</p>
+                        @endif
+                        <p class="text-slate-600 text-base leading-relaxed mb-8 line-clamp-4">"{{ $review->body }}"</p>
                     </div>
-                    <h3 class="text-lg font-bold text-black mb-2">{{ $amenity->name }}</h3>
-                    <!-- <p class="text-sm text-slate-400 font-light italic">{{ $amenity->description }}</p> -->
+                    <div class="flex items-center gap-4 pt-4 border-t border-slate-200/50">
+                        <div class="w-14 h-14 rounded-full bg-[#A89070] flex items-center justify-center font-bold text-white text-xl shadow-inner">
+                            {{ substr($review->name, 0, 1) }}
+                        </div>
+                        <div>
+                            <p class="font-bold text-base text-slate-900">{{ $review->name }}</p>
+                            <p class="text-sm text-slate-500 uppercase tracking-wider font-semibold mt-0.5">Verified Guest</p>
+                        </div>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+
+            <!-- Track 2 (Duplicate for seamless loop) -->
+            <div class="marquee-track flex gap-6 md:gap-8 px-3 md:px-4" aria-hidden="true">
+                @foreach($reviews as $review)
+                <div class="flex-none w-[90vw] md:w-[30rem] bg-slate-50 p-10 rounded-[2rem] shadow-sm border border-slate-100 flex flex-col justify-between transform transition-transform duration-300 hover:-translate-y-2">
+                    <div>
+                        <div class="flex items-center mb-4">
+                            @for($i = 1; $i <= 5; $i++)
+                                <span class="text-3xl {{ $i <= $review->rating ? 'text-yellow-400' : 'text-slate-200' }}">★</span>
+                                @endfor
+                        </div>
+                        @if($review->type === 'room_type' && $review->roomType)
+                        <p class="text-xs text-[#A89070] font-bold uppercase tracking-widest mb-2">Stayed in {{ $review->roomType->name }}</p>
+                        @endif
+                        <p class="text-slate-600 text-base leading-relaxed mb-8 line-clamp-4">"{{ $review->body }}"</p>
+                    </div>
+                    <div class="flex items-center gap-4 pt-4 border-t border-slate-200/50">
+                        <div class="w-14 h-14 rounded-full bg-[#A89070] flex items-center justify-center font-bold text-white text-xl shadow-inner">
+                            {{ substr($review->name, 0, 1) }}
+                        </div>
+                        <div>
+                            <p class="font-bold text-base text-slate-900">{{ $review->name }}</p>
+                            <p class="text-sm text-slate-500 uppercase tracking-wider font-semibold mt-0.5">Verified Guest</p>
+                        </div>
+                    </div>
                 </div>
                 @endforeach
             </div>
         </div>
+        @else
+        <div class="text-center text-slate-500 italic pb-8">
+            Check back soon for our latest guest experiences.
+        </div>
+        @endif
     </section>
 
     <section class="relative py-32 md:py-48 overflow-hidden bg-black/75">
         <div class="absolute inset-0 z-0">
-            <img src="{{ $webInfo->homepage_end_image ? asset('storage/' . $webInfo->homepage_end_image) : 'https://cdn1.prayagsamagam.com/media/2025/05/20170044/3-42.webp' }}" 
-                 class="w-full h-full object-cover opacity-30" alt="DwellCasa">
+            <img src="{{ $webInfo->homepage_end_image ? asset('storage/' . $webInfo->homepage_end_image) : 'https://cdn1.prayagsamagam.com/media/2025/05/20170044/3-42.webp' }}"
+                class="w-full h-full object-cover opacity-30" alt="DwellCasa">
             <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
         </div>
-        
+
         <div class="relative z-10 max-w-4xl mx-auto text-center px-6" data-aos="fade-up">
             <h2 class="font-serif font-bold text-5xl md:text-7xl text-white mb-10 italic">
                 {{ $webInfo->front_page_end_heading }}
@@ -188,8 +284,8 @@
             <p class="text-white/60 text-lg md:text-xl mb-14 max-w-xl mx-auto font-light leading-relaxed">
                 {{ $webInfo->front_page_end_sub_heading }}
             </p>
-            <a href="{{ route('booking.create') }}" 
-               class="inline-block bg-white text-slate-900 px-14 py-6 rounded-full font-bold text-xl hover:scale-105 transition-transform shadow-2xl hover:bg-blue-50">
+            <a href="{{ route('booking.create') }}"
+                class="inline-block bg-white text-slate-900 px-14 py-6 rounded-full font-bold text-xl hover:scale-105 transition-transform shadow-2xl hover:bg-blue-50">
                 Reserve Your Suite Now
             </a>
         </div>

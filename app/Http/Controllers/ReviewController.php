@@ -54,7 +54,6 @@ class ReviewController extends Controller
         $request->validate([
             'token'  => 'required|string',
             'rating' => 'required|integer|min:1|max:5',
-            'title'  => 'nullable|string|max:255',
             'body'   => 'required|string',
         ]);
 
@@ -76,7 +75,6 @@ class ReviewController extends Controller
 
         $this->reviewRepository->update($review->id, [
             'rating'     => $request->rating,
-            'title'      => $request->title,
             'body'       => $request->body,
             'status'     => 'pending',
             'token_used' => true,

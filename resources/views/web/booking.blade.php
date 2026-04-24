@@ -53,15 +53,18 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div class="md:col-span-2">
                                 <label class="block text-xs font-bold tracking-widest uppercase text-slate-500 mb-2">Full Name *</label>
-                                <input type="text" name="guest_name" value="{{ old('guest_name') }}" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white transition-all" pattern="^[a-zA-Z\s]{2,255}$" title="Please enter a valid name (letters and spaces only)" required>
+                                <input type="text" name="guest_name" value="{{ old('guest_name') }}" placeholder=" " class="peer w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white transition-all [&:not(:placeholder-shown):invalid]:border-red-500 [&:not(:placeholder-shown):invalid]:ring-red-200" pattern="^[a-zA-Z\s]{2,255}$" title="Please enter a valid name (letters and spaces only)" required>
+                                <p class="mt-2 hidden text-xs text-red-500 peer-[&:not(:placeholder-shown):invalid]:block">Please enter a valid name (letters and spaces only).</p>
                             </div>
                             <div>
                                 <label class="block text-xs font-bold tracking-widest uppercase text-slate-500 mb-2">Email *</label>
-                                <input type="email" name="guest_email" value="{{ old('guest_email') }}" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white transition-all" pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$" title="Please enter a valid email address" required>
+                                <input type="email" name="guest_email" value="{{ old('guest_email') }}" placeholder=" " class="peer w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white transition-all [&:not(:placeholder-shown):invalid]:border-red-500 [&:not(:placeholder-shown):invalid]:ring-red-200" pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$" title="Please enter a valid email address" required>
+                                <p class="mt-2 hidden text-xs text-red-500 peer-[&:not(:placeholder-shown):invalid]:block">Please enter a valid email address.</p>
                             </div>
                             <div>
                                 <label class="block text-xs font-bold tracking-widest uppercase text-slate-500 mb-2">Phone</label>
-                                <input type="tel" name="guest_phone" value="{{ old('guest_phone') }}" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white transition-all" pattern="^\+?[0-9\s\-]{7,15}$" title="Please enter a valid phone number">
+                                <input type="tel" name="guest_phone" value="{{ old('guest_phone') }}" placeholder=" " class="peer w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white transition-all [&:not(:placeholder-shown):invalid]:border-red-500 [&:not(:placeholder-shown):invalid]:ring-red-200" pattern="^\+?[0-9\s\-]{7,15}$" title="Please enter a valid phone number">
+                                <p class="mt-2 hidden text-xs text-red-500 peer-[&:not(:placeholder-shown):invalid]:block">Please enter a valid phone number (7-15 digits).</p>
                             </div>
                         </div>
                     </div>
@@ -368,17 +371,12 @@
             calculateTotal(); // Ensure button is disabled if no room type is selected
         }
 
-        // Override form submission to use client-side validation first
         document.getElementById('main-booking-form').addEventListener('submit', function(e) {
-            e.preventDefault(); // Stop immediate submission
-
             // If the button is disabled, prevent submission
             if (submitButton.disabled) {
+                e.preventDefault();
                 alert('Please select valid and available check-in/check-out dates.');
-                return;
             }
-
-            this.submit(); // Proceed with server-side validation
         });
     });
 </script>

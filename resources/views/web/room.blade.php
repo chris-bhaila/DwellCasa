@@ -14,18 +14,18 @@
 
 @section('content')
 @php
-    $galleryImages = $roomType->galleryImages ?? collect();
-    $imagesForLightbox = $galleryImages->count() > 0 
-        ? $galleryImages->map(fn($img) => ['url' => asset('storage/' . $img->filename), 'caption' => $img->caption, 'alt' => $img->alt_text])->toArray()
-        : [
-            ['url' => 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&q=80&w=1200', 'caption' => '', 'alt' => 'Room View'],
-            ['url' => 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&q=80&w=600', 'caption' => '', 'alt' => 'Bathroom'],
-            ['url' => 'https://images.unsplash.com/photo-1505693314120-0d443867891c?auto=format&fit=crop&q=80&w=600', 'caption' => '', 'alt' => 'Details'],
-        ];
+$galleryImages = $roomType->galleryImages ?? collect();
+$imagesForLightbox = $galleryImages->count() > 0
+? $galleryImages->map(fn($img) => ['url' => asset('storage/' . $img->filename), 'caption' => $img->caption, 'alt' => $img->alt_text])->toArray()
+: [
+['url' => 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&q=80&w=1200', 'caption' => '', 'alt' => 'Room View'],
+['url' => 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&q=80&w=600', 'caption' => '', 'alt' => 'Bathroom'],
+['url' => 'https://images.unsplash.com/photo-1505693314120-0d443867891c?auto=format&fit=crop&q=80&w=600', 'caption' => '', 'alt' => 'Details'],
+];
 
-    $image1 = $imagesForLightbox[0]['url'] ?? '';
-    $image2 = $imagesForLightbox[1]['url'] ?? $imagesForLightbox[0]['url'];
-    $image3 = $imagesForLightbox[2]['url'] ?? $imagesForLightbox[0]['url'];
+$image1 = $imagesForLightbox[0]['url'] ?? '';
+$image2 = $imagesForLightbox[1]['url'] ?? $imagesForLightbox[0]['url'];
+$image3 = $imagesForLightbox[2]['url'] ?? $imagesForLightbox[0]['url'];
 @endphp
 <!-- Hero Image Section -->
 <section class="mt-4 relative h-[60vh] min-h-[400px] flex items-center justify-center overflow-hidden bg-slate-900">
@@ -87,14 +87,14 @@
                     <h2 class="text-3xl font-serif italic font-bold text-slate-900 mb-6">What this room offers</h2>
                     <div class="grid grid-cols-2 sm:grid-cols-3 gap-6">
                         @forelse($roomType->amenities ?? [] as $amenity)
-                            @if ($amenity->is_active == 1)
-                                <div class="flex items-center gap-3 text-slate-700">
-                                    <span class="text-2xl text-black">{!! $amenity->icon ?: '✨' !!}</span>
-                                    <span class="font-medium">{{ $amenity->name }}</span>
-                                </div>
-                            @endif
+                        @if ($amenity->is_active == 1)
+                        <div class="flex items-center gap-3 text-slate-700">
+                            <span class="text-2xl text-black">{!! $amenity->icon ?: '✨' !!}</span>
+                            <span class="font-medium">{{ $amenity->name }}</span>
+                        </div>
+                        @endif
                         @empty
-                                <p class="text-slate-500 italic col-span-full">No specific amenities listed for this room.</p>
+                        <p class="text-slate-500 italic col-span-full">No specific amenities listed for this room.</p>
                         @endforelse
                     </div>
                 </div>
@@ -135,7 +135,7 @@
                                 <select id="bw-guests" class="text-sm text-slate-800 bg-transparent outline-none cursor-pointer">
                                     @for ($i = 1; $i <= ($roomType->max_occupancy ?? 4); $i++)
                                         <option value="{{ $i }}">{{ $i }} guest{{ $i > 1 ? 's' : '' }}</option>
-                                    @endfor
+                                        @endfor
                                 </select>
                             </div>
                         </div>
@@ -184,26 +184,77 @@
     </div>
 </section>
 
+@php
+$reviews = \App\Models\Review::where('type', 'room_type')
+->where('room_type_id', $roomType->id)
+->where('status', 'approved')
+->orderByDesc('rating')
+->latest()
+->take(6)
+->get();
+@endphp
+
+@if($reviews->count() > 0)
+<section class="py-16 bg-white border-t border-slate-100">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12" data-aos="fade-up">
+            <span class="uppercase tracking-[0.2em] text-xs text-primary font-bold mb-3 block">Guest Feedback</span>
+            <h2 class="font-serif font-bold text-3xl md:text-4xl text-slate-900 italic">Reviews for {{ $roomType->name }}</h2>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            @foreach($reviews as $review)
+            <div class="bg-slate-50 p-8 rounded-[2rem] shadow-sm border border-slate-100 flex flex-col justify-between transition-transform duration-300 hover:-translate-y-1" data-aos="fade-up" data-aos-delay="{{ $loop->index * 100 }}">
+                <div>
+                    <div class="flex items-center mb-4">
+                        @for($i = 1; $i <= 5; $i++)
+                            <span class="text-2xl {{ $i <= $review->rating ? 'text-yellow-400' : 'text-slate-200' }}">★</span>
+                            @endfor
+                    </div>
+                    <p class="text-slate-600 text-sm leading-relaxed mb-6">"{{ $review->body }}"</p>
+                </div>
+                <div class="flex items-center gap-4 pt-4 border-t border-slate-200/50">
+                    <div class="w-12 h-12 rounded-full bg-[#A89070] flex items-center justify-center font-bold text-white text-lg shadow-inner">
+                        {{ substr($review->name, 0, 1) }}
+                    </div>
+                    <div>
+                        <p class="font-bold text-sm text-slate-900">{{ $review->name }}</p>
+                        <p class="text-xs text-slate-500 uppercase tracking-wider font-semibold mt-0.5">Verified Guest &bull; {{ $review->created_at->format('M Y') }}</p>
+                    </div>
+                </div>
+            </div>
+            @endforeach
+        </div>
+    </div>
+</section>
+@endif
+
 <!-- Lightbox Modal -->
 <div id="lightbox" class="fixed inset-0 z-[100] hidden flex-col items-center justify-center bg-black/95 backdrop-blur-sm opacity-0 transition-opacity duration-300">
     <!-- Controls -->
     <div class="absolute top-0 left-0 w-full p-4 flex justify-between items-center z-10 bg-gradient-to-b from-black/50 to-transparent">
         <div id="lightbox-counter" class="text-white font-medium text-sm">1 / 3</div>
         <button type="button" onclick="closeLightbox()" class="text-black bg-white/80 hover:bg-white transition-colors w-10 h-10 flex items-center justify-center rounded-full shadow-sm">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
         </button>
     </div>
 
     <!-- Image Container -->
     <div id="lightbox-img-container" class="relative w-full h-full flex items-center justify-center p-4 md:p-12 overflow-hidden touch-pan-y gap-4 md:gap-8">
         <button type="button" onclick="prevImage(event)" class="shrink-0 text-black bg-white/80 hover:bg-white transition-colors w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full z-10 focus:outline-none shadow-sm">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+            </svg>
         </button>
 
         <img id="lightbox-img" src="" alt="" class="max-h-full min-w-0 object-contain select-none transition-transform duration-300 shadow-2xl">
-        
+
         <button type="button" onclick="nextImage(event)" class="shrink-0 text-black bg-white/80 hover:bg-white transition-colors w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full z-10 focus:outline-none shadow-sm">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
         </button>
     </div>
 
@@ -214,252 +265,255 @@
 </div>
 @push('scripts')
 <script>
-(function () {
-    const RATE = {{ $roomType->price_per_night ?? 15000 }};
-    const BOOKED = @json($bookedDates ?? []);
+    (function() {
+        const RATE = {{ $roomType -> price_per_night ?? 15000 }};
+        const BOOKED = @json($bookedDates ?? []);
 
-    // Lightbox Logic
-    const galleryImagesData = @json($imagesForLightbox);
-    let currentLightboxIndex = 0;
-    
-    const lightbox = document.getElementById('lightbox');
-    const lightboxImg = document.getElementById('lightbox-img');
-    const lightboxCaption = document.getElementById('lightbox-caption');
-    const lightboxCounter = document.getElementById('lightbox-counter');
+        // Lightbox Logic
+        const galleryImagesData = @json($imagesForLightbox);
+        let currentLightboxIndex = 0;
 
-    window.openLightbox = function(index) {
-        currentLightboxIndex = index;
-        if (currentLightboxIndex >= galleryImagesData.length) {
-            currentLightboxIndex = 0;
-        }
-        updateLightbox();
-        if (lightbox) {
-            lightbox.classList.remove('hidden');
-            lightbox.classList.add('flex');
-            setTimeout(() => {
-                lightbox.classList.remove('opacity-0');
-            }, 10);
-            document.body.style.overflow = 'hidden';
-        }
-    };
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightbox-img');
+        const lightboxCaption = document.getElementById('lightbox-caption');
+        const lightboxCounter = document.getElementById('lightbox-counter');
 
-    window.closeLightbox = function() {
-        if (lightbox) {
-            lightbox.classList.add('opacity-0');
-            setTimeout(() => {
-                lightbox.classList.add('hidden');
-                lightbox.classList.remove('flex');
-                document.body.style.overflow = '';
-            }, 300);
-        }
-    };
-
-    window.nextImage = function(e) {
-        if (e) e.stopPropagation();
-        if (!galleryImagesData || galleryImagesData.length === 0) return;
-        currentLightboxIndex = (currentLightboxIndex + 1) % galleryImagesData.length;
-        animateSlide('right');
-    };
-
-    window.prevImage = function(e) {
-        if (e) e.stopPropagation();
-        if (!galleryImagesData || galleryImagesData.length === 0) return;
-        currentLightboxIndex = (currentLightboxIndex - 1 + galleryImagesData.length) % galleryImagesData.length;
-        animateSlide('left');
-    };
-
-    function updateLightbox() {
-        if (!galleryImagesData || galleryImagesData.length === 0) return;
-        const img = galleryImagesData[currentLightboxIndex];
-
-        if (lightboxImg) {
-            lightboxImg.src = img.url;
-            lightboxImg.alt = img.alt || 'Gallery Image';
-        }
-        if (lightboxCaption) {
-            lightboxCaption.textContent = img.caption || img.alt || '';
-        }
-        if (lightboxCounter) {
-            lightboxCounter.textContent = `${currentLightboxIndex + 1} / ${galleryImagesData.length}`;
-        }
-    }
-
-    function animateSlide(direction) {
-        if (!lightboxImg) return;
-        lightboxImg.style.transform = `translateX(${direction === 'right' ? '20px' : '-20px'}) scale(0.98)`;
-        lightboxImg.style.opacity = '0.5';
-
-        setTimeout(() => {
+        window.openLightbox = function(index) {
+            currentLightboxIndex = index;
+            if (currentLightboxIndex >= galleryImagesData.length) {
+                currentLightboxIndex = 0;
+            }
             updateLightbox();
-            lightboxImg.style.transform = 'translateX(0) scale(1)';
-            lightboxImg.style.opacity = '1';
-        }, 150);
-    }
+            if (lightbox) {
+                lightbox.classList.remove('hidden');
+                lightbox.classList.add('flex');
+                setTimeout(() => {
+                    lightbox.classList.remove('opacity-0');
+                }, 10);
+                document.body.style.overflow = 'hidden';
+            }
+        };
 
-    document.addEventListener('keydown', (e) => {
-        if (lightbox && !lightbox.classList.contains('hidden')) {
-            if (e.key === 'Escape') closeLightbox();
-            if (e.key === 'ArrowRight') nextImage();
-            if (e.key === 'ArrowLeft') prevImage();
-        }
-    });
+        window.closeLightbox = function() {
+            if (lightbox) {
+                lightbox.classList.add('opacity-0');
+                setTimeout(() => {
+                    lightbox.classList.add('hidden');
+                    lightbox.classList.remove('flex');
+                    document.body.style.overflow = '';
+                }, 300);
+            }
+        };
 
-    // Touch Swipe Logic
-    let touchStartX = 0;
-    let touchEndX = 0;
-    const imgContainer = document.getElementById('lightbox-img-container');
+        window.nextImage = function(e) {
+            if (e) e.stopPropagation();
+            if (!galleryImagesData || galleryImagesData.length === 0) return;
+            currentLightboxIndex = (currentLightboxIndex + 1) % galleryImagesData.length;
+            animateSlide('right');
+        };
 
-    if (imgContainer) {
-        imgContainer.addEventListener('touchstart', e => {
-            touchStartX = e.changedTouches[0].screenX;
-        }, {
-            passive: true
-        });
+        window.prevImage = function(e) {
+            if (e) e.stopPropagation();
+            if (!galleryImagesData || galleryImagesData.length === 0) return;
+            currentLightboxIndex = (currentLightboxIndex - 1 + galleryImagesData.length) % galleryImagesData.length;
+            animateSlide('left');
+        };
 
-        imgContainer.addEventListener('touchend', e => {
-            touchEndX = e.changedTouches[0].screenX;
-            handleSwipe();
-        }, {
-            passive: true
-        });
-    }
+        function updateLightbox() {
+            if (!galleryImagesData || galleryImagesData.length === 0) return;
+            const img = galleryImagesData[currentLightboxIndex];
 
-    function handleSwipe() {
-        const threshold = 50;
-        if (touchEndX < touchStartX - threshold) nextImage();
-        if (touchEndX > touchStartX + threshold) prevImage();
-    }
-
-    let checkInDate = null;
-    let checkOutDate = null;
-    let checkoutPicker = null;
-
-    const checkinInput  = document.getElementById('bw-checkin');
-    const checkoutInput = document.getElementById('bw-checkout');
-    const btn           = document.getElementById('bw-btn');
-    const summary       = document.getElementById('bw-summary');
-    const rateLabel     = document.getElementById('bw-rate-label');
-    const subtotalEl    = document.getElementById('bw-subtotal');
-    const totalEl       = document.getElementById('bw-total');
-    const nightsLabel   = document.getElementById('bw-nights-label');
-    const cancelMsg     = document.getElementById('bw-cancel-msg');
-    const cancelDate    = document.getElementById('bw-cancel-date');
-
-    function formatShort(d) {
-        return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    }
-
-    function toLocalYMD(date) {
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
-    }
-
-    function updateSummary() {
-        if (!checkInDate || !checkOutDate) {
-            summary.classList.add('hidden');
-            cancelMsg.classList.add('hidden');
-            nightsLabel.textContent = '';
-            btn.classList.add('hidden');
-            btn.classList.remove('block');
-            return;
+            if (lightboxImg) {
+                lightboxImg.src = img.url;
+                lightboxImg.alt = img.alt || 'Gallery Image';
+            }
+            if (lightboxCaption) {
+                lightboxCaption.textContent = img.caption || img.alt || '';
+            }
+            if (lightboxCounter) {
+                lightboxCounter.textContent = `${currentLightboxIndex + 1} / ${galleryImagesData.length}`;
+            }
         }
 
-        const nights   = Math.round((checkOutDate - checkInDate) / 86400000);
-        const subtotal = nights * RATE;
+        function animateSlide(direction) {
+            if (!lightboxImg) return;
+            lightboxImg.style.transform = `translateX(${direction === 'right' ? '20px' : '-20px'}) scale(0.98)`;
+            lightboxImg.style.opacity = '0.5';
 
-        rateLabel.textContent  = 'Rs. ' + RATE.toLocaleString() + ' x ' + nights + ' night' + (nights !== 1 ? 's' : '');
-        subtotalEl.textContent = 'Rs. ' + subtotal.toLocaleString();
-        totalEl.textContent    = 'Rs. ' + subtotal.toLocaleString();
-        nightsLabel.textContent = nights + ' night' + (nights !== 1 ? 's' : '') + ' total';
+            setTimeout(() => {
+                updateLightbox();
+                lightboxImg.style.transform = 'translateX(0) scale(1)';
+                lightboxImg.style.opacity = '1';
+            }, 150);
+        }
 
-        const cancelD = new Date(checkInDate);
-        cancelD.setDate(cancelD.getDate() - 1);
-        cancelDate.textContent = formatShort(cancelD);
-
-        document.getElementById('bw-form-checkin').value = toLocalYMD(checkInDate);
-        document.getElementById('bw-form-checkout').value = toLocalYMD(checkOutDate);
-        document.getElementById('bw-form-guests').value = document.getElementById('bw-guests').value;
-
-        summary.classList.remove('hidden');
-        cancelMsg.classList.remove('hidden');
-        btn.classList.remove('hidden');
-        btn.classList.add('block');
-    }
-
-    flatpickr(checkinInput, {
-        minDate: 'today',
-        dateFormat: 'm/d/Y',
-        disable: [
-            function(date) {
-                return BOOKED.includes(toLocalYMD(date));
+        document.addEventListener('keydown', (e) => {
+            if (lightbox && !lightbox.classList.contains('hidden')) {
+                if (e.key === 'Escape') closeLightbox();
+                if (e.key === 'ArrowRight') nextImage();
+                if (e.key === 'ArrowLeft') prevImage();
             }
-        ],
-        disableMobile: true,
-        onDayCreate: function(dObj, dStr, fp, dayElem) {
-            const localDate = toLocalYMD(dayElem.dateObj);
-            if (BOOKED.includes(localDate)) {
-                dayElem.classList.add('fully-booked-date');
-            }
-        },
-        onChange: function (selected) {
-            checkInDate = selected[0] || null;
-            if (checkInDate && checkOutDate && checkOutDate <= checkInDate) {
-                checkOutDate = null;
-                checkoutPicker.clear();
-            }
-            if (checkoutPicker) {
-                checkoutPicker.set('minDate', checkInDate
-                    ? new Date(checkInDate.getTime() + 86400000)
-                    : 'today');
+        });
 
-                let maxDate = null;
-                if (checkInDate) {
-                    const checkInStr = toLocalYMD(checkInDate);
-                    for (let i = 0; i < BOOKED.length; i++) {
-                        if (BOOKED[i] >= checkInStr) {
-                            maxDate = BOOKED[i];
-                            break;
+        // Touch Swipe Logic
+        let touchStartX = 0;
+        let touchEndX = 0;
+        const imgContainer = document.getElementById('lightbox-img-container');
+
+        if (imgContainer) {
+            imgContainer.addEventListener('touchstart', e => {
+                touchStartX = e.changedTouches[0].screenX;
+            }, {
+                passive: true
+            });
+
+            imgContainer.addEventListener('touchend', e => {
+                touchEndX = e.changedTouches[0].screenX;
+                handleSwipe();
+            }, {
+                passive: true
+            });
+        }
+
+        function handleSwipe() {
+            const threshold = 50;
+            if (touchEndX < touchStartX - threshold) nextImage();
+            if (touchEndX > touchStartX + threshold) prevImage();
+        }
+
+        let checkInDate = null;
+        let checkOutDate = null;
+        let checkoutPicker = null;
+
+        const checkinInput = document.getElementById('bw-checkin');
+        const checkoutInput = document.getElementById('bw-checkout');
+        const btn = document.getElementById('bw-btn');
+        const summary = document.getElementById('bw-summary');
+        const rateLabel = document.getElementById('bw-rate-label');
+        const subtotalEl = document.getElementById('bw-subtotal');
+        const totalEl = document.getElementById('bw-total');
+        const nightsLabel = document.getElementById('bw-nights-label');
+        const cancelMsg = document.getElementById('bw-cancel-msg');
+        const cancelDate = document.getElementById('bw-cancel-date');
+
+        function formatShort(d) {
+            return d.toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric'
+            });
+        }
+
+        function toLocalYMD(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function updateSummary() {
+            if (!checkInDate || !checkOutDate) {
+                summary.classList.add('hidden');
+                cancelMsg.classList.add('hidden');
+                nightsLabel.textContent = '';
+                btn.classList.add('hidden');
+                btn.classList.remove('block');
+                return;
+            }
+
+            const nights = Math.round((checkOutDate - checkInDate) / 86400000);
+            const subtotal = nights * RATE;
+
+            rateLabel.textContent = 'Rs. ' + RATE.toLocaleString() + ' x ' + nights + ' night' + (nights !== 1 ? 's' : '');
+            subtotalEl.textContent = 'Rs. ' + subtotal.toLocaleString();
+            totalEl.textContent = 'Rs. ' + subtotal.toLocaleString();
+            nightsLabel.textContent = nights + ' night' + (nights !== 1 ? 's' : '') + ' total';
+
+            const cancelD = new Date(checkInDate);
+            cancelD.setDate(cancelD.getDate() - 1);
+            cancelDate.textContent = formatShort(cancelD);
+
+            document.getElementById('bw-form-checkin').value = toLocalYMD(checkInDate);
+            document.getElementById('bw-form-checkout').value = toLocalYMD(checkOutDate);
+            document.getElementById('bw-form-guests').value = document.getElementById('bw-guests').value;
+
+            summary.classList.remove('hidden');
+            cancelMsg.classList.remove('hidden');
+            btn.classList.remove('hidden');
+            btn.classList.add('block');
+        }
+
+        flatpickr(checkinInput, {
+            minDate: 'today',
+            dateFormat: 'm/d/Y',
+            disable: [
+                function(date) {
+                    return BOOKED.includes(toLocalYMD(date));
+                }
+            ],
+            disableMobile: true,
+            onDayCreate: function(dObj, dStr, fp, dayElem) {
+                const localDate = toLocalYMD(dayElem.dateObj);
+                if (BOOKED.includes(localDate)) {
+                    dayElem.classList.add('fully-booked-date');
+                }
+            },
+            onChange: function(selected) {
+                checkInDate = selected[0] || null;
+                if (checkInDate && checkOutDate && checkOutDate <= checkInDate) {
+                    checkOutDate = null;
+                    checkoutPicker.clear();
+                }
+                if (checkoutPicker) {
+                    checkoutPicker.set('minDate', checkInDate ?
+                        new Date(checkInDate.getTime() + 86400000) :
+                        'today');
+
+                    let maxDate = null;
+                    if (checkInDate) {
+                        const checkInStr = toLocalYMD(checkInDate);
+                        for (let i = 0; i < BOOKED.length; i++) {
+                            if (BOOKED[i] >= checkInStr) {
+                                maxDate = BOOKED[i];
+                                break;
+                            }
+                        }
+                    }
+                    checkoutPicker.set('maxDate', maxDate);
+
+                    if (maxDate && checkOutDate) {
+                        if (toLocalYMD(checkOutDate) > maxDate) {
+                            checkOutDate = null;
+                            checkoutPicker.clear();
                         }
                     }
                 }
-                checkoutPicker.set('maxDate', maxDate);
+                updateSummary();
+            }
+        });
 
-                if (maxDate && checkOutDate) {
-                    if (toLocalYMD(checkOutDate) > maxDate) {
-                        checkOutDate = null;
-                        checkoutPicker.clear();
-                    }
+        checkoutPicker = flatpickr(checkoutInput, {
+            minDate: 'today',
+            dateFormat: 'm/d/Y',
+            disable: [
+                function(date) {
+                    return BOOKED.includes(toLocalYMD(date));
                 }
+            ],
+            disableMobile: true,
+            onDayCreate: function(dObj, dStr, fp, dayElem) {
+                const localDate = toLocalYMD(dayElem.dateObj);
+                if (BOOKED.includes(localDate)) {
+                    dayElem.classList.add('fully-booked-date');
+                }
+            },
+            onChange: function(selected) {
+                checkOutDate = selected[0] || null;
+                updateSummary();
             }
-            updateSummary();
-        }
-    });
+        });
 
-    checkoutPicker = flatpickr(checkoutInput, {
-        minDate: 'today',
-        dateFormat: 'm/d/Y',
-        disable: [
-            function(date) {
-                return BOOKED.includes(toLocalYMD(date));
-            }
-        ],
-        disableMobile: true,
-        onDayCreate: function(dObj, dStr, fp, dayElem) {
-            const localDate = toLocalYMD(dayElem.dateObj);
-            if (BOOKED.includes(localDate)) {
-                dayElem.classList.add('fully-booked-date');
-            }
-        },
-        onChange: function (selected) {
-            checkOutDate = selected[0] || null;
-            updateSummary();
-        }
-    });
-
-    document.getElementById('bw-guests').addEventListener('change', updateSummary);
-})();
+        document.getElementById('bw-guests').addEventListener('change', updateSummary);
+    })();
 </script>
 @endpush
 @endsection

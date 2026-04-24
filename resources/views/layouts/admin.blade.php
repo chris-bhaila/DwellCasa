@@ -68,10 +68,10 @@
             </a>
         </nav>
         <div class="p-4 border-t border-slate-800">
-            <a href="{{ route('admin.info') }}" class="sidebar-link flex items-center px-4 py-3 mb-6 rounded-lg transition-colors {{ request()->is('admin/info*') ? 'active' : '' }}">
+            <!-- <a href="{{ route('admin.info') }}" class="sidebar-link flex items-center px-4 py-3 mb-6 rounded-lg transition-colors {{ request()->is('admin/info*') ? 'active' : '' }}">
                 <i class="bi bi-chat-left-text sidebar-icon text-slate-400 mr-3 text-lg"></i>
                 <span class="font-medium">Website Information</span>
-            </a>
+            </a> -->
             <div class="flex items-center">
                 <div class="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center font-bold text-white flex-shrink-0">
                     {{ substr(Auth::user()->name, 0, 1) }}

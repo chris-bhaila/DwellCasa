@@ -91,7 +91,7 @@
                 </div>
 
                 <div class="hidden md:flex items-center space-x-10">
-                    @php $navItems = ['Rooms' => 'web.rooms.index', 'Gallery' => 'gallery', 'About' => 'about', 'Contact' => 'contact']; @endphp
+                    @php $navItems = ['Rooms' => 'web.rooms.index', 'Gallery' => 'gallery', 'About' => 'about', 'Contact' => 'contact']; @endphp <!--, 'Review' => 'web.hotel-review'-->
 
                     @foreach($navItems as $name => $route)
                     <a href="{{ route($route) }}"

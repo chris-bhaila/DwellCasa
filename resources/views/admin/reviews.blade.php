@@ -51,9 +51,6 @@
                         </div>
                     </td>
                     <td class="p-4 text-slate-600 max-w-md truncate">
-                        @if($review->title)
-                        <div class="font-medium text-slate-800 mb-0.5 truncate">{{ $review->title }}</div>
-                        @endif
                         {{ \Illuminate\Support\Str::limit($review->body, 50) }}
                     </td>
                     <td class="p-4">
@@ -122,7 +119,6 @@
             <div class="pt-4 border-t border-slate-100">
                 <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Review Content</label>
                 <div class="bg-slate-50 rounded-xl p-4">
-                    <h3 class="font-bold text-slate-900 mb-2" id="modal-title"></h3>
                     <p class="text-slate-700 text-sm whitespace-pre-wrap leading-relaxed" id="modal-body"></p>
                 </div>
             </div>
@@ -154,7 +150,6 @@
             document.getElementById('modal-email').textContent = review.email;
             document.getElementById('modal-type').textContent = review.target_name || 'Hotel';
             document.getElementById('modal-date').textContent = new Date(review.created_at).toLocaleString();
-            document.getElementById('modal-title').textContent = review.title || '';
             document.getElementById('modal-body').textContent = review.body;
 
             // Rating stars

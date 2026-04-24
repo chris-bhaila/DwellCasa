@@ -27,6 +27,25 @@ Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap')
 Route::get('/robots.txt', [RobotsController::class, 'index'])->name('robots');
 Route::post('/room-types/{id}/images', [RoomTypeController::class, 'uploadImage'])->name('room-types.images.upload');
 Route::delete('/room-types/{id}/images/{imageId}', [RoomTypeController::class, 'deleteImage'])->name('room-types.images.delete');
+Route::get('/hotel-review', function () {
+    return view('web.hotel-review');
+})->name('web.hotel-review');
+
+Route::post('/hotel-review', function (\Illuminate\Http\Request $request) {
+    $request->validate([
+        'name'   => 'required|string|max:255',
+        'email'  => 'required|email|max:255',
+        'rating' => 'required|integer|min:1|max:5',
+        'body'   => 'required|string',
+    ]);
+
+    \App\Models\Review::create(array_merge($request->only(['name', 'email', 'rating', 'body']), [
+        'type'   => 'hotel',
+        'status' => 'pending',
+    ]));
+
+    return redirect()->route('home')->with('success', 'Thank you for your review! It will appear after approval.');
+})->name('web.hotel-review.store');
 Route::get('/review/{token}', function ($token) {
     $review = \App\Models\Review::where('review_token', $token)
         ->where('token_used', false)
@@ -37,7 +56,6 @@ Route::get('/review/{token}', function ($token) {
 Route::post('/review/{token}', function (\Illuminate\Http\Request $request, $token) {
     $request->validate([
         'rating' => 'required|integer|min:1|max:5',
-        'title'  => 'nullable|string|max:255',
         'body'   => 'required|string',
     ]);
 
@@ -47,7 +65,6 @@ Route::post('/review/{token}', function (\Illuminate\Http\Request $request, $tok
 
     $review->update([
         'rating'     => $request->rating,
-        'title'      => $request->title,
         'body'       => $request->body,
         'token_used' => true,
     ]);
