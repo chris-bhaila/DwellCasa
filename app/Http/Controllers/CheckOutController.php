@@ -13,6 +13,7 @@ use App\Models\Review;
 use App\Mail\ReviewRequestMail;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
+use Spatie\Activitylog\Facades\Activity;
 
 class CheckOutController extends Controller
 {
@@ -46,27 +47,26 @@ class CheckOutController extends Controller
         try {
             $checkOut = DB::transaction(function () use ($request) {
                 $validated = $request->validated();
-    
+
                 // 1. Create check_out record
                 $checkOutRecord = $this->checkOutRepository->create($validated);
-    
+
                 // 2. Update booking status
                 $booking = Booking::with(['guest', 'roomType'])->findOrFail($validated['booking_id']);
                 $booking->status = 'checked_out';
                 $booking->checked_out_at = $validated['checked_out_at'];
                 $booking->save();
-    
+
                 // 3. Update room status back to available
                 if ($booking->room_id) {
                     $room = Room::findOrFail($booking->room_id);
                     $room->status = 'available';
                     $room->save();
                 }
-    
                 // 4. Generate review token and create pending review record
                 if ($booking->guest && $booking->room_type_id) {
                     $token = Str::uuid()->toString();
-    
+
                     Review::create([
                         'name'         => $booking->guest->full_name,
                         'email'        => $booking->guest->email,
@@ -80,7 +80,7 @@ class CheckOutController extends Controller
                         'rating'       => 0, // placeholder until guest submits
                         'body'         => '', // placeholder until guest submits
                     ]);
-    
+
                     // 5. Send review request email
                     try {
                         Mail::to($booking->guest->email)
@@ -89,15 +89,21 @@ class CheckOutController extends Controller
                         \Log::error('Review request email failed: ' . $e->getMessage());
                     }
                 }
-    
+
                 return $checkOutRecord;
             });
-    
+            $booking = \App\Models\Booking::with(['guest', 'room'])->findOrFail($request->booking_id);
+
+            activity()
+                ->causedBy(auth()->user())
+                ->performedOn($booking)
+                ->withProperties(['location_id' => $booking->location_id])
+                ->log('Checked out guest ' . ($booking->guest->full_name ?? '') . ' — Room ' . ($booking->room->room_number ?? '') . ' (' . $booking->booking_ref . ')');
+
             return response()->json([
                 'message' => 'Guest successfully checked out.',
                 'data'    => $checkOut
             ], 201);
-    
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Check-out failed due to an internal error.',

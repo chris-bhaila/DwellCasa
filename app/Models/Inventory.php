@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Scopes\LocationScope;
 
 class Inventory extends Model
 {
@@ -22,6 +23,8 @@ class Inventory extends Model
         'status',
         'image',
         'unit_price',
+        'location_id',
+
     ];
 
     protected $casts = [
@@ -44,5 +47,6 @@ class Inventory extends Model
                 $inventory->status = 'available';
             }
         });
+        static::addGlobalScope(new LocationScope());
     }
 }

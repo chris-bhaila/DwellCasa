@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use App\Models\Scopes\LocationScope;
 
 class GalleryImage extends Model
 {
@@ -27,6 +28,8 @@ class GalleryImage extends Model
         'is_featured',
         'is_active',
         'sort_order',
+        'location_id',
+
     ];
 
     protected $casts = [
@@ -37,5 +40,10 @@ class GalleryImage extends Model
     public function imageable(): MorphTo
     {
         return $this->morphTo();
+    }
+
+    protected static function booted(): void
+    {
+        static::addGlobalScope(new LocationScope());
     }
 }

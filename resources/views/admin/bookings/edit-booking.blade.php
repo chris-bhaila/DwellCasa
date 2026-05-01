@@ -68,7 +68,7 @@
                                 <select name="room_type_id" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors" required>
                                     <option value="">Select a room...</option>
                                     @foreach($roomTypes ?? [] as $room)
-                                <option value="{{ $room->id }}" data-price-night="{{ $room->price_per_night }}" data-price-month="{{ $room->price_per_month }}" {{ old('room_type_id', $booking->room_type_id) == $room->id ? 'selected' : '' }}>{{ $room->name }}</option>
+                                    <option value="{{ $room->id }}" data-price-night="{{ $room->price_per_night }}" data-price-month="{{ $room->price_per_month }}" {{ old('room_type_id', $booking->room_type_id) == $room->id ? 'selected' : '' }}>{{ $room->name }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -135,7 +135,7 @@
                 <div class="p-6 space-y-6">
                     <!-- <div>
                         <label class="block text-sm font-medium text-slate-700 mb-2">Booking Status</label>
-                        <select name="status" form="edit-booking-form" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors">
+                        <select name="status" form="edit-booking-form" class="w-full border rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors">
                             <option value="pending" {{ old('status', $booking->status) == 'pending' ? 'selected' : '' }}>Pending</option>
                             <option value="confirmed" {{ old('status', $booking->status) == 'confirmed' ? 'selected' : '' }}>Confirmed</option>
                             <option value="checked_in" {{ old('status', $booking->status) == 'checked_in' ? 'selected' : '' }}>Checked In</option>
@@ -167,7 +167,14 @@
                 </button>
             </div>
             @endif
-
+            @if(!in_array($booking->status, ['cancelled', 'checked_out']))
+            <div class="mt-4">
+                <button type="button" onclick="cancelBooking()"
+                    class="w-full bg-red-50 text-red-600 border border-red-200 px-4 py-3 rounded-xl font-medium hover:bg-red-100 transition-all">
+                    Cancel Booking
+                </button>
+            </div>
+            @endif
             @if($booking->status === 'confirmed')
             <div class="mt-4">
                 <button type="button" onclick="openCheckInModal()" class="w-full bg-green-700 text-white px-4 py-3 rounded-xl font-medium hover:bg-green-800 transition-all shadow-sm">
@@ -491,12 +498,38 @@
         }
     }
 
+    async function cancelBooking() {
+        if (!confirm('Are you sure you want to cancel this booking? This cannot be undone.')) return;
+
+        try {
+            const response = await fetch(`/api/bookings/{{ $booking->id }}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({
+                    status: 'cancelled'
+                })
+            });
+
+            if (response.ok) {
+                window.location.href = "{{ route('admin.bookings') }}";
+            } else {
+                alert('Error cancelling booking.');
+            }
+        } catch (error) {
+            alert('An error occurred.');
+        }
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
         const stayTypeSelect = document.querySelector('select[name="stay_type"]');
         const roomTypeSelect = document.querySelector('select[name="room_type_id"]');
         const checkInInput = document.querySelector('input[name="check_in_date"]');
         const checkOutInput = document.querySelector('input[name="check_out_date"]');
-        
+
         const ratePerNightWrapper = document.getElementById('rate-per-night-wrapper');
         const ratePerMonthWrapper = document.getElementById('rate-per-month-wrapper');
         const ratePerNightInput = document.querySelector('input[name="rate_per_night"]');
@@ -512,10 +545,10 @@
 
             if (stayTypeSelect.value === 'short_term') {
                 ratePerNightInput.value = Math.round(priceNight);
-                
+
                 const checkInDate = new Date(checkInInput.value);
                 const checkOutDate = new Date(checkOutInput.value);
-                
+
                 if (checkInInput.value && checkOutInput.value && checkOutDate > checkInDate) {
                     const diffTime = Math.abs(checkOutDate - checkInDate);
                     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
@@ -551,9 +584,9 @@
 
             // Pass true on initial load so it doesn't overwrite existing DB values
             toggleRateFields(true);
-            
+
             stayTypeSelect.addEventListener('change', () => toggleRateFields(false));
-            
+
             roomTypeSelect.addEventListener('change', calculateTotal);
             checkInInput.addEventListener('change', calculateTotal);
             checkOutInput.addEventListener('change', calculateTotal);

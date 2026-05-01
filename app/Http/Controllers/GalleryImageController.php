@@ -6,7 +6,7 @@ use App\Http\Requests\StoreGalleryImageRequest;
 use App\Models\GalleryImage;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
-
+use Spatie\Activitylog\Facades\Activity;
 class GalleryImageController extends Controller
 {
     /**
@@ -17,14 +17,21 @@ class GalleryImageController extends Controller
      */
     public function store(StoreGalleryImageRequest $request): JsonResponse
     {
+        $user = auth()->user();
+        $locationId = $user->hasRole('super_admin')
+            ? session('selected_location_id')
+            : $user->location_id;
+
+        abort_if(!$locationId, 422, 'No location selected.');
+
         $validated = $request->validated();
+        $validated['location_id'] = $locationId;
 
         if ($request->hasFile('image')) {
             $path = $request->file('image')->store('gallery', 'public');
             $validated['filename'] = $path;
         }
 
-        // The 'image' field is a file object and should not be passed to the create method.
         unset($validated['image']);
 
         $image = GalleryImage::create($validated);

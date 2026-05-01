@@ -7,6 +7,7 @@ use App\Http\Requests\StoreReviewRequest;
 use App\Http\Requests\UpdateReviewRequest;
 use Illuminate\Http\Request;
 use App\Models\Review;
+use Spatie\Activitylog\Facades\Activity;
 
 class ReviewController extends Controller
 {
@@ -37,8 +38,16 @@ class ReviewController extends Controller
 
     public function store(StoreReviewRequest $request)
     {
+        $user = auth()->user();
+        $locationId = $user->hasRole('super_admin')
+            ? session('selected_location_id')
+            : $user->location_id;
+
+        abort_if(!$locationId, 422, 'No location selected.');
+
         $review = $this->reviewRepository->create(array_merge($request->validated(), [
-            'status' => 'pending',
+            'status'      => 'pending',
+            'location_id' => $locationId,
         ]));
 
         return response()->json([
@@ -88,7 +97,10 @@ class ReviewController extends Controller
 
     public function update(UpdateReviewRequest $request, $id)
     {
-        $review = $this->reviewRepository->update($id, $request->validated());
+        $data = $request->validated();
+        unset($data['location_id']);
+
+        $review = $this->reviewRepository->update($id, $data);
         return response()->json([
             'success' => true,
             'message' => 'Review updated successfully',
@@ -99,6 +111,11 @@ class ReviewController extends Controller
     public function destroy($id)
     {
         $this->reviewRepository->delete($id);
+        $review = $this->reviewRepository->find($id);
+        activity()
+            ->causedBy(auth()->user())
+            ->withProperties(['location_id' => $review->location_id])
+            ->log('Deleted review by ' . $review->name);
         return response()->json([
             'success' => true,
             'message' => 'Review deleted successfully'
@@ -113,6 +130,11 @@ class ReviewController extends Controller
         ]);
 
         $review = $this->reviewRepository->update($id, ['status' => $request->status]);
+        activity()
+            ->causedBy(auth()->user())
+            ->performedOn($review)
+            ->withProperties(['location_id' => $review->location_id])
+            ->log('Review by ' . $review->name . ' — status set to ' . $request->status);
         return response()->json([
             'success' => true,
             'message' => 'Review status updated successfully',

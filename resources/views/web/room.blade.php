@@ -159,7 +159,7 @@ $image3 = $imagesForLightbox[2]['url'] ?? $imagesForLightbox[0]['url'];
                     </p>
 
                     <!-- Hidden form -->
-                    <form id="bw-form" action="{{ route('booking.create') }}" method="GET">
+                    <form id="bw-form" action="{{ route('booking.create', $location->slug) }}" method="GET">
                         <input type="hidden" name="room_type_id" value="{{ $roomType->id }}">
                         <input type="hidden" name="stay_type" value="short_term">
                         <input type="hidden" name="check_in_date" id="bw-form-checkin">

@@ -7,15 +7,17 @@
 <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
     <div>
         <h1 class="text-3xl font-serif font-bold text-slate-900 italic">Dashboard Overview</h1>
-        <p class="text-slate-500">Welcome back, Administrator. Here's what's happening today.</p>
+        <p class="text-slate-500">Welcome back, {{ Auth::user()->name }}. Here's what's happening today.</p>
     </div>
     <div class="flex gap-3">
         <!-- <button class="bg-white border border-slate-200 text-slate-700 px-4 py-2 rounded-lg font-medium hover:bg-slate-50 transition-all shadow-sm">
                 Download Report
             </button> -->
+        @can('manage rooms')
         <a href="{{ route('admin.room_type.create') }}" class="bg-[#A89070] text-white px-4 py-2 rounded-lg font-medium hover:bg-[#8E795E] transition-all shadow-md">
             + Add New Room
         </a>
+        @endcan
     </div>
 </div>
 

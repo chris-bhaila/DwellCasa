@@ -85,32 +85,39 @@
                 <div class="flex items-center">
                     <a href="{{ route('home') }}"
                         class="text-2xl font-bold tracking-tighter nav-transition"
-                        :class="{{ request()->routeIs('home') ? '!scrolled' : 'false' }} ? 'text-white' : 'text-slate-900'">
+                        :class="{{ request()->routeIs('home', 'location.home') ? '!scrolled' : 'false' }} ? 'text-white' : 'text-slate-900'">
                         DwellCasa<span class="text-primary">.</span>
                     </a>
                 </div>
 
                 <div class="hidden md:flex items-center space-x-10">
-                    @php $navItems = ['Rooms' => 'web.rooms.index', 'Gallery' => 'gallery', 'About' => 'about', 'Contact' => 'contact']; @endphp <!--, 'Review' => 'web.hotel-review'-->
+                    @php
+                    $navItems = [
+                    'Rooms' => 'web.rooms.index',
+                    'Gallery' => 'gallery',
+                    'About' => 'about',
+                    'Contact' => 'contact',
+                    ];
+                    @endphp
 
                     @foreach($navItems as $name => $route)
-                    <a href="{{ route($route) }}"
+                    <a href="{{ $location ? route($route, $location->slug) : '#' }}"
                         class="text-md font-medium tracking-wide uppercase hover:opacity-100 transition-opacity nav-transition"
-                        :class="{{ request()->routeIs('home') ? '!scrolled' : 'false' }} ? 'text-white/80 hover:text-white' : 'text-black font-bold hover:text-primary'">
+                        :class="{{ request()->routeIs('home', 'location.home') ? '!scrolled' : 'false' }} ? 'text-white/80 hover:text-white' : 'text-black font-bold hover:text-primary'">
                         {{ $name }}
                     </a>
                     @endforeach
                 </div>
 
                 <div class="flex items-center space-x-4">
-                    <!-- <a href="{{ route('booking.create') }}"
+                    <!-- <a href="#"
                         class="px-6 py-2.5 rounded-full text-sm font-bold tracking-wider uppercase transition-all shadow-lg active:scale-95"
                         :class="scrolled ? 'bg-primary text-white hover:bg-white hover:text-primary' : 'bg-white text-primary hover:bg-[#A89070] hover:text-white'">
                         Book Now
                     </a> -->
 
                     <button class="md:hidden p-2" @click="mobileMenu = true">
-                        <svg class="w-6 h-6" :class="{{ request()->routeIs('home') ? '!scrolled' : 'false' }} ? 'text-white' : 'text-slate-900'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-6 h-6" :class="{{ request()->routeIs('home', 'location.home') ? '!scrolled' : 'false' }} ? 'text-white' : 'text-slate-900'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
                         </svg>
                     </button>
@@ -138,7 +145,11 @@
 
                 <div class="space-y-8">
                     @foreach($navItems as $name => $route)
-                    <a href="{{ route($route) }}" class="block text-4xl font-serif text-white italic transition-colors">{{ $name }}</a>
+                    <a href="{{ $location ? route($route, $location->slug) : '#' }}"
+                        class="text-md font-medium tracking-wide uppercase hover:opacity-100 transition-opacity nav-transition"
+                        :class="{{ request()->routeIs('home', 'location.home') ? '!scrolled' : 'false' }} ? 'text-white/80 hover:text-white' : 'text-black font-bold hover:text-primary'">
+                        {{ $name }}
+                    </a>
                     @endforeach
                 </div>
             </div>
@@ -158,7 +169,7 @@
             @endif
         </div>
 
-        <div class="{{ request()->routeIs('home') ? '' : 'pt-16' }}">
+        <div class="{{ request()->routeIs('home', 'location.home') ? '' : 'pt-16' }}">
             @yield('content')
         </div>
     </main>
@@ -176,9 +187,9 @@
                 <div>
                     <h4 class="text-xs uppercase tracking-[0.3em] font-bold text-white mb-8">Navigation</h4>
                     <ul class="space-y-4 text-white">
-                        <li><a href="{{ route('web.rooms.index') }}" class="hover:text-white transition-colors">Suites & Rooms</a></li>
-                        <li><a href="{{ route('gallery') }}" class="hover:text-white transition-colors">Visual Gallery</a></li>
-                        <li><a href="{{ route('about') }}" class="hover:text-white transition-colors">Our Heritage</a></li>
+                        <li><a href="{{ $location ? route('web.rooms.index', $location->slug) : '#' }}" class="hover:text-white transition-colors">Suites & Rooms</a></li>
+                        <li><a href="{{ $location ? route('gallery', $location->slug) : '#' }}" class="hover:text-white transition-colors">Visual Gallery</a></li>
+                        <li><a href="{{ $location ? route('about', $location->slug) : '#' }}" class="hover:text-white transition-colors">Our Heritage</a></li>
                     </ul>
                 </div>
 

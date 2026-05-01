@@ -7,6 +7,7 @@ use App\Http\Requests\StoreCheckInRequest;
 use App\Http\Requests\UpdateCheckInRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Spatie\Activitylog\Facades\Activity;
 
 class CheckInController extends Controller
 {
@@ -40,19 +41,25 @@ class CheckInController extends Controller
         $checkIn = DB::transaction(function () use ($request) {
             $checkIn = $this->checkInRepository->create($request->validated());
 
-            // Update booking status to confirmed and assign the actual room_id
             $checkIn->booking->update([
                 'status' => 'checked_in',
                 'room_id' => $checkIn->room_id
             ]);
 
-            // Update room status to occupied
             if ($checkIn->room_id) {
                 \App\Models\Room::where('id', $checkIn->room_id)
                     ->update(['status' => 'occupied']);
             }
+
             return $checkIn;
         });
+
+        // Log AFTER transaction succeeds
+        activity()
+            ->causedBy(auth()->user())
+            ->performedOn($checkIn->booking)
+            ->withProperties(['location_id' => $checkIn->booking->location_id])
+            ->log('Checked in guest ' . ($checkIn->booking->guest->full_name ?? $checkIn->booking->guest_name) . ' — Room ' . $checkIn->room->room_number . ' (' . $checkIn->booking->booking_ref . ')');
 
         return response()->json([
             'success' => true,

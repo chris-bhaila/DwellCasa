@@ -25,6 +25,7 @@ class UpdateUserRequest extends FormRequest
             'name' => 'sometimes|required|string|max:255',
             'email' => 'sometimes|required|email|unique:users,email,' . $this->route('user'),
             'password' => 'sometimes|required|string|min:8|confirmed',
+            'location_id' => 'nullable|exists:locations,id',
         ];
     }
 }

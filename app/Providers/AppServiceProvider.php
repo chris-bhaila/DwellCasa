@@ -37,6 +37,8 @@ use App\Contracts\InventoryRepositoryInterface;
 use App\Repositories\InventoryRepository;
 use App\Contracts\ReviewRepositoryInterface;
 use App\Repositories\ReviewRepository;
+use App\Contracts\LocationRepositoryInterface;
+use App\Repositories\LocationRepository;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -62,6 +64,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(WebsiteInfoRepositoryInterface::class, WebsiteInfoRepository::class);
         $this->app->bind(InventoryRepositoryInterface::class, InventoryRepository::class);
         $this->app->bind(ReviewRepositoryInterface::class, ReviewRepository::class);
+        $this->app->bind(LocationRepositoryInterface::class, LocationRepository::class);
     }
 
     /**
@@ -71,6 +74,18 @@ class AppServiceProvider extends ServiceProvider
     {
         view()->composer('layouts.app', function ($view) {
             $view->with('webInfo', \App\Models\WebsiteInfo::first() ?? new \App\Models\WebsiteInfo());
+        });
+        view()->composer('layouts.app', function ($view) {
+            // Resolve location from current route
+            $location = request()->route('location');
+    
+            // Resolve webInfo based on location
+            $webInfo = $location
+                ? \App\Models\WebsiteInfo::where('location_id', $location->id)->first()
+                : \App\Models\WebsiteInfo::first() ?? new \App\Models\WebsiteInfo();
+    
+            $view->with('location', $location);
+            $view->with('webInfo', $webInfo);
         });
     }
 }

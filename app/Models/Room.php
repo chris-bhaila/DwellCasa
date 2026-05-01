@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\Scopes\LocationScope;
 
 class Room extends Model
 {
@@ -20,6 +21,7 @@ class Room extends Model
         'floor',
         'status',
         'notes',
+        'location_id',
     ];
 
     public function roomType(): BelongsTo
@@ -36,6 +38,8 @@ class Room extends Model
     {
         return $this->hasMany(Booking::class);
     }
+
+
     protected static function booted()
     {
         static::saved(function ($model) {
@@ -43,5 +47,7 @@ class Room extends Model
                 $model->amenities()->sync(request('amenities', []));
             }
         });
+
+        static::addGlobalScope(new LocationScope());
     }
 }

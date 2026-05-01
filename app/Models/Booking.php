@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
-
+use App\Models\Scopes\LocationScope;
 class Booking extends Model
 {
     use HasFactory, SoftDeletes;
@@ -34,6 +34,7 @@ class Booking extends Model
         'checked_out_at',
         'special_requests',
         'admin_notes',
+        'location_id',
     ];
 
     protected $casts = [
@@ -58,11 +59,6 @@ class Booking extends Model
         return $this->belongsTo(RoomType::class);
     }
 
-    public function bookingInquiry(): BelongsTo
-    {
-        return $this->belongsTo(BookingInquiry::class);
-    }
-
     public function payments(): HasMany
     {
         return $this->hasMany(Payment::class);
@@ -80,5 +76,10 @@ class Booking extends Model
     public function checkOut(): HasOne
     {
         return $this->hasOne(CheckOut::class);
+    }
+
+    protected static function booted(): void
+    {
+        static::addGlobalScope(new LocationScope());
     }
 }

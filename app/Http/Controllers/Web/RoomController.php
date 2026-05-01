@@ -6,33 +6,35 @@ use App\Http\Controllers\Controller;
 use App\Contracts\RoomTypeRepositoryInterface;
 use App\Models\Booking;
 use App\Contracts\WebsiteInfoRepositoryInterface;
+use App\Models\Location;
 
 class RoomController extends Controller
 {
     protected $roomTypeRepository;
     protected $websiteInfoRepository;
 
-    public function __construct(RoomTypeRepositoryInterface $roomTypeRepository,
+    public function __construct(
+        RoomTypeRepositoryInterface $roomTypeRepository,
         WebsiteInfoRepositoryInterface $websiteInfoRepository
-    )
-    {
+    ) {
         $this->roomTypeRepository = $roomTypeRepository;
         $this->websiteInfoRepository = $websiteInfoRepository;
-        
     }
 
-    public function index()
+    public function index(Location $location)
     {
-        $webInfo = $this->websiteInfoRepository->get();
-        $roomTypes = $this->roomTypeRepository->all();
-        return view('web.rooms', compact('roomTypes', 'webInfo'));
+        $webInfo = $this->websiteInfoRepository->getForLocation($location->id);
+        $roomTypes = $this->roomTypeRepository->all()
+            ->where('location_id', $location->id)
+            ->where('is_active', true);
+        return view('web.rooms', compact('roomTypes', 'webInfo', 'location'));
     }
 
-    public function show($id)
+    public function show(Location $location, $id)
     {
         $roomType = $this->roomTypeRepository->find($id);
-        abort_if(!$roomType, 404);
-        
+        abort_if($roomType->location_id !== $location->id, 404);
+
         $totalRooms = \App\Models\Room::where('room_type_id', $id)
             ->whereNotIn('status', ['maintenance', 'out_of_service'])
             ->count();
@@ -67,6 +69,6 @@ class RoomController extends Controller
             sort($bookedDates);
         }
 
-        return view('web.room', compact('roomType', 'bookedDates'));
+        return view('web.room', compact('roomType', 'bookedDates', 'location'));
     }
 }

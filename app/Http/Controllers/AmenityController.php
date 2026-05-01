@@ -29,13 +29,26 @@ class AmenityController extends Controller
 
     public function store(StoreAmenityRequest $request)
     {
-        $amenity = $this->amenityRepository->create($request->validated());
+        $user = auth()->user();
+        $locationId = $user->hasRole('super_admin')
+            ? session('selected_location_id')
+            : $user->location_id;
+
+        abort_if(!$locationId, 422, 'No location selected.');
+
+        $data = $request->validated();
+        $data['location_id'] = $locationId;
+
+        $amenity = $this->amenityRepository->create($data);
         return response()->json(['success' => true, 'message' => 'Amenity created successfully', 'data' => $amenity], 201);
     }
 
     public function update(UpdateAmenityRequest $request, $id)
     {
-        $amenity = $this->amenityRepository->update($id, $request->validated());
+        $data = $request->validated();
+        unset($data['location_id']);
+
+        $amenity = $this->amenityRepository->update($id, $data);
         return response()->json(['success' => true, 'message' => 'Amenity updated successfully', 'data' => $amenity], 200);
     }
 

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Scopes\LocationScope;
 
 class WebsiteInfo extends Model
 {
@@ -34,10 +35,16 @@ class WebsiteInfo extends Model
         'homepage_main_image',
         'homepage_end_image',
         'about_image',
+        'location_id',
     ];
 
     protected $casts = [
         'check_in'  => 'string',
         'check_out' => 'string',
     ];
+
+    protected static function booted(): void
+    {
+        static::addGlobalScope(new LocationScope());
+    }
 }

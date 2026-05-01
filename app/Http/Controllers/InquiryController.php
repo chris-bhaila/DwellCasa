@@ -38,21 +38,34 @@ class InquiryController extends Controller
 
     public function store(StoreInquiryRequest $request)
     {
-        $inquiry = $this->inquiryRepository->create($request->validated());
+        $user = auth()->user();
+        $locationId = $user->hasRole('super_admin')
+            ? session('selected_location_id')
+            : $user->location_id;
+
+        abort_if(!$locationId, 422, 'No location selected.');
+
+        $data = $request->validated();
+        $data['location_id'] = $locationId;
+
+        $inquiry = $this->inquiryRepository->create($data);
         return response()->json([
             'success' => true,
             'message' => 'Inquiry submitted successfully',
-            'data' => $inquiry
+            'data'    => $inquiry
         ], 201);
     }
 
     public function update(UpdateInquiryRequest $request, $id)
     {
-        $inquiry = $this->inquiryRepository->update($id, $request->validated());
+        $data = $request->validated();
+        unset($data['location_id']);
+
+        $inquiry = $this->inquiryRepository->update($id, $data);
         return response()->json([
             'success' => true,
             'message' => 'Inquiry updated successfully',
-            'data' => $inquiry
+            'data'    => $inquiry
         ], 200);
     }
 
@@ -67,7 +80,7 @@ class InquiryController extends Controller
 
         try {
             Mail::to($inquiry->email)->send(new InquiryReplyMail($inquiry, $request->subject, $request->message));
-            
+
             return response()->json([
                 'success' => true,
                 'message' => 'Reply sent successfully'

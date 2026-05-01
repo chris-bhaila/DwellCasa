@@ -26,7 +26,7 @@ class StoreBookingRequest extends FormRequest
             'guest_name'      => 'required|string|max:255',
             'guest_email'     => 'required|email|max:255',
             'guest_phone'     => 'nullable|string|max:20',
-            'special_requests'=> 'nullable|string',
+            'special_requests' => 'nullable|string',
         ];
     }
 
@@ -41,9 +41,11 @@ class StoreBookingRequest extends FormRequest
         ];
 
         if ($email) {
+            $locationId = $this->route('location')?->id;
+
             $guest = Guest::firstOrCreate(
-                ['email' => $email],
-                ['full_name' => $name, 'phone' => $phone]
+                ['email' => $email, 'location_id' => $locationId],
+                ['full_name' => $name, 'phone' => $phone, 'location_id' => $locationId]
             );
             $merge['guest_id'] = $guest->id;
         }

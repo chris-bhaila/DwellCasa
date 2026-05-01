@@ -175,7 +175,8 @@
 <script>
 document.addEventListener('DOMContentLoaded', async function() {
     try {
-        const response = await fetch('/api/website-info');
+        const locationId = '{{ session('selected_location_id') }}';
+        const response = await fetch(`/api/website-info?location_id=${locationId}`);
         const result = await response.json();
         
         if (response.ok && result.data) {
@@ -218,6 +219,8 @@ document.getElementById('website-info-form').addEventListener('submit', async fu
     // API requires time formats to be H:i
     if (formData.get('check_in')) formData.set('check_in', formData.get('check_in').substring(0, 5));
     if (formData.get('check_out')) formData.set('check_out', formData.get('check_out').substring(0, 5));
+
+    formData.append('location_id', '{{ session('selected_location_id') }}');
 
     try {
         const response = await fetch('/api/website-info', {

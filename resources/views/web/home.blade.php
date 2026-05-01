@@ -1,181 +1,95 @@
 @extends('layouts.app')
 
-@section('title', 'DwellCasa - Luxury Stays in Lalitpur')
-
-@section('content')
+@section('title', 'DwellCasa - Luxury Stays in Nepal')
 
 @push('head')
 <style>
-    /* Typography & Core Styling */
-    .font-serif {
-        font-family: 'Cormorant Garamond', serif;
-    }
+    .font-serif { font-family: 'Cormorant Garamond', serif; }
+    body { font-family: 'DM Sans', sans-serif; background-color: #fbfbf9; overflow-x: hidden; }
 
-    .font-sans {
-        font-family: 'DM Sans', sans-serif;
-    }
-
-    html {
-        scroll-behavior: smooth;
-    }
-
-    body {
-        font-family: 'DM Sans', sans-serif;
-        background-color: #fbfbf9;
-        overflow-x: hidden;
-    }
-
-    /* Glassmorphism Effect */
-    .glass {
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        border: 1px solid rgba(255, 255, 255, 0.3);
-    }
-
-    /* Hero Animation */
-    .hero-zoom {
-        animation: slowZoom 20s infinite alternate ease-in-out;
-    }
-
+    .hero-zoom { animation: slowZoom 20s infinite alternate ease-in-out; }
     @keyframes slowZoom {
-        from {
-            transform: scale(1);
-        }
-
-        to {
-            transform: scale(1.1);
-        }
+        from { transform: scale(1); }
+        to   { transform: scale(1.1); }
     }
 
-    /* Custom Scrollbar for Luxury Feel */
-    ::-webkit-scrollbar {
-        width: 8px;
-    }
+    .location-card-img { transition: transform 0.7s ease; }
+    .location-card:hover .location-card-img { transform: scale(1.06); }
 
-    ::-webkit-scrollbar-track {
-        background: #f1f1f1;
-    }
-
-    ::-webkit-scrollbar-thumb {
-        background: #1e293b;
-        border-radius: 10px;
-    }
-
-    /* Remove default date styling for cleaner UI */
-    input[type="date"]::-webkit-calendar-picker-indicator {
-        cursor: pointer;
-        opacity: 0.6;
-    }
-
-    /* Reviews Marquee */
-    .marquee-track {
-        flex-shrink: 0;
-        display: flex;
-        min-width: 100%;
-        animation: scrollLeft 40s linear infinite;
-    }
-
-    .marquee-container:hover .marquee-track {
-        animation-play-state: paused;
-    }
-
-    @keyframes scrollLeft {
-        from {
-            transform: translateX(0);
-        }
-
-        to {
-            transform: translateX(-100%);
-        }
+    .location-card-overlay {
+        background: linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.15) 60%, transparent 100%);
     }
 </style>
 @endpush
 
+@section('content')
 <main>
 
-    <section class="relative min-h-[85vh] flex items-center justify-center overflow-hidden bg-slate-900">
+    {{-- ── Hero ──────────────────────────────────────────────────────── --}}
+    <section class="relative min-h-[80vh] flex items-center justify-center overflow-hidden bg-slate-900">
         <div class="absolute inset-0 z-0">
-            <img src="{{ $webInfo->homepage_main_image ? asset('storage/' . $webInfo->homepage_main_image) : 'https://upload.wikimedia.org/wikipedia/commons/6/68/Pashupatinaath0587.JPG' }}"
-                class="hero-zoom w-full h-full object-cover opacity-50" alt="DwellCasa">
-            <div class="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-slate-900/60"></div>
+            <img
+                src="{{ $webInfo->homepage_main_image ? asset('storage/' . $webInfo->homepage_main_image) : 'https://upload.wikimedia.org/wikipedia/commons/6/68/Pashupatinaath0587.JPG' }}"
+                class="hero-zoom w-full h-full object-cover opacity-45"
+                alt="DwellCasa Nepal"
+            >
+            <div class="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-slate-900/70"></div>
         </div>
 
-        <div class="relative z-10 text-center text-white px-6 max-w-5xl" data-aos="fade-up" data-aos-duration="1200">
-            <span class="font-serif uppercase tracking-[0.1em] text-xs md:text-xl mb-6 block font-medium opacity-90">{{ $webInfo->front_page_sub_heading_1 }}</span>
-            <h1 class="font-serif text-5xl font-extrabold md:text-8xl mb-8 italic">{{ $webInfo->front_page_main_heading }}</h1>
-            <p class="text-base md:text-xl font-light max-w-2xl mx-auto mb-12 leading-relaxed opacity-80">
-                {{ $webInfo->front_page_sub_heading_2 }}
+        <div class="relative z-10 text-center text-white px-6 max-w-4xl" data-aos="fade-up" data-aos-duration="1200">
+            <span class="font-serif uppercase tracking-[0.12em] text-xs md:text-sm mb-6 block font-medium opacity-80">
+                Two Locations. One Standard of Excellence.
+            </span>
+            <h1 class="font-serif text-5xl md:text-8xl font-extrabold mb-8 italic leading-tight">
+                {{ $webInfo->front_page_main_heading ?? 'DwellCasa' }}
+            </h1>
+            <p class="text-base md:text-xl font-light max-w-2xl mx-auto mb-12 leading-relaxed opacity-75">
+                {{ $webInfo->front_page_sub_heading_2 ?? 'Curated luxury stays in the heart of Nepal.' }}
             </p>
-            <div class="flex flex-col sm:flex-row gap-6 justify-center items-center">
-                <a href="#rooms" class="w-full sm:w-auto bg-white text-slate-900 px-10 py-4 rounded-full font-bold hover:bg-slate-100 transition-all transform hover:-translate-y-1 shadow-xl">
-                    Explore Suites
-                </a>
-                <a href="#booking-form" class="w-full sm:w-auto border border-white/40 backdrop-blur-md px-10 py-4 rounded-full font-semibold hover:bg-white/20 transition-all">
-                    Quick Booking
-                </a>
-            </div>
+            <a href="#locations"
+               class="inline-block border border-white/40 backdrop-blur-md px-10 py-4 rounded-full font-semibold hover:bg-white/20 transition-all">
+                Choose Your Location ↓
+            </a>
         </div>
     </section>
 
-    <section id="booking-form" class="relative z-30 -mt-10 md:-mt-14 px-4">
+    {{-- ── Location Cards ────────────────────────────────────────────── --}}
+    <section id="locations" class="py-28 px-6">
         <div class="max-w-6xl mx-auto">
-            <div class="glass shadow-2xl rounded-3xl md:rounded-full p-2 md:p-3" data-aos="zoom-in" data-aos-delay="200">
-                <form action="{{ route('booking.create') }}" method="GET" class="flex flex-col md:flex-row items-center gap-1">
-                    <div class="w-full md:flex-1 px-8 py-4 border-b md:border-b-0 md:border-r border-slate-200/50">
-                        <label class="block text-[10px] uppercase tracking-widest text-slate-400 mb-1 font-bold">Check In</label>
-                        <input type="date" name="check_in_date" class="bg-transparent border-none p-0 focus:ring-0 text-sm font-semibold w-full text-slate-800">
-                    </div>
-                    <div class="w-full md:flex-1 px-8 py-4 border-b md:border-b-0 md:border-r border-slate-200/50">
-                        <label class="block text-[10px] uppercase tracking-widest text-slate-400 mb-1 font-bold">Check Out</label>
-                        <input type="date" name="check_out_date" class="bg-transparent border-none p-0 focus:ring-0 text-sm font-semibold w-full text-slate-800">
-                    </div>
-                    <div class="w-full md:flex-1 px-8 py-4">
-                        <label class="block text-[10px] uppercase tracking-widest text-slate-400 mb-1 font-bold">Room Type</label>
-                        <select name="room_type_id" class="bg-transparent border-none p-0 focus:ring-0 text-sm font-semibold w-full text-slate-800 appearance-none cursor-pointer">
-                            @foreach($featuredRoomTypes as $roomType)
-                            <option value="{{ $roomType->id }}">{{ $roomType->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="w-full md:w-auto p-1">
-                        <button type="submit" class="w-full md:px-10 py-4 md:py-5 rounded-2xl md:rounded-full bg-primary text-white hover:bg-primary-dark
-                        transition-all uppercase tracking-widest text-xs font-bold shadow-lg transform hover:scale-[1.02]">
-                            Check Availability
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </section>
 
-    <section id="rooms" class="py-32">
-        <div class="max-w-7xl mx-auto px-6">
-            <div class="flex flex-col md:flex-row justify-between items-end mb-20" data-aos="fade-right">
-                <div class="max-w-xl">
-                    <h2 class="font-serif text-4xl md:text-6xl mb-6 text-black font-bold italic">Curated Spaces</h2>
-                    <p class="text-slate-500 text-lg leading-relaxed">Each room is a masterpiece of design, blending local Nepalese artistry with modern minimalist luxury.</p>
-                </div>
-                <a href="{{ route('web.rooms.index') }}" class="mt-8 md:mt-0 inline-flex items-center gap-3 text-black border-b-2 border-black pb-2 font-bold hover:text-primary hover:border-primary transition-all group">
-                    View All Accommodations
-                    <span class="group-hover:translate-x-2 transition-transform">→</span>
-                </a>
+            <div class="text-center mb-20" data-aos="fade-up">
+                <span class="uppercase tracking-[0.12em] text-xs font-bold text-primary mb-4 block">Our Properties</span>
+                <h2 class="font-serif text-4xl md:text-6xl font-bold italic text-slate-900">Where Would You Like to Stay?</h2>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
-                @foreach($featuredRoomTypes as $roomType)
-                <a href="{{ route('web.rooms.show', $roomType->id) }}" class="block group bg-white rounded-[2.5rem] cursor-pointer overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 border border-slate-100" data-aos="fade-up" data-aos-delay="{{ $loop->index * 150 }}">
-                    <div class="relative aspect-[4/5] overflow-hidden">
-                        <img src="{{ $roomType->thumbnail ? asset('storage/' . $roomType->thumbnail) : 'https://images.unsplash.com/photo-1618773928121-c32242e63f39?auto=format&fit=crop&q=80&w=800' }}"
-                            class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="{{ $roomType->name }}">
-                        <div class="absolute top-6 left-6 glass px-5 py-2 rounded-full text-sm font-bold text-slate-900 shadow-sm">
-                            Rs.{{ $roomType->price_per_night }} <span class="text-[10px] font-normal text-slate-500 italic">/ night</span>
-                        </div>
-                    </div>
-                    <div class="p-10">
-                        <h3 class="font-serif text-3xl font-bold text-black mb-3 group-hover:text-primary transition-colors">{{ $roomType->name }}</h3>
-                        <span class="inline-flex items-center gap-2 font-bold text-slate-900 group-hover:gap-4 transition-all">
-                            Explore Room <span>→</span>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
+                @foreach($locations as $loc)
+                <a href="{{ route('location.home', $loc->slug) }}"
+                   class="location-card group relative block rounded-[2.5rem] overflow-hidden aspect-[3/4] md:aspect-[4/5] shadow-lg hover:shadow-2xl transition-shadow duration-500"
+                   data-aos="fade-up"
+                   data-aos-delay="{{ $loop->index * 150 }}">
+
+                    <img
+                        src="{{ $loc->hero_image ? asset('storage/' . $loc->hero_image) : 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&q=80&w=800' }}"
+                        class="location-card-img absolute inset-0 w-full h-full object-cover"
+                        alt="{{ $loc->name }}"
+                    >
+
+                    <div class="location-card-overlay absolute inset-0"></div>
+
+                    <div class="absolute inset-0 flex flex-col justify-end p-10 text-white">
+                        <p class="text-xs uppercase tracking-[0.15em] font-bold opacity-70 mb-3">Nepal</p>
+                        <h3 class="font-serif text-4xl md:text-5xl font-bold italic mb-4 leading-tight">
+                            {{ $loc->name }}
+                        </h3>
+                        @if(isset($loc->short_description))
+                        <p class="text-white/70 text-sm leading-relaxed mb-6 max-w-sm">
+                            {{ $loc->short_description }}
+                        </p>
+                        @endif
+                        <span class="inline-flex items-center gap-3 text-sm font-bold border-b border-white/40 pb-1 group-hover:border-white transition-colors">
+                            Explore Property
+                            <span class="group-hover:translate-x-2 transition-transform inline-block">→</span>
                         </span>
                     </div>
                 </a>
@@ -184,118 +98,69 @@
         </div>
     </section>
 
-    <section class="py-24 bg-white overflow-hidden">
+    {{-- ── Brand Promise ─────────────────────────────────────────────── --}}
+    <section class="py-24 bg-white">
+        <div class="max-w-4xl mx-auto px-6 text-center" data-aos="fade-up">
+            <h2 class="font-serif text-4xl md:text-5xl font-bold italic text-slate-900 mb-8">
+                The DwellCasa Standard
+            </h2>
+            <p class="text-slate-500 text-lg leading-relaxed max-w-2xl mx-auto">
+                Whether in the cultural heart of Patan or the vibrant energy of Thamel,
+                every DwellCasa property delivers the same promise — thoughtful design,
+                genuine hospitality, and an unmistakably Nepali sense of place.
+            </p>
+        </div>
+    </section>
+
+    {{-- ── Reviews ───────────────────────────────────────────────────── --}}
+    @if(isset($reviews) && $reviews->count() > 0)
+    <section class="py-24 bg-slate-50 overflow-hidden">
         <div class="max-w-7xl mx-auto px-6 mb-16">
             <div class="text-center" data-aos="fade-up">
-                <span class="uppercase tracking-[0.1em] text-md text-primary font-bold mb-4 block">Guest Experiences</span>
+                <span class="uppercase tracking-[0.1em] text-xs text-primary font-bold mb-4 block">Guest Experiences</span>
                 <h2 class="font-serif font-bold text-4xl md:text-5xl text-black italic">What They Say</h2>
                 <div class="w-24 h-1 bg-black mx-auto mt-8"></div>
             </div>
         </div>
 
-        @php
-        $reviews = \App\Models\Review::where('status', 'approved')
-        ->orderByDesc('rating')
-        ->latest()
-        ->take(5)
-        ->get();
-        @endphp
+        <style>
+            .marquee-track { flex-shrink: 0; display: flex; min-width: 100%; animation: scrollLeft 40s linear infinite; }
+            .marquee-container:hover .marquee-track { animation-play-state: paused; }
+            @keyframes scrollLeft { from { transform: translateX(0); } to { transform: translateX(-100%); } }
+        </style>
 
-        @if($reviews->count() > 0)
-        <div class="marquee-container flex overflow-hidden w-full relative group">
-            <!-- Fade gradients to blend sides into background -->
-            <div class="absolute inset-y-0 left-0 w-16 md:w-32 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none"></div>
-            <div class="absolute inset-y-0 right-0 w-16 md:w-32 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none"></div>
+        <div class="marquee-container flex overflow-hidden w-full relative">
+            <div class="absolute inset-y-0 left-0 w-16 md:w-32 bg-gradient-to-r from-slate-50 to-transparent z-10 pointer-events-none"></div>
+            <div class="absolute inset-y-0 right-0 w-16 md:w-32 bg-gradient-to-l from-slate-50 to-transparent z-10 pointer-events-none"></div>
 
-            <!-- Track 1 -->
-            <div class="marquee-track flex gap-6 md:gap-8 px-3 md:px-4">
+            @foreach([1, 2] as $track)
+            <div class="marquee-track flex gap-6 md:gap-8 px-3 md:px-4" @if($track === 2) aria-hidden="true" @endif>
                 @foreach($reviews as $review)
-                <div class="flex-none w-[90vw] md:w-[30rem] bg-slate-50 p-10 rounded-[2rem] shadow-sm border border-slate-100 flex flex-col justify-between transform transition-transform duration-300 hover:-translate-y-2">
+                <div class="flex-none w-[90vw] md:w-[30rem] bg-white p-10 rounded-[2rem] shadow-sm border border-slate-100 flex flex-col justify-between">
                     <div>
                         <div class="flex items-center mb-4">
                             @for($i = 1; $i <= 5; $i++)
-                                <span class="text-3xl {{ $i <= $review->rating ? 'text-yellow-400' : 'text-slate-200' }}">★</span>
-                                @endfor
+                            <span class="text-2xl {{ $i <= $review->rating ? 'text-yellow-400' : 'text-slate-200' }}">★</span>
+                            @endfor
                         </div>
-                        @if($review->type === 'room_type' && $review->roomType)
-                        <p class="text-xs text-[#A89070] font-bold uppercase tracking-widest mb-2">Stayed in {{ $review->roomType->name }}</p>
-                        @endif
                         <p class="text-slate-600 text-base leading-relaxed mb-8 line-clamp-4">"{{ $review->body }}"</p>
                     </div>
                     <div class="flex items-center gap-4 pt-4 border-t border-slate-200/50">
-                        <div class="w-14 h-14 rounded-full bg-[#A89070] flex items-center justify-center font-bold text-white text-xl shadow-inner">
+                        <div class="w-12 h-12 rounded-full bg-[#A89070] flex items-center justify-center font-bold text-white text-lg">
                             {{ substr($review->name, 0, 1) }}
                         </div>
                         <div>
-                            <p class="font-bold text-base text-slate-900">{{ $review->name }}</p>
-                            <p class="text-sm text-slate-500 uppercase tracking-wider font-semibold mt-0.5">Verified Guest</p>
+                            <p class="font-bold text-sm text-slate-900">{{ $review->name }}</p>
+                            <p class="text-xs text-slate-500 uppercase tracking-wider font-semibold mt-0.5">Verified Guest</p>
                         </div>
                     </div>
                 </div>
                 @endforeach
             </div>
-
-            <!-- Track 2 (Duplicate for seamless loop) -->
-            <div class="marquee-track flex gap-6 md:gap-8 px-3 md:px-4" aria-hidden="true">
-                @foreach($reviews as $review)
-                <div class="flex-none w-[90vw] md:w-[30rem] bg-slate-50 p-10 rounded-[2rem] shadow-sm border border-slate-100 flex flex-col justify-between transform transition-transform duration-300 hover:-translate-y-2">
-                    <div>
-                        <div class="flex items-center mb-4">
-                            @for($i = 1; $i <= 5; $i++)
-                                <span class="text-3xl {{ $i <= $review->rating ? 'text-yellow-400' : 'text-slate-200' }}">★</span>
-                                @endfor
-                        </div>
-                        @if($review->type === 'room_type' && $review->roomType)
-                        <p class="text-xs text-[#A89070] font-bold uppercase tracking-widest mb-2">Stayed in {{ $review->roomType->name }}</p>
-                        @endif
-                        <p class="text-slate-600 text-base leading-relaxed mb-8 line-clamp-4">"{{ $review->body }}"</p>
-                    </div>
-                    <div class="flex items-center gap-4 pt-4 border-t border-slate-200/50">
-                        <div class="w-14 h-14 rounded-full bg-[#A89070] flex items-center justify-center font-bold text-white text-xl shadow-inner">
-                            {{ substr($review->name, 0, 1) }}
-                        </div>
-                        <div>
-                            <p class="font-bold text-base text-slate-900">{{ $review->name }}</p>
-                            <p class="text-sm text-slate-500 uppercase tracking-wider font-semibold mt-0.5">Verified Guest</p>
-                        </div>
-                    </div>
-                </div>
-                @endforeach
-            </div>
-        </div>
-        @else
-        <div class="text-center text-slate-500 italic pb-8">
-            Check back soon for our latest guest experiences.
-        </div>
-        @endif
-    </section>
-
-    <section class="relative py-32 md:py-48 overflow-hidden bg-black/75">
-        <div class="absolute inset-0 z-0">
-            <img src="{{ $webInfo->homepage_end_image ? asset('storage/' . $webInfo->homepage_end_image) : 'https://cdn1.prayagsamagam.com/media/2025/05/20170044/3-42.webp' }}"
-                class="w-full h-full object-cover opacity-30" alt="DwellCasa">
-            <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
-        </div>
-
-        <div class="relative z-10 max-w-4xl mx-auto text-center px-6" data-aos="fade-up">
-            <h2 class="font-serif font-bold text-5xl md:text-7xl text-white mb-10 italic">
-                {{ $webInfo->front_page_end_heading }}
-            </h2>
-            <p class="text-white/60 text-lg md:text-xl mb-14 max-w-xl mx-auto font-light leading-relaxed">
-                {{ $webInfo->front_page_end_sub_heading }}
-            </p>
-            <a href="{{ route('booking.create') }}"
-                class="inline-block bg-white text-slate-900 px-14 py-6 rounded-full font-bold text-xl hover:scale-105 transition-transform shadow-2xl hover:bg-blue-50">
-                Reserve Your Suite Now
-            </a>
+            @endforeach
         </div>
     </section>
+    @endif
 
 </main>
-<script src="https://unpkg.com/lucide@latest"></script>
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        lucide.createIcons();
-    });
-</script>
 @endsection

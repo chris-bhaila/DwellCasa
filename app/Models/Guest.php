@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\Scopes\LocationScope;
 
 class Guest extends Model
 {
@@ -20,6 +21,7 @@ class Guest extends Model
         'id_number',
         'address',
         'notes',
+        'location_id',
     ];
 
     public function bookings(): HasMany
@@ -27,13 +29,13 @@ class Guest extends Model
         return $this->hasMany(Booking::class);
     }
 
-    public function bookingInquiries(): HasMany
-    {
-        return $this->hasMany(BookingInquiry::class);
-    }
-
     public function payments(): HasMany
     {
         return $this->hasMany(Payment::class);
+    }
+
+    protected static function booted(): void
+    {
+        static::addGlobalScope(new LocationScope());
     }
 }

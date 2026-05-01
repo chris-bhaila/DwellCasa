@@ -9,6 +9,7 @@ use App\Http\Requests\StoreBookingRequest;
 use App\Models\Booking;
 use App\Models\RoomType;
 use Illuminate\Support\Facades\DB;
+use App\Models\Location;
 
 class BookingController extends Controller
 {
@@ -23,13 +24,15 @@ class BookingController extends Controller
         $this->bookingRepository  = $bookingRepository;
     }
 
-    public function create()
+    public function create(Location $location)
     {
-        $roomTypes = $this->roomTypeRepository->all();
-        return view('web.booking', compact('roomTypes'));
+        $roomTypes = RoomType::where('location_id', $location->id)
+            ->where('is_active', true)
+            ->get();
+        return view('web.booking', compact('roomTypes', 'location'));
     }
 
-    public function store(StoreBookingRequest $request)
+    public function store(StoreBookingRequest $request, Location $location)
     {
         $roomType = RoomType::findOrFail($request->room_type_id);
         $bookableRoomsCount = $roomType->rooms()
@@ -56,7 +59,7 @@ class BookingController extends Controller
             : $rate * ceil($nights / 30);
 
         try {
-            DB::transaction(function () use ($request, $rate, $total, $bookableRoomsCount) {
+            DB::transaction(function () use ($request, $rate, $total, $bookableRoomsCount, $location) {
                 // Lock room type row to prevent race conditions
                 $roomType = RoomType::lockForUpdate()
                     ->findOrFail($request->room_type_id);
@@ -66,7 +69,7 @@ class BookingController extends Controller
                 if ($currentBookableRoomsCount === 0) {
                     throw new \Exception('fully_booked:all');
                 }
-                
+
                 // Check availability inside the lock
                 $bookings = Booking::where('room_type_id', $request->room_type_id)
                     ->whereIn('status', ['pending', 'confirmed', 'checked_in'])
@@ -92,6 +95,7 @@ class BookingController extends Controller
                 }
 
                 $this->bookingRepository->create(array_merge($request->validated(), [
+                    'location_id'    => $location->id,
                     'status'         => 'pending',
                     'payment_status' => 'unpaid',
                     'rate_per_night' => $request->stay_type === 'short_term' ? $rate : null,

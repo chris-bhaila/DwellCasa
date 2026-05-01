@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Contracts\BookingInquiryRepositoryInterface;
 use App\Http\Requests\StoreBookingInquiryRequest;
 use App\Http\Requests\UpdateBookingInquiryRequest;
+use Spatie\Activitylog\Facades\Activity;
 
 class BookingInquiryController extends Controller
 {
@@ -46,6 +47,11 @@ class BookingInquiryController extends Controller
     public function update(UpdateBookingInquiryRequest $request, $id)
     {
         $inquiry = $this->bookingInquiryRepository->update($id, $request->validated());
+        activity()
+            ->causedBy(auth()->user())
+            ->performedOn($inquiry)
+            ->withProperties(['location_id' => $inquiry->location_id])
+            ->log('Updated booking inquiry from ' . $inquiry->name);
         return response()->json([
             'success' => true,
             'message' => 'Booking inquiry updated successfully',
@@ -55,6 +61,11 @@ class BookingInquiryController extends Controller
 
     public function destroy($id)
     {
+        $inquiry = $this->bookingInquiryRepository->find($id);
+        activity()
+            ->causedBy(auth()->user())
+            ->withProperties(['location_id' => $inquiry->location_id])
+            ->log('Deleted booking inquiry from ' . $inquiry->name);
         $this->bookingInquiryRepository->delete($id);
         return response()->json([
             'success' => true,

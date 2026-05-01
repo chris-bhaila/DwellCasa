@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Models\Scopes\LocationScope;
 
 class Review extends Model
 {
@@ -61,5 +62,10 @@ class Review extends Model
     public function scopeRoomType($query)
     {
         return $query->where('type', 'room_type');
+    }
+    
+    protected static function booted(): void
+    {
+        static::addGlobalScope(new LocationScope());
     }
 }

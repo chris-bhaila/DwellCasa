@@ -30,11 +30,52 @@ class HomeController extends Controller
 
     public function index()
     {
-        $webInfo = $this->websiteInfoRepository->get();
-        $featuredRoomTypes = $this->roomTypeRepository->all()->take(3);
-        $amenities = $this->amenityRepository->all()->take(6);
-        $galleryImages = $this->galleryImageRepository->all()->take(8);
+        $locations = \App\Models\Location::where('is_active', true)->orderBy('name')->get();
+        $webInfo   = $this->websiteInfoRepository->getGlobal();
+        $reviews   = \App\Models\Review::withoutGlobalScopes()
+            ->where('status', 'approved')
+            ->orderByDesc('rating')
+            ->latest()
+            ->take(8)
+            ->get();
 
-        return view('web.home', compact('featuredRoomTypes', 'amenities', 'galleryImages', 'webInfo'));
+        return view('web.home', compact('locations', 'webInfo', 'reviews'));
+    }
+
+    public function location(\App\Models\Location $location)
+    {
+        $webInfo          = $this->websiteInfoRepository->getForLocation($location->id);
+        $featuredRoomTypes = \App\Models\RoomType::withoutGlobalScopes()
+            ->where('location_id', $location->id)
+            ->where('is_active', true)
+            ->take(3)
+            ->get();
+        $amenities        = \App\Models\Amenity::withoutGlobalScopes()
+            ->where('location_id', $location->id)
+            ->where('is_active', true)
+            ->take(6)
+            ->get();
+        $galleryImages    = \App\Models\GalleryImage::withoutGlobalScopes()
+            ->where('location_id', $location->id)
+            ->where('is_active', true)
+            ->latest()
+            ->take(8)
+            ->get();
+        $reviews          = \App\Models\Review::withoutGlobalScopes()
+            ->where('location_id', $location->id)
+            ->where('status', 'approved')
+            ->orderByDesc('rating')
+            ->latest()
+            ->take(8)
+            ->get();
+
+        return view('web.location', compact(
+            'location',
+            'webInfo',
+            'featuredRoomTypes',
+            'amenities',
+            'galleryImages',
+            'reviews'
+        ));
     }
 }

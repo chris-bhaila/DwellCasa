@@ -4,8 +4,7 @@ namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
 use App\Contracts\WebsiteInfoRepositoryInterface;
-
-
+use App\Models\Location;
 class ContactController extends Controller
 {
     protected $websiteInfoRepository;
@@ -16,10 +15,9 @@ class ContactController extends Controller
     ) {
         $this->websiteInfoRepository = $websiteInfoRepository;
     }
-    public function index()
+    public function index(Location $location)
     {
-        $webInfo = $this->websiteInfoRepository->get();
-
-        return view('web.contact', compact('webInfo'));
+        $webInfo = $this->websiteInfoRepository->getForLocation($location->id);
+        return view('web.contact', compact('webInfo', 'location'));
     }
 }

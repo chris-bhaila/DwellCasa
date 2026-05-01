@@ -66,7 +66,7 @@
                             <p class="text-sm text-slate-600 mt-1">Rs. {{ number_format($roomType->price_per_month, 0) }}/month</p>
                             @endif
                         </div>
-                        <a href="{{ route('web.rooms.show', $roomType->id) }}" class="inline-flex items-center justify-center bg-slate-900 text-white px-8 py-3.5 rounded-xl font-medium hover:bg-primary transition-colors hover:-translate-y-0.5 transform duration-200">
+                        <a href="{{ route('web.rooms.show', [$location->slug, $roomType->id]) }}" class="inline-flex items-center justify-center bg-slate-900 text-white px-8 py-3.5 rounded-xl font-medium hover:bg-primary transition-colors hover:-translate-y-0.5 transform duration-200">
                             View Details
                         </a>
                     </div>

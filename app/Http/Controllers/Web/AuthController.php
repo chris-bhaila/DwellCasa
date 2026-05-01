@@ -19,12 +19,37 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $credentials = $request->validate([
-            'email' => ['required', 'email'],
-            'password' => ['required'],
+            'email'       => ['required', 'email'],
+            'password'    => ['required'],
+            'location_id' => ['nullable', 'exists:locations,id'],
         ]);
 
-        if (Auth::attempt($credentials)) {
+        $loginCredentials = [
+            'email'    => $credentials['email'],
+            'password' => $credentials['password'],
+        ];
+
+        if (Auth::attempt($loginCredentials)) {
             $request->session()->regenerate();
+
+            $user = Auth::user();
+
+            // Super admin — store selected location in session
+            if ($user->hasRole('super_admin')) {
+                session(['selected_location_id' => $request->location_id ?? null]);
+                return redirect()->intended(route('admin'));
+            }
+
+            // Admin/staff — must belong to a location
+            if (!$user->location_id) {
+                Auth::logout();
+                return back()->withErrors([
+                    'email' => 'Your account is not assigned to any location. Please contact your administrator.',
+                ]);
+            }
+
+            // Store location in session for consistency
+            session(['selected_location_id' => $user->location_id]);
 
             return redirect()->intended(route('admin'));
         }

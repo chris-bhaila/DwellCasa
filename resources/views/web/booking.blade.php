@@ -21,7 +21,7 @@
             </p>
         </div>
 
-        <form action="{{ route('booking.store') }}" method="POST" id="main-booking-form">
+        <form action="{{ route('booking.store', $location->slug) }}" method="POST" id="main-booking-form">
             @csrf
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">

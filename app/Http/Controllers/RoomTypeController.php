@@ -10,7 +10,7 @@ use App\Models\Booking;
 use App\Models\RoomType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-
+use Spatie\Activitylog\Facades\Activity;
 
 class RoomTypeController extends Controller
 {
@@ -41,7 +41,15 @@ class RoomTypeController extends Controller
 
     public function store(StoreRoomTypeRequest $request)
     {
+        $user = auth()->user();
+        $locationId = $user->hasRole('super_admin')
+            ? session('selected_location_id')
+            : $user->location_id;
+
+        abort_if(!$locationId, 422, 'No location selected. Please select a location before creating a room type.');
+
         $data = $request->validated();
+        $data['location_id'] = $locationId;
 
         if ($request->hasFile('thumbnail')) {
             $file = $request->file('thumbnail');
@@ -50,6 +58,11 @@ class RoomTypeController extends Controller
         }
 
         $roomType = $this->roomTypeRepository->create($data);
+        activity()
+            ->causedBy(auth()->user())
+            ->performedOn($roomType)
+            ->withProperties(['location_id' => $locationId])
+            ->log('Created room type ' . $roomType->name);
 
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $file) {
@@ -60,6 +73,7 @@ class RoomTypeController extends Controller
                     'imageable_type' => \App\Models\RoomType::class,
                     'imageable_id'   => $roomType->id,
                     'is_active'      => true,
+                    'location_id'    => $locationId,
                 ]);
             }
         }
@@ -67,13 +81,15 @@ class RoomTypeController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Room type created successfully',
-            'data' => $roomType
+            'data'    => $roomType
         ], 201);
     }
 
     public function update(UpdateRoomTypeRequest $request, $id)
     {
         $data = $request->validated();
+        unset($data['location_id']); // never allow location reassignment
+
         $roomType = $this->roomTypeRepository->find($id);
 
         if ($request->hasFile('thumbnail')) {
@@ -84,9 +100,16 @@ class RoomTypeController extends Controller
                 Storage::disk('public')->delete($roomType->thumbnail);
             }
             $data['thumbnail'] = $file->storeAs('room_types', $filename, 'public');
+        } else {
+            unset($data['thumbnail']);
         }
 
         $updatedRoomType = $this->roomTypeRepository->update($id, $data);
+        activity()
+            ->causedBy(auth()->user())
+            ->performedOn($updatedRoomType)
+            ->withProperties(['location_id' => $updatedRoomType->location_id])
+            ->log('Updated room type ' . $updatedRoomType->name);
 
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $file) {
@@ -97,6 +120,7 @@ class RoomTypeController extends Controller
                     'imageable_type' => \App\Models\RoomType::class,
                     'imageable_id'   => $roomType->id,
                     'is_active'      => true,
+                    'location_id'    => $roomType->location_id, // inherit from existing record
                 ]);
             }
         }
@@ -104,12 +128,17 @@ class RoomTypeController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Room type updated successfully',
-            'data' => $updatedRoomType
+            'data'    => $updatedRoomType
         ], 200);
     }
 
     public function destroy($id)
     {
+        $roomType = $this->roomTypeRepository->find($id);
+        activity()
+            ->causedBy(auth()->user())
+            ->withProperties(['location_id' => $roomType->location_id])
+            ->log('Deleted room type ' . $roomType->name);
         $this->roomTypeRepository->delete($id);
         return response()->json([
             'success' => true,
@@ -142,6 +171,11 @@ class RoomTypeController extends Controller
             'is_active'      => true,
             'sort_order'     => $request->sort_order ?? 0,
         ]);
+        activity()
+            ->causedBy(auth()->user())
+            ->performedOn($roomType)
+            ->withProperties(['location_id' => $roomType->location_id])
+            ->log('Uploaded image to room type ' . $roomType->name);
 
         return response()->json([
             'success' => true,
@@ -167,6 +201,11 @@ class RoomTypeController extends Controller
         if (method_exists($image, 'forceDelete')) {
             $image->forceDelete();
         } else {
+            activity()
+                ->causedBy(auth()->user())
+                ->performedOn($roomType)
+                ->withProperties(['location_id' => $roomType->location_id])
+                ->log('Deleted image from room type ' . $roomType->name);
             $image->delete();
         }
 
