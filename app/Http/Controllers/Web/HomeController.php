@@ -7,6 +7,9 @@ use App\Contracts\RoomTypeRepositoryInterface;
 use App\Contracts\AmenityRepositoryInterface;
 use App\Contracts\GalleryImageRepositoryInterface;
 use App\Contracts\WebsiteInfoRepositoryInterface;
+use App\Models\Booking;
+use App\Models\Room;
+use Carbon\CarbonPeriod;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -69,13 +72,50 @@ class HomeController extends Controller
             ->take(8)
             ->get();
 
+        $bookedDatesByRoomType = [];
+        foreach ($featuredRoomTypes as $rt) {
+            $totalRooms = Room::withoutGlobalScopes()
+                ->where('room_type_id', $rt->id)
+                ->whereNotIn('status', ['maintenance', 'out_of_service'])
+                ->count();
+
+            if ($totalRooms === 0) {
+                $period = CarbonPeriod::create(now(), now()->addYears(2));
+                $bookedDatesByRoomType[$rt->id] = collect($period)->map(fn($d) => $d->format('Y-m-d'))->values()->toArray();
+            } else {
+                $bookings = Booking::where('room_type_id', $rt->id)
+                    ->whereIn('status', ['pending', 'confirmed', 'checked_in'])
+                    ->where('check_out_date', '>', now()->toDateString())
+                    ->get(['check_in_date', 'check_out_date']);
+
+                $dateCounts = [];
+                foreach ($bookings as $booking) {
+                    $period = CarbonPeriod::create($booking->check_in_date, $booking->check_out_date->copy()->subDay());
+                    foreach ($period as $date) {
+                        $dateStr = $date->format('Y-m-d');
+                        $dateCounts[$dateStr] = ($dateCounts[$dateStr] ?? 0) + 1;
+                    }
+                }
+
+                $booked = [];
+                foreach ($dateCounts as $date => $count) {
+                    if ($count >= $totalRooms) {
+                        $booked[] = $date;
+                    }
+                }
+                sort($booked);
+                $bookedDatesByRoomType[$rt->id] = $booked;
+            }
+        }
+
         return view('web.location', compact(
             'location',
             'webInfo',
             'featuredRoomTypes',
             'amenities',
             'galleryImages',
-            'reviews'
+            'reviews',
+            'bookedDatesByRoomType'
         ));
     }
 }

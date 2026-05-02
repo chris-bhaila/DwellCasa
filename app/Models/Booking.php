@@ -7,11 +7,18 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\MassPrunable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\Scopes\LocationScope;
+
 class Booking extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, MassPrunable;
+
+    public function prunable(): \Illuminate\Database\Eloquent\Builder
+    {
+        return static::onlyTrashed()->where('deleted_at', '<=', now()->subDays(90));
+    }
 
     protected $fillable = [
         'booking_ref',

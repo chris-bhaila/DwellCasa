@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Contracts\LocationRepositoryInterface;
 use App\Http\Requests\StoreLocationRequest;
 use App\Http\Requests\UpdateLocationRequest;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -83,5 +82,12 @@ class LocationController extends Controller
             'success' => true,
             'message' => 'Location deleted successfully'
         ], 200);
+    }
+
+    public function page()
+    {
+        $locations = $this->locationRepository->all();
+
+        return view('admin.location', compact('locations'));
     }
 }

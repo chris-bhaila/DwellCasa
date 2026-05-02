@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Contracts\RoomTypeRepositoryInterface;
 use App\Http\Requests\StoreGalleryImageRequest;
 use App\Models\GalleryImage;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
-use Spatie\Activitylog\Facades\Activity;
 class GalleryImageController extends Controller
 {
     /**
@@ -64,5 +64,13 @@ class GalleryImageController extends Controller
         }
 
         return response()->json(['success' => true, 'message' => 'Image deleted successfully.'], 200);
+    }
+
+    public function page(RoomTypeRepositoryInterface $roomTypeRepository)
+    {
+        $roomTypes = $roomTypeRepository->all();
+        $images    = GalleryImage::latest()->get();
+
+        return view('admin.gallery', compact('roomTypes', 'images'));
     }
 }

@@ -57,4 +57,11 @@ class AmenityController extends Controller
         $this->amenityRepository->delete($id);
         return response()->json(['success' => true, 'message' => 'Amenity deleted successfully'], 200);
     }
+
+    public function page()
+    {
+        $amenities = $this->amenityRepository->all();
+
+        return view('admin.amenities', compact('amenities'));
+    }
 }

@@ -7,13 +7,12 @@ use App\Models\Room;
 use App\Contracts\CheckOutRepositoryInterface;
 use App\Http\Requests\StoreCheckOutRequest;
 use App\Http\Requests\UpdateCheckOutRequest;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use App\Models\Review;
 use App\Mail\ReviewRequestMail;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
-use Spatie\Activitylog\Facades\Activity;
 
 class CheckOutController extends Controller
 {
@@ -24,7 +23,7 @@ class CheckOutController extends Controller
         $this->checkOutRepository = $checkOutRepository;
     }
 
-    public function index(Request $request)
+    public function index()
     {
         $checkOuts = $this->checkOutRepository->all();
         return response()->json([
@@ -44,26 +43,25 @@ class CheckOutController extends Controller
 
     public function store(StoreCheckOutRequest $request)
     {
+        $emailData = null;
+
         try {
-            $checkOut = DB::transaction(function () use ($request) {
+            $checkOut = DB::transaction(function () use ($request, &$emailData) {
                 $validated = $request->validated();
 
-                // 1. Create check_out record
                 $checkOutRecord = $this->checkOutRepository->create($validated);
 
-                // 2. Update booking status
                 $booking = Booking::with(['guest', 'roomType'])->findOrFail($validated['booking_id']);
                 $booking->status = 'checked_out';
                 $booking->checked_out_at = $validated['checked_out_at'];
                 $booking->save();
 
-                // 3. Update room status back to available
                 if ($booking->room_id) {
                     $room = Room::findOrFail($booking->room_id);
                     $room->status = 'available';
                     $room->save();
                 }
-                // 4. Generate review token and create pending review record
+
                 if ($booking->guest && $booking->room_type_id) {
                     $token = Str::uuid()->toString();
 
@@ -77,28 +75,34 @@ class CheckOutController extends Controller
                         'status'       => 'pending',
                         'review_token' => $token,
                         'token_used'   => false,
-                        'rating'       => 0, // placeholder until guest submits
-                        'body'         => '', // placeholder until guest submits
+                        'rating'       => 0,
+                        'body'         => '',
                     ]);
 
-                    // 5. Send review request email
-                    try {
-                        Mail::to($booking->guest->email)
-                            ->send(new ReviewRequestMail($booking, $token));
-                    } catch (\Exception $e) {
-                        \Log::error('Review request email failed: ' . $e->getMessage());
-                    }
+                    // Capture for dispatch after the transaction commits
+                    $emailData = ['booking' => $booking, 'token' => $token];
                 }
 
                 return $checkOutRecord;
             });
-            $booking = \App\Models\Booking::with(['guest', 'room'])->findOrFail($request->booking_id);
+
+            // Queue the review request email after the transaction has committed
+            if ($emailData) {
+                try {
+                    Mail::to($emailData['booking']->guest->email)
+                        ->queue(new ReviewRequestMail($emailData['booking'], $emailData['token']));
+                } catch (\Exception $e) {
+                    Log::error("Review request email failed: {$e->getMessage()}");
+                }
+            }
+
+            $booking = Booking::with(['guest', 'room'])->findOrFail($request->input('booking_id'));
 
             activity()
                 ->causedBy(auth()->user())
                 ->performedOn($booking)
                 ->withProperties(['location_id' => $booking->location_id])
-                ->log('Checked out guest ' . ($booking->guest->full_name ?? '') . ' — Room ' . ($booking->room->room_number ?? '') . ' (' . $booking->booking_ref . ')');
+                ->log("Checked out guest {$booking->guest->full_name} — Room {$booking->room->room_number} ({$booking->booking_ref})");
 
             return response()->json([
                 'message' => 'Guest successfully checked out.',

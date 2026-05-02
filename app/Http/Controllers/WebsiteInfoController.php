@@ -58,4 +58,9 @@ class WebsiteInfoController extends Controller
             'data'    => $info
         ], 200);
     }
+
+    public function page()
+    {
+        return view('admin.info');
+    }
 }

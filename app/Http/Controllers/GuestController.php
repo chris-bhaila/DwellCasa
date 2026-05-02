@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Contracts\GuestRepositoryInterface;
 use App\Http\Requests\StoreGuestRequest;
 use App\Http\Requests\UpdateGuestRequest;
+use App\Models\Guest;
 
 class GuestController extends Controller
 {
@@ -59,6 +60,35 @@ class GuestController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Guest deleted successfully'
+        ], 200);
+    }
+
+    public function trashed()
+    {
+        $guests = $this->guestRepository->trashed();
+        return response()->json([
+            'data'    => $guests,
+            'message' => 'Trashed guests fetched successfully'
+        ], 200);
+    }
+
+    public function restore($id)
+    {
+        $guest = $this->guestRepository->restore($id);
+        return response()->json([
+            'success' => true,
+            'message' => 'Guest restored successfully',
+            'data'    => $guest
+        ], 200);
+    }
+
+    public function forceDelete($id)
+    {
+        $guest = Guest::onlyTrashed()->findOrFail($id);
+        $this->guestRepository->forceDelete($id);
+        return response()->json([
+            'success' => true,
+            'message' => 'Guest permanently deleted'
         ], 200);
     }
 }

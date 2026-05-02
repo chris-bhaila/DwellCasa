@@ -4,16 +4,23 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\MassPrunable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Str;
+use App\Models\Room;
 use App\Models\Scopes\LocationScope;
 
 class RoomType extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, MassPrunable;
+
+    public function prunable(): \Illuminate\Database\Eloquent\Builder
+    {
+        return static::onlyTrashed()->where('deleted_at', '<=', now()->subDays(90));
+    }
 
     protected $fillable = [
         'name',
@@ -72,6 +79,13 @@ class RoomType extends Model
             if (request()->has('amenities')) {
                 $model->amenities()->sync(request('amenities', []));
             }
+        });
+
+        // Null out room_type_id on associated rooms before deleting so rooms
+        // remain and can be reassigned, rather than being cascade-deleted.
+        // withoutGlobalScopes() bypasses LocationScope to catch all rooms.
+        static::deleting(function (RoomType $model) {
+            Room::withoutGlobalScopes()->where('room_type_id', $model->id)->update(['room_type_id' => null]);
         });
 
         static::addGlobalScope(new LocationScope());

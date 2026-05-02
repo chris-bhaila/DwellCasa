@@ -9,12 +9,12 @@ class GuestRepository implements GuestRepositoryInterface
 {
     public function all()
     {
-        return Guest::all();
+        return Guest::with(['bookings', 'payments'])->get();
     }
 
     public function find($id)
     {
-        return Guest::findOrFail($id);
+        return Guest::with(['bookings', 'payments'])->findOrFail($id);
     }
 
     public function create(array $data)
@@ -33,6 +33,25 @@ class GuestRepository implements GuestRepositoryInterface
     {
         $guest = $this->find($id);
         $guest->delete();
+        return true;
+    }
+
+    public function trashed()
+    {
+        return Guest::onlyTrashed()->with(['bookings', 'payments'])->latest('deleted_at')->get();
+    }
+
+    public function restore($id)
+    {
+        $guest = Guest::onlyTrashed()->findOrFail($id);
+        $guest->restore();
+        return $guest;
+    }
+
+    public function forceDelete($id)
+    {
+        $guest = Guest::onlyTrashed()->findOrFail($id);
+        $guest->forceDelete();
         return true;
     }
 }

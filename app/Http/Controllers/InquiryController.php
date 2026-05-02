@@ -27,6 +27,13 @@ class InquiryController extends Controller
         ], 200);
     }
 
+    public function page()
+    {
+        $inquiries = $this->inquiryRepository->all();
+
+        return view('admin.inquiry', compact('inquiries'));
+    }
+
     public function show($id)
     {
         $inquiry = $this->inquiryRepository->find($id);
@@ -49,6 +56,11 @@ class InquiryController extends Controller
         $data['location_id'] = $locationId;
 
         $inquiry = $this->inquiryRepository->create($data);
+        activity()
+            ->causedBy(auth()->user())
+            ->performedOn($inquiry)
+            ->withProperties(['location_id' => $locationId])
+            ->log("Created inquiry from {$inquiry->name} ({$inquiry->inquiry_type})");
         return response()->json([
             'success' => true,
             'message' => 'Inquiry submitted successfully',
@@ -62,6 +74,11 @@ class InquiryController extends Controller
         unset($data['location_id']);
 
         $inquiry = $this->inquiryRepository->update($id, $data);
+        activity()
+            ->causedBy(auth()->user())
+            ->performedOn($inquiry)
+            ->withProperties(['location_id' => $inquiry->location_id])
+            ->log("Updated inquiry from {$inquiry->name}");
         return response()->json([
             'success' => true,
             'message' => 'Inquiry updated successfully',
@@ -79,7 +96,13 @@ class InquiryController extends Controller
         $inquiry = $this->inquiryRepository->find($id);
 
         try {
-            Mail::to($inquiry->email)->send(new InquiryReplyMail($inquiry, $request->subject, $request->message));
+            Mail::to($inquiry->email)->queue(new InquiryReplyMail($inquiry, $request->input('subject'), $request->input('message')));
+
+            activity()
+                ->causedBy(auth()->user())
+                ->performedOn($inquiry)
+                ->withProperties(['location_id' => $inquiry->location_id])
+                ->log("Replied to inquiry from {$inquiry->name} — subject: {$request->input('subject')}");
 
             return response()->json([
                 'success' => true,
@@ -96,6 +119,11 @@ class InquiryController extends Controller
 
     public function destroy($id)
     {
+        $inquiry = $this->inquiryRepository->find($id);
+        activity()
+            ->causedBy(auth()->user())
+            ->withProperties(['location_id' => $inquiry->location_id])
+            ->log("Deleted inquiry from {$inquiry->name}");
         $this->inquiryRepository->delete($id);
         return response()->json([
             'success' => true,

@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Contracts\AmenityRepositoryInterface;
 use App\Contracts\RoomTypeRepositoryInterface;
 use App\Http\Requests\StoreRoomTypeRequest;
 use App\Http\Requests\UpdateRoomTypeRequest;
-use App\Models\GalleryImage;
+use App\Models\Amenity;
 use App\Models\Booking;
+use App\Models\GalleryImage;
+use App\Models\Room;
 use App\Models\RoomType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -263,5 +266,74 @@ class RoomTypeController extends Controller
             ],
             'message' => 'Availability fetched successfully'
         ]);
+    }
+
+    public function trashed()
+    {
+        $roomTypes = $this->roomTypeRepository->trashed();
+        return response()->json([
+            'data'    => $roomTypes,
+            'message' => 'Trashed room types fetched successfully'
+        ], 200);
+    }
+
+    public function restore($id)
+    {
+        $roomType = $this->roomTypeRepository->restore($id);
+        activity()
+            ->causedBy(auth()->user())
+            ->performedOn($roomType)
+            ->withProperties(['location_id' => $roomType->location_id])
+            ->log("Restored room type {$roomType->name}");
+        return response()->json([
+            'success' => true,
+            'message' => 'Room type restored successfully',
+            'data'    => $roomType
+        ], 200);
+    }
+
+    public function forceDelete($id)
+    {
+        $roomType = RoomType::onlyTrashed()->findOrFail($id);
+        activity()
+            ->causedBy(auth()->user())
+            ->withProperties(['location_id' => $roomType->location_id])
+            ->log("Permanently deleted room type {$roomType->name}");
+        $this->roomTypeRepository->forceDelete($id);
+        return response()->json([
+            'success' => true,
+            'message' => 'Room type permanently deleted'
+        ], 200);
+    }
+
+    public function page(Request $request)
+    {
+        $filter = $request->query('filter', 'all');
+
+        if ($filter === 'trashed') {
+            $roomTypes = RoomType::onlyTrashed()->latest('deleted_at')->get();
+            $rooms     = Room::onlyTrashed()->with('roomType')->latest('deleted_at')->get();
+        } else {
+            $roomTypes = $this->roomTypeRepository->all();
+            $rooms     = Room::with('roomType')->orderBy('room_number')->get();
+        }
+
+        return view('admin.room_type.index', compact('roomTypes', 'rooms', 'filter'));
+    }
+
+    public function createPage()
+    {
+        $amenities = Amenity::where('is_active', true)->get();
+
+        return view('admin.room_type.create', compact('amenities'));
+    }
+
+    public function editPage(int $id)
+    {
+        $roomType = $this->roomTypeRepository->find($id);
+        abort_if(!$roomType, 404);
+        $amenities = Amenity::where('is_active', true)->get();
+
+        return view('admin.room_type.edit', compact('roomType', 'amenities'));
     }
 }

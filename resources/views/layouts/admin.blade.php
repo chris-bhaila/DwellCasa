@@ -124,7 +124,7 @@
             @endcan
 
             @can('manage logs')
-            <a href="{{ route('admin.activity-log') }}" class="sidebar-link flex items-center px-4 py-3 rounded-lg transition-colors {{ request()->is('admin/logs*') ? 'active' : '' }}">
+            <a href="{{ route('admin.activity-log') }}" class="sidebar-link flex items-center px-4 py-3 rounded-lg transition-colors {{ request()->is('admin/activity-log*') ? 'active' : '' }}">
                 <i class="bi bi-journal-text sidebar-icon text-slate-400 mr-3 text-lg"></i>
                 <span class="font-medium">Logs</span>
             </a>

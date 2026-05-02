@@ -26,6 +26,13 @@ class InventoryController extends Controller
         ], 200);
     }
 
+    public function page()
+    {
+        $inventory = $this->inventoryRepository->all();
+
+        return view('admin.inventory', compact('inventory'));
+    }
+
     public function show($id)
     {
         $item = $this->inventoryRepository->find($id);
@@ -97,6 +104,10 @@ class InventoryController extends Controller
             ->causedBy(auth()->user())
             ->withProperties(['location_id' => $item->location_id])
             ->log('Deleted inventory item ' . $item->name);
+
+
+
+            
         if ($item && $item->image) {
             Storage::disk('public')->delete($item->image);
         }

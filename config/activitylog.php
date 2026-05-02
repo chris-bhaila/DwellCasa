@@ -2,7 +2,7 @@
 
 use Spatie\Activitylog\Actions\CleanActivityLogAction;
 use Spatie\Activitylog\Actions\LogActivityAction;
-use Spatie\Activitylog\Models\Activity;
+use App\Models\Activity;
 
 return [
 
@@ -15,7 +15,7 @@ return [
      * When the clean command is executed, all recording activities older than
      * the number of days specified here will be deleted.
      */
-    'clean_after_days' => 365,
+    'clean_after_days' => 90,
 
     /*
      * If no log name is passed to the activity() helper

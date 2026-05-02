@@ -10,8 +10,9 @@ $permissionGroups = [
 'Inventory' => ['view inventory', 'edit inventory'],
 'Content' => ['manage room types', 'manage rooms', 'manage amenities', 'manage gallery', 'manage website info'],
 'Communication' => ['manage inquiries', 'manage reviews'],
-'System' => ['manage users', 'manage locations'],
+'System' => ['manage users', 'manage locations', 'manage logs'],
 ];
+$superAdminOnlyPerms = ['manage users', 'manage locations', 'manage logs'];
 @endphp
 
 <div x-data="{ activeTab: 'users' }">
@@ -21,7 +22,7 @@ $permissionGroups = [
             <h1 class="text-3xl font-serif font-bold text-slate-900 italic">User Management</h1>
             <p class="text-slate-500 mt-1">Manage admin panel access, roles, and permissions.</p>
         </div>
-        <div class="flex gap-3">
+        <div class="flex items-center gap-3 flex-wrap">
             <div x-show="activeTab === 'users'">
                 <button onclick="openModal('add')" class="bg-primary text-white px-5 py-2.5 rounded-xl font-medium hover:bg-[#8E795E] transition-all shadow-sm flex items-center gap-2">
                     <i class="bi bi-person-plus"></i> Add User
@@ -40,7 +41,9 @@ $permissionGroups = [
     <!-- Tabs Navigation -->
     <div class="flex space-x-6 mb-8 border-b border-slate-200">
         <button @click="activeTab = 'users'" :class="activeTab === 'users' ? 'border-primary text-primary border-b-2' : 'text-slate-500 hover:text-slate-700'" class="pb-3 font-medium px-2 transition-colors">Users</button>
+        @role('super_admin')
         <button @click="activeTab = 'roles'" :class="activeTab === 'roles' ? 'border-primary text-primary border-b-2' : 'text-slate-500 hover:text-slate-700'" class="pb-3 font-medium px-2 transition-colors">Role Permissions</button>
+        @endrole
     </div>
 
     <!-- Tab 1: Users List -->
@@ -108,7 +111,8 @@ $permissionGroups = [
         </div>
     </div>
 
-    <!-- Tab 2: Role Permissions -->
+    <!-- Tab 2: Role Permissions (super_admin only) -->
+    @role('super_admin')
     <div x-show="activeTab === 'roles'" x-cloak class="space-y-8">
         @foreach($roles as $role)
         <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
@@ -154,6 +158,7 @@ $permissionGroups = [
         </div>
         @endforeach
     </div>
+    @endrole
 
     <!-- Add / Edit Modal -->
     <div id="user-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm opacity-0 transition-opacity duration-300">
@@ -220,7 +225,7 @@ $permissionGroups = [
                                 <h4 class="text-xs font-bold text-slate-500 uppercase mb-3">{{ $group }}</h4>
                                 <div class="space-y-2">
                                     @foreach($perms as $perm)
-                                    @if(auth()->user()->hasRole('super_admin') || auth()->user()->hasPermissionTo($perm))
+                                    @if(auth()->user()->hasRole('super_admin') || (auth()->user()->hasPermissionTo($perm) && !in_array($perm, $superAdminOnlyPerms)))
                                     <label class="flex items-center gap-2 text-sm text-slate-700 perm-wrapper cursor-pointer group">
                                         <input type="checkbox" name="permissions[]" value="{{ $perm }}" class="user-perm-checkbox rounded border-slate-300 text-primary focus:ring-primary w-4 h-4">
                                         <span class="group-hover:text-primary transition-colors">{{ ucwords(str_replace('-', ' ', $perm)) }}</span>
@@ -271,7 +276,7 @@ $permissionGroups = [
                                 <h4 class="text-xs font-bold text-slate-500 uppercase mb-3">{{ $group }}</h4>
                                 <div class="space-y-2">
                                     @foreach($perms as $perm)
-                                    @if(auth()->user()->hasRole('super_admin') || auth()->user()->hasPermissionTo($perm))
+                                    @if(auth()->user()->hasRole('super_admin') || (auth()->user()->hasPermissionTo($perm) && !in_array($perm, $superAdminOnlyPerms)))
                                     <label class="flex items-center gap-2 text-sm text-slate-700 perm-wrapper cursor-pointer group">
                                         <input type="checkbox" name="permissions[]" value="{{ $perm }}" class="user-perm-checkbox rounded border-slate-300 text-primary focus:ring-primary w-4 h-4">
                                         <span class="group-hover:text-primary transition-colors">{{ ucwords(str_replace('-', ' ', $perm)) }}</span>

@@ -9,12 +9,12 @@ class PaymentRepository implements PaymentRepositoryInterface
 {
     public function all()
     {
-        return Payment::all();
+        return Payment::with(['booking', 'guest'])->latest()->get();
     }
 
     public function find($id)
     {
-        return Payment::findOrFail($id);
+        return Payment::with(['booking', 'guest'])->findOrFail($id);
     }
 
     public function create(array $data)

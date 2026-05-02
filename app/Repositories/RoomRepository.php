@@ -9,12 +9,12 @@ class RoomRepository implements RoomRepositoryInterface
 {
     public function all()
     {
-        return Room::all();
+        return Room::with(['roomType', 'amenities'])->get();
     }
 
     public function find($id)
     {
-        return Room::findOrFail($id);
+        return Room::with(['roomType', 'amenities'])->findOrFail($id);
     }
 
     public function create(array $data)
@@ -33,6 +33,25 @@ class RoomRepository implements RoomRepositoryInterface
     {
         $room = $this->find($id);
         $room->delete();
+        return true;
+    }
+
+    public function trashed()
+    {
+        return Room::onlyTrashed()->with(['roomType', 'amenities'])->latest('deleted_at')->get();
+    }
+
+    public function restore($id)
+    {
+        $room = Room::onlyTrashed()->findOrFail($id);
+        $room->restore();
+        return $room;
+    }
+
+    public function forceDelete($id)
+    {
+        $room = Room::onlyTrashed()->findOrFail($id);
+        $room->forceDelete();
         return true;
     }
 }

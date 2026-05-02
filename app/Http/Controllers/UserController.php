@@ -9,6 +9,8 @@ use Spatie\Permission\Models\Role;
 
 class UserController extends AdminController
 {
+    private const SUPER_ADMIN_ONLY_PERMISSIONS = ['manage users', 'manage locations', 'manage logs'];
+
     private function resolveLocationId(): ?int
     {
         $user = auth()->user();
@@ -66,6 +68,13 @@ class UserController extends AdminController
             return response()->json(['message' => 'Admins cannot assign the admin role.'], 403);
         }
 
+        if (!$isSuperAdmin) {
+            $restricted = array_intersect($request->input('permissions', []), self::SUPER_ADMIN_ONLY_PERMISSIONS);
+            if (!empty($restricted)) {
+                return response()->json(['message' => 'You cannot assign system-level permissions.'], 403);
+            }
+        }
+
         $user = User::create([
             'name'        => $request->name,
             'email'       => $request->email,
@@ -102,10 +111,16 @@ class UserController extends AdminController
             return response()->json(['message' => 'You cannot edit your own account.'], 403);
         }
 
-        // Prevent admin from assigning permissions they don't have
+        // Prevent admin from assigning permissions they don't have or system-level permissions
         if (!$authUser->hasRole('super_admin')) {
+            $requestedPermissions = $request->input('permissions', []);
+
+            $restricted = array_intersect($requestedPermissions, self::SUPER_ADMIN_ONLY_PERMISSIONS);
+            if (!empty($restricted)) {
+                return response()->json(['message' => 'You cannot assign system-level permissions.'], 403);
+            }
+
             $allowedPermissions = $authUser->getAllPermissions()->pluck('name')->toArray();
-            $requestedPermissions = $request->permissions ?? [];
             $unauthorized = array_diff($requestedPermissions, $allowedPermissions);
             if (!empty($unauthorized)) {
                 return response()->json(['message' => 'You cannot assign permissions you do not have.'], 403);
@@ -240,5 +255,29 @@ class UserController extends AdminController
             'success' => true,
             'message' => 'Role permissions updated successfully'
         ]);
+    }
+
+    public function page()
+    {
+        $authUser     = auth()->user();
+        $isSuperAdmin = $authUser->hasRole('super_admin');
+        $locationId   = $isSuperAdmin
+            ? session('selected_location_id')
+            : $authUser->location_id;
+
+        $users = User::with(['roles', 'permissions', 'location'])
+            ->when($locationId, fn ($q) => $q->where('location_id', $locationId))
+            ->whereDoesntHave('roles', fn ($q) => $q->whereIn('name', ['super_admin', 'admin']))
+            ->where('id', '!=', $authUser->id)
+            ->orderBy('name')
+            ->get();
+
+        $roles = Role::with('permissions')
+            ->when(!$isSuperAdmin, fn ($q) => $q->whereNotIn('name', ['super_admin', 'admin']))
+            ->get();
+
+        $permissions = \Spatie\Permission\Models\Permission::all();
+
+        return view('admin.users', compact('users', 'roles', 'permissions'));
     }
 }
