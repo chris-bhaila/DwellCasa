@@ -1,6 +1,7 @@
 @extends('layouts.admin')
 
 @section('title', 'Amenities - DwellCasa Admin')
+@section('header_title', 'Amenities')
 
 @section('content')
 {{-- Temporary Mock Data for Previewing --}}
@@ -18,7 +19,7 @@ $amenities = collect([
 <!-- Header -->
 <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
     <div>
-        <h1 class="text-3xl font-serif font-bold text-slate-900 italic">Amenities Management</h1>
+        <h1 class="text-3xl font-serif font-bold text-slate-900 italic lg:hidden">Amenities Management</h1>
         <p class="text-slate-500 mt-1">Create and manage amenities available for your properties and rooms.</p>
     </div>
 </div>
@@ -38,13 +39,13 @@ $amenities = collect([
                     <!-- Name -->
                     <div>
                         <label for="name" class="block text-sm font-medium text-slate-700 mb-2">Amenity Name <span class="text-red-500">*</span></label>
-                        <input type="text" name="name" id="name" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors" placeholder="e.g. High-Speed WiFi" required>
+                        <input type="text" name="name" id="name" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors" placeholder="e.g. High-Speed WiFi" required>
                     </div>
 
                     <!-- Category -->
                     <div>
                         <label for="category" class="block text-sm font-medium text-slate-700 mb-2">Category</label>
-                        <input type="text" name="category" id="category" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors" placeholder="e.g. Hygiene">
+                        <input type="text" name="category" id="category" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors" placeholder="e.g. Hygiene">
 
                     </div>
 
@@ -176,13 +177,13 @@ $amenities = collect([
                     <!-- Description -->
                     <div>
                         <label for="description" class="block text-sm font-medium text-slate-700 mb-2">Description</label>
-                        <textarea name="description" id="description" rows="3" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors" placeholder="Brief description..."></textarea>
+                        <textarea name="description" id="description" rows="3" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors" placeholder="Brief description..."></textarea>
                     </div>
 
                     <!-- Sort Order -->
                     <div>
                         <label for="sort_order" class="block text-sm font-medium text-slate-700 mb-2">Sort Order</label>
-                        <input type="number" name="sort_order" id="sort_order" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors" value="0" min="0">
+                        <input type="number" name="sort_order" id="sort_order" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors" value="0" min="0">
                     </div>
 
                     <!-- Is Active -->

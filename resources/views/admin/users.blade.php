@@ -1,6 +1,7 @@
 @extends('layouts.admin')
 
 @section('title', 'User Management - DwellCasa Admin')
+@section('header_title', 'User Management')
 
 @section('content')
 @php
@@ -19,8 +20,8 @@ $superAdminOnlyPerms = ['manage users', 'manage locations', 'manage logs'];
     <!-- Header -->
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
         <div>
-            <h1 class="text-3xl font-serif font-bold text-slate-900 italic">User Management</h1>
-            <p class="text-slate-500 mt-1">Manage admin panel access, roles, and permissions.</p>
+            <h1 class="text-3xl font-serif font-bold text-slate-900 italic lg:hidden">User Management</h1>
+        <p class="text-slate-500 mt-1">Manage admin panel access, roles, and permissions.</p>
         </div>
         <div class="flex items-center gap-3 flex-wrap">
             <div x-show="activeTab === 'users'">

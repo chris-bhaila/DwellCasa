@@ -1,6 +1,7 @@
 @extends('layouts.admin')
 
 @section('title', 'Edit Booking - DwellCasa Admin')
+@section('header_title', 'Edit Booking')
 
 @section('content')
 
@@ -13,8 +14,8 @@
             </svg>
         </a>
         <div>
-            <h1 class="text-3xl font-serif font-bold text-slate-900 italic">Edit Booking</h1>
-            <p class="text-slate-500 mt-1">Update details for booking #{{ $booking->booking_ref }}.</p>
+            <h1 class="text-3xl font-serif font-bold text-slate-900 italic lg:hidden">Edit Booking</h1>
+        <p class="text-slate-500 mt-1">Update details for booking #{{ $booking->booking_ref }}.</p>
         </div>
     </div>
 </div>

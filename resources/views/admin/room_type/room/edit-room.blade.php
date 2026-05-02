@@ -1,6 +1,7 @@
 @extends('layouts.admin')
 
 @section('title', 'Edit Room - DwellCasa Admin')
+@section('header_title', 'Edit Room')
 
 @section('content')
 
@@ -13,8 +14,8 @@
             </svg>
         </a>
         <div>
-            <h1 class="text-3xl font-serif font-bold text-slate-900 italic">Edit Room Details</h1>
-            <p class="text-slate-500 mt-1">Update details and status for this individual room.</p>
+            <h1 class="text-3xl font-serif font-bold text-slate-900 italic lg:hidden">Edit Room Details</h1>
+        <p class="text-slate-500 mt-1">Update details and status for this individual room.</p>
         </div>
     </div>
 </div>

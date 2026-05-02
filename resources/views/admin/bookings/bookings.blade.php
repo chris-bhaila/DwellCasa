@@ -1,47 +1,46 @@
 @extends('layouts.admin')
 
 @section('title', 'Booking Management - DwellCasa Admin')
+@section('header_title', 'Bookings')
 
 @section('content')
 <!-- Header -->
-<div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
     <div>
-        <h1 class="text-3xl font-serif font-bold text-slate-900 italic">Booking Management</h1>
+        <h1 class="text-3xl font-serif font-bold text-slate-900 italic lg:hidden">Booking Management</h1>
         <p class="text-slate-500 mt-1">View and manage all guest reservations and inquiries.</p>
     </div>
-    <div>
-        @if($filter !== 'trashed')
-        <a href="{{ route('admin.bookings.create') }}" class="inline-flex items-center justify-center bg-primary text-white px-5 py-2.5 rounded-xl font-medium hover:bg-[#8E795E] transition-all shadow-sm">
-            <i class="bi bi-plus-lg mr-2 text-lg"></i>
-            Add Booking
-        </a>
-        @endif
-    </div>
+    @if($filter !== 'trashed')
+    <a href="{{ route('admin.bookings.create') }}" class="inline-flex items-center justify-center bg-primary text-white px-5 py-2.5 rounded-xl font-medium hover:bg-[#8E795E] transition-all shadow-sm self-start md:self-auto">
+        <i class="bi bi-plus-lg mr-2 text-lg"></i>
+        Add Booking
+    </a>
+    @endif
 </div>
 
 <!-- List Section -->
 <div>
     <!-- Filters / Tabs -->
-    <div class="mb-6 border-b border-slate-200">
-        <nav class="flex space-x-8" aria-label="Tabs">
+    <div class="mb-6 border-b border-slate-200 overflow-x-auto">
+        <nav class="flex min-w-max space-x-6" aria-label="Tabs">
             <a href="{{ request()->fullUrlWithQuery(['filter' => 'all']) }}"
-                class="{{ (!request('filter') || request('filter') === 'all') ? 'border-[#A89070] text-[#A89070]' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300' }} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                class="{{ (!request('filter') || request('filter') === 'all') ? 'border-[#A89070] text-[#A89070]' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300' }} whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm">
                 All Bookings
             </a>
             <a href="{{ request()->fullUrlWithQuery(['filter' => 'upcoming']) }}"
-                class="{{ request('filter') === 'upcoming' ? 'border-[#A89070] text-[#A89070]' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300' }} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                class="{{ request('filter') === 'upcoming' ? 'border-[#A89070] text-[#A89070]' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300' }} whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm">
                 Upcoming
             </a>
             <a href="{{ request()->fullUrlWithQuery(['filter' => 'inhouse']) }}"
-                class="{{ request('filter') === 'inhouse' ? 'border-[#A89070] text-[#A89070]' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300' }} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                class="{{ request('filter') === 'inhouse' ? 'border-[#A89070] text-[#A89070]' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300' }} whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm">
                 In-house
             </a>
             <a href="{{ request()->fullUrlWithQuery(['filter' => 'completed']) }}"
-                class="{{ request('filter') === 'completed' ? 'border-[#A89070] text-[#A89070]' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300' }} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                class="{{ request('filter') === 'completed' ? 'border-[#A89070] text-[#A89070]' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300' }} whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm">
                 Completed
             </a>
             <a href="{{ request()->fullUrlWithQuery(['filter' => 'trashed']) }}"
-                class="{{ request('filter') === 'trashed' ? 'border-red-400 text-red-500' : 'border-transparent text-slate-400 hover:text-slate-600 hover:border-slate-300' }} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-1.5">
+                class="{{ request('filter') === 'trashed' ? 'border-red-400 text-red-500' : 'border-transparent text-slate-400 hover:text-slate-600 hover:border-slate-300' }} whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm flex items-center gap-1.5">
                 <i class="bi bi-trash3"></i> Trash
             </a>
         </nav>
@@ -57,13 +56,13 @@
     <!-- Data Table -->
     <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
         <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse">
+            <table class="w-full min-w-[720px] text-left border-collapse">
                 <thead>
                     <tr class="bg-slate-50/50 text-slate-500 text-sm border-b border-slate-100">
                         <th class="p-4 font-medium">Ref / Guest</th>
                         <th class="p-4 font-medium">Room Type</th>
                         <th class="p-4 font-medium">Check In / Out</th>
-                        <th class="p-4 font-medium">Guests</th>
+                        <th class="p-4 font-medium w-16">Guests</th>
                         <th class="p-4 font-medium">Amount</th>
                         @if($filter === 'trashed')
                         <th class="p-4 font-medium">Deleted</th>

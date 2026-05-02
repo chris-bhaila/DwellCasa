@@ -1,12 +1,13 @@
 @extends('layouts.admin')
 
 @section('title', 'Activity Log - DwellCasa Admin')
+@section('header_title', 'Activity Log')
 
 @section('content')
 
 <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
     <div>
-        <h1 class="text-3xl font-serif font-bold text-slate-900 italic">Activity Log</h1>
+        <h1 class="text-3xl font-serif font-bold text-slate-900 italic lg:hidden">Activity Log</h1>
         <p class="text-slate-500 mt-1">
             @if(auth()->user()->hasRole('super_admin'))
                 All admin actions across every location.

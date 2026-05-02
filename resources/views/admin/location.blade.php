@@ -1,12 +1,13 @@
 @extends('layouts.admin')
 
 @section('title', 'Locations Management - DwellCasa Admin')
+@section('header_title', 'Locations')
 
 @section('content')
 <!-- Header -->
 <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
     <div>
-        <h1 class="text-3xl font-serif font-bold text-slate-900 italic">Locations Management</h1>
+        <h1 class="text-3xl font-serif font-bold text-slate-900 italic lg:hidden">Locations Management</h1>
         <p class="text-slate-500 mt-1">Manage physical property locations, addresses, and details.</p>
     </div>
     <div>
@@ -19,37 +20,37 @@
 <!-- List Section -->
 <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
     <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse">
+        <table class="w-full min-w-[640px] text-left border-collapse">
             <thead>
                 <tr class="bg-slate-50/50 text-slate-500 text-sm border-b border-slate-100">
-                    <th class="p-4 font-medium">Location Details</th>
+                    <th class="p-4 font-medium w-56">Location Details</th>
                     <th class="p-4 font-medium">Contact & Address</th>
-                    <th class="p-4 font-medium">Status</th>
-                    <th class="p-4 font-medium text-right">Actions</th>
+                    <th class="p-4 font-medium w-24">Status</th>
+                    <th class="p-4 font-medium w-24 text-right">Actions</th>
                 </tr>
             </thead>
             <tbody class="text-sm divide-y divide-slate-100" id="locations-list">
                 @forelse($locations ?? [] as $location)
                 <tr class="hover:bg-slate-50/50 transition-colors">
-                    <td class="p-4">
+                    <td class="p-4 w-56">
                         <div class="flex items-center gap-4">
                             @if($location->hero_image)
-                                <img src="{{ asset('storage/' . $location->hero_image) }}" alt="{{ $location->name }}" class="w-16 h-12 rounded-lg object-cover border border-slate-100">
+                                <img src="{{ asset('storage/' . $location->hero_image) }}" alt="{{ $location->name }}" class="w-16 h-12 flex-shrink-0 rounded-lg object-cover border border-slate-100">
                             @else
-                                <div class="w-16 h-12 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400 border border-slate-100">
+                                <div class="w-16 h-12 flex-shrink-0 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400 border border-slate-100">
                                     <i class="bi bi-image text-xl"></i>
                                 </div>
                             @endif
-                            <div>
-                                <div class="font-bold text-slate-900">{{ $location->name }}</div>
-                                <div class="text-xs text-slate-500 mt-0.5">/{{ $location->slug }}</div>
+                            <div class="min-w-0">
+                                <div class="font-bold text-slate-900 truncate">{{ $location->name }}</div>
+                                <div class="text-xs text-slate-500 mt-0.5 truncate">/{{ $location->slug }}</div>
                             </div>
                         </div>
                     </td>
                     <td class="p-4">
-                        <div class="font-medium text-slate-700">{{ $location->address ?: 'No address provided' }}</div>
+                        <div class="font-medium text-slate-700 truncate max-w-xs">{{ $location->address ?: 'No address provided' }}</div>
                         <div class="text-xs text-slate-500 mt-1 flex flex-col gap-0.5">
-                            @if($location->email) <span><i class="bi bi-envelope mr-1"></i>{{ $location->email }}</span> @endif
+                            @if($location->email) <span class="truncate max-w-xs"><i class="bi bi-envelope mr-1"></i>{{ $location->email }}</span> @endif
                             @if($location->phone) <span><i class="bi bi-telephone mr-1"></i>{{ $location->phone }}</span> @endif
                         </div>
                     </td>

@@ -1,12 +1,13 @@
 @extends('layouts.admin')
 
 @section('title', 'My Profile - DwellCasa Admin')
+@section('header_title', 'My Profile')
 
 @section('content')
 <!-- Header -->
 <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
     <div>
-        <h1 class="text-3xl font-serif font-bold text-slate-900 italic">My Profile</h1>
+        <h1 class="text-3xl font-serif font-bold text-slate-900 italic lg:hidden">My Profile</h1>
         <p class="text-slate-500 mt-1">Manage your account settings and password.</p>
     </div>
 </div>

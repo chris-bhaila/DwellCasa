@@ -33,7 +33,9 @@ class HomeController extends Controller
 
     public function index()
     {
-        $locations = \App\Models\Location::where('is_active', true)->orderBy('name')->get();
+        $locations = \App\Models\Location::where('is_active', true)
+            ->whereHas('websiteInfo', fn($q) => $q->whereNotNull('front_page_main_heading'))
+            ->orderBy('name')->get();
         $webInfo   = $this->websiteInfoRepository->getGlobal();
         $reviews   = \App\Models\Review::withoutGlobalScopes()
             ->where('status', 'approved')

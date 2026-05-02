@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
+use App\Models\Location;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -36,7 +37,9 @@ class AuthController extends Controller
 
             // Super admin — store selected location in session
             if ($user->hasRole('super_admin')) {
-                session(['selected_location_id' => $request->location_id ?? null]);
+                $defaultLocation = $request->input('location_id')
+                    ?? Location::orderBy('id')->value('id');
+                session(['selected_location_id' => $defaultLocation]);
                 return redirect()->intended(route('admin'));
             }
 

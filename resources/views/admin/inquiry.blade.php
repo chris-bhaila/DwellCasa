@@ -1,12 +1,13 @@
 @extends('layouts.admin')
 
 @section('title', 'Inquiries - DwellCasa Admin')
+@section('header_title', 'Inquiries')
 
 @section('content')
 <!-- Header -->
 <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
     <div>
-        <h1 class="text-3xl font-serif font-bold text-slate-900 italic">Inquiries Management</h1>
+        <h1 class="text-3xl font-serif font-bold text-slate-900 italic lg:hidden">Inquiries Management</h1>
         <p class="text-slate-500 mt-1">View and manage messages submitted through the website contact form.</p>
     </div>
 </div>

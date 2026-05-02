@@ -1,192 +1,362 @@
 @extends('layouts.admin')
 
 @section('title', 'Admin Dashboard - DwellCasa')
+@section('header_title', 'Dashboard')
 
 @section('content')
+
+{{-- Incomplete website info notifications (super_admin only) --}}
+@if(auth()->user()->hasRole('super_admin') && isset($incompleteLocations) && $incompleteLocations->isNotEmpty())
+<div class="mb-8 space-y-3">
+    @foreach($incompleteLocations as $loc)
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-amber-50 border border-amber-200 px-5 py-4 rounded-xl shadow-sm">
+        <div class="flex items-start sm:items-center gap-3">
+            <svg class="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5 sm:mt-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+            </svg>
+            <p class="text-sm text-amber-800">
+                <span class="font-bold">{{ $loc->name }}</span> is missing website information and won't appear on the public website until it's filled in.
+            </p>
+        </div>
+        <button type="button" onclick="switchAndGoToInfo({{ $loc->id }})"
+            class="flex-shrink-0 text-xs font-bold bg-amber-200 hover:bg-amber-300 text-amber-900 px-4 py-2 rounded-lg transition-colors whitespace-nowrap">
+            Fill Website Info &rarr;
+        </button>
+    </div>
+    @endforeach
+</div>
+@endif
+
 <!-- Header -->
-<div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
     <div>
-        <h1 class="text-3xl font-serif font-bold text-slate-900 italic">Dashboard Overview</h1>
-        <p class="text-slate-500">Welcome back, {{ Auth::user()->name }}. Here's what's happening today.</p>
-    </div>
-    <div class="flex gap-3">
-        <!-- <button class="bg-white border border-slate-200 text-slate-700 px-4 py-2 rounded-lg font-medium hover:bg-slate-50 transition-all shadow-sm">
-                Download Report
-            </button> -->
-        @can('manage rooms')
-        <a href="{{ route('admin.room_type.create') }}" class="bg-[#A89070] text-white px-4 py-2 rounded-lg font-medium hover:bg-[#8E795E] transition-all shadow-md">
-            + Add New Room
-        </a>
-        @endcan
+        <h1 class="text-3xl font-serif font-bold text-slate-900 italic lg:hidden">Dashboard</h1>
+        <p class="text-slate-500 mt-1">{{ now()->format('l, F j, Y') }} &mdash; Welcome back, {{ Auth::user()->name }}.</p>
     </div>
 </div>
 
-<!-- Stats Grid -->
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-        <div class="flex items-center justify-between mb-4">
-            <div class="w-12 h-12 bg-[#A89070]/10 rounded-xl flex items-center justify-center text-[#A89070]">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                </svg>
+<!-- Primary KPI Cards -->
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+
+    <!-- Today's Arrivals -->
+    <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
+        <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-xl bg-[#A89070]/10 flex items-center justify-center text-[#A89070]">
+                <i class="bi bi-box-arrow-in-right text-lg"></i>
             </div>
-            <span class="text-sm font-medium text-green-600 bg-green-50 px-2 py-1 rounded-md">+12%</span>
+            <span class="text-xs font-medium px-2 py-1 rounded-md bg-slate-100 text-slate-500">Today</span>
         </div>
-        <h3 class="text-slate-500 text-sm font-medium">Total Bookings</h3>
-        <p class="text-2xl font-bold text-slate-900 mt-1">1,248</p>
+        <p class="text-slate-500 text-xs font-medium mb-1">Today's Arrivals</p>
+        <p class="text-3xl font-bold text-slate-900">{{ $todayArrivals }}</p>
+        <p class="text-xs text-slate-400 mt-1">Confirmed &amp; pending check-ins</p>
     </div>
 
-    <!-- Available Rooms -->
-    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-        <div class="flex items-center justify-between mb-4">
-            <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
-                </svg>
+    <!-- Guests In-House -->
+    <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
+        <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-500">
+                <i class="bi bi-people text-lg"></i>
             </div>
-            <!-- <span class="text-sm font-medium text-red-600 bg-red-50 px-2 py-1 rounded-md">-2</span> -->
+            <span class="text-xs font-medium px-2 py-1 rounded-md bg-blue-50 text-blue-600">Live</span>
         </div>
-        <h3 class="text-slate-500 text-sm font-medium">Total Rooms</h3>
-        <p class="text-2xl font-bold text-slate-900 mt-1">{{ $rooms->count() }}</p>
+        <p class="text-slate-500 text-xs font-medium mb-1">Guests In-House</p>
+        <p class="text-3xl font-bold text-slate-900">{{ $inHouseCount }}</p>
+        <p class="text-xs text-slate-400 mt-1">Currently checked in</p>
     </div>
 
-    <!-- Revenue -->
-    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-        <div class="flex items-center justify-between mb-4">
-            <div class="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center text-green-600">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
+    <!-- Monthly Revenue -->
+    <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
+        <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center text-green-600">
+                <i class="bi bi-currency-rupee text-lg"></i>
             </div>
-            <span class="text-sm font-medium text-green-600 bg-green-50 px-2 py-1 rounded-md">+8.5%</span>
+            <span class="text-xs font-medium px-2 py-1 rounded-md bg-green-50 text-green-600">{{ now()->format('M') }}</span>
         </div>
-        <h3 class="text-slate-500 text-sm font-medium">Revenue (Month)</h3>
-        <p class="text-2xl font-bold text-slate-900 mt-1">Rs. 854,000</p>
+        <p class="text-slate-500 text-xs font-medium mb-1">Revenue Collected</p>
+        <p class="text-3xl font-bold text-slate-900">Rs. {{ number_format($monthlyRevenue, 0) }}</p>
+        <p class="text-xs text-slate-400 mt-1">From check-ins this month</p>
     </div>
 
-    <!-- Active Guests -->
-    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-        <div class="flex items-center justify-between mb-4">
-            <div class="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center text-purple-600">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                </svg>
+    <!-- Unreplied Inquiries -->
+    <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
+        <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-xl bg-rose-50 flex items-center justify-center text-rose-500">
+                <i class="bi bi-chat-left-dots text-lg"></i>
             </div>
-            <span class="text-sm font-medium text-slate-500 bg-slate-100 px-2 py-1 rounded-md">Steady</span>
+            @if($unrepliedInquiries > 0)
+            <span class="text-xs font-bold px-2 py-1 rounded-md bg-rose-50 text-rose-600">Action needed</span>
+            @else
+            <span class="text-xs font-medium px-2 py-1 rounded-md bg-green-50 text-green-600">All clear</span>
+            @endif
         </div>
-        <h3 class="text-slate-500 text-sm font-medium">Active Guests</h3>
-        <p class="text-2xl font-bold text-slate-900 mt-1">48</p>
+        <p class="text-slate-500 text-xs font-medium mb-1">Unreplied Inquiries</p>
+        <p class="text-3xl font-bold text-slate-900">{{ $unrepliedInquiries }}</p>
+        <p class="text-xs text-slate-400 mt-1">Waiting for a response</p>
     </div>
+
 </div>
 
-<!-- Main Content Area -->
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-    <!-- Recent Bookings List -->
+<!-- Secondary Stats Row -->
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+
+    <div class="bg-white rounded-xl border border-slate-100 shadow-sm px-5 py-4 flex items-center gap-4">
+        <div class="w-9 h-9 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500 flex-shrink-0">
+            <i class="bi bi-box-arrow-right"></i>
+        </div>
+        <div>
+            <p class="text-xs text-slate-500 font-medium">Today's Departures</p>
+            <p class="text-xl font-bold text-slate-900">{{ $todayDepartures }}</p>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-xl border border-slate-100 shadow-sm px-5 py-4 flex items-center gap-4">
+        <div class="w-9 h-9 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500 flex-shrink-0">
+            <i class="bi bi-door-open"></i>
+        </div>
+        <div>
+            <p class="text-xs text-slate-500 font-medium">Rooms Available</p>
+            <p class="text-xl font-bold text-slate-900">{{ $availableRooms }} <span class="text-sm font-normal text-slate-400">/ {{ $totalRooms }}</span></p>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-xl border border-slate-100 shadow-sm px-5 py-4 flex items-center gap-4">
+        <div class="w-9 h-9 rounded-lg bg-amber-50 flex items-center justify-center text-amber-500 flex-shrink-0">
+            <i class="bi bi-star-half"></i>
+        </div>
+        <div>
+            <p class="text-xs text-slate-500 font-medium">Avg. Review Score</p>
+            <p class="text-xl font-bold text-slate-900">
+                {{ $avgRating ? number_format($avgRating, 1) : '—' }}
+                <span class="text-sm font-normal text-slate-400">/ 5</span>
+            </p>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-xl border border-slate-100 shadow-sm px-5 py-4 flex items-center gap-4">
+        <div class="w-9 h-9 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500 flex-shrink-0">
+            <i class="bi bi-calendar-check"></i>
+        </div>
+        <div>
+            <p class="text-xs text-slate-500 font-medium">Bookings This Month</p>
+            <p class="text-xl font-bold text-slate-900">{{ $monthlyBookings }}</p>
+        </div>
+    </div>
+
+</div>
+
+<!-- Main Content Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+
+    <!-- Recent Bookings -->
     <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-        <div class="p-6 border-b border-slate-100 flex justify-between items-center">
-            <h2 class="text-xl font-serif font-bold text-slate-900 italic">Recent Bookings</h2>
-            <a href="#" class="text-[#A89070] text-sm font-medium hover:underline">View All</a>
+        <div class="p-5 border-b border-slate-100 flex justify-between items-center">
+            <h2 class="text-lg font-serif font-bold text-slate-900 italic">Recent Bookings</h2>
+            <a href="{{ route('admin.bookings') }}" class="text-[#A89070] text-sm font-medium hover:underline">View All</a>
         </div>
         <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse">
+            <table class="w-full min-w-[560px] text-left border-collapse">
                 <thead>
-                    <tr class="bg-slate-50/50 text-slate-500 text-sm border-b border-slate-100">
-                        <th class="p-4 font-medium">Guest</th>
-                        <th class="p-4 font-medium">Room Type</th>
-                        <th class="p-4 font-medium">Check In/Out</th>
-                        <th class="p-4 font-medium">Status</th>
-                        <th class="p-4 font-medium">Amount</th>
+                    <tr class="bg-slate-50/50 text-slate-500 text-xs border-b border-slate-100">
+                        <th class="px-5 py-3 font-medium">Guest</th>
+                        <th class="px-5 py-3 font-medium">Room Type</th>
+                        <th class="px-5 py-3 font-medium">Check In / Out</th>
+                        <th class="px-5 py-3 font-medium">Status</th>
+                        <th class="px-5 py-3 font-medium text-right">Amount</th>
                     </tr>
                 </thead>
                 <tbody class="text-sm divide-y divide-slate-100">
-                    @foreach ($bookings as $booking)
-                    <tr class="hover:bg-slate-50/50 transition-colors">
-                        <td class="p-4">
-                            <p class="font-medium text-slate-900">{{ $booking->guest->full_name ?? 'N/A' }}</p>
-                            <p class="text-slate-500 text-xs">{{ $booking->guest->email ?? 'N/A' }}</p>
+                    @forelse($bookings as $booking)
+                    <tr class="hover:bg-slate-50/30 transition-colors">
+                        <td class="px-5 py-3.5">
+                            <p class="font-medium text-slate-900 text-sm">{{ $booking->guest->full_name ?? 'N/A' }}</p>
+                            <p class="text-slate-400 text-xs">{{ $booking->guest->email ?? '' }}</p>
                         </td>
-                        <td class="p-4 text-slate-700">{{ $booking->roomtype->name }}</td>
-                        <td class="p-4 text-slate-700">
-                            <p>{{ $booking->check_in_date ? \Carbon\Carbon::parse($booking->check_in_date)->format('M d, Y') : 'N/A' }}</p>
-                            <p class="text-xs text-slate-400">{{ $booking->check_out_date ? \Carbon\Carbon::parse($booking->check_out_date)->format('M d, Y') : 'N/A' }}</p>
+                        <td class="px-5 py-3.5 text-slate-600 text-sm">{{ $booking->roomType->name ?? '—' }}</td>
+                        <td class="px-5 py-3.5">
+                            <p class="text-slate-800 text-sm font-medium">{{ $booking->check_in_date ? $booking->check_in_date->format('M d, Y') : 'N/A' }}</p>
+                            <p class="text-slate-400 text-xs">to {{ $booking->check_out_date ? $booking->check_out_date->format('M d, Y') : 'N/A' }}</p>
                         </td>
-                        <td class="p-4">
+                        <td class="px-5 py-3.5">
                             @if($booking->status === 'confirmed')
-                            <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-green-50 text-green-700 border border-green-200">Confirmed</span>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-green-50 text-green-700 border border-green-200">Confirmed</span>
                             @elseif($booking->status === 'pending')
-                            <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-yellow-50 text-yellow-700 border border-yellow-200">Pending</span>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-yellow-50 text-yellow-700 border border-yellow-200">Pending</span>
                             @elseif($booking->status === 'checked_in')
-                            <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">Checked In</span>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">Checked In</span>
                             @elseif($booking->status === 'checked_out')
-                            <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-50 text-slate-700 border border-slate-200">Completed</span>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-slate-50 text-slate-600 border border-slate-200">Completed</span>
                             @else
-                            <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-red-50 text-red-700 border border-red-200">Cancelled</span>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-red-50 text-red-700 border border-red-200">Cancelled</span>
                             @endif
                         </td>
-                        <td class="p-4 font-medium text-slate-900">Rs. {{ number_format($booking->amount_paid, 0) }}</td>
+                        <td class="px-5 py-3.5 text-right">
+                            @if($booking->amount_paid > 0)
+                            <p class="font-semibold text-slate-900 text-sm">Rs. {{ number_format($booking->amount_paid, 0) }}</p>
+                            @else
+                            <p class="text-slate-400 text-xs italic">Not paid</p>
+                            @endif
+                        </td>
                     </tr>
-                    @endforeach
+                    @empty
+                    <tr>
+                        <td colspan="5" class="px-5 py-8 text-center text-slate-400 text-sm italic">No bookings yet.</td>
+                    </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
     </div>
 
-    <!-- Quick Actions & Room Status -->
-    <div class="space-y-8">
+    <!-- Right Column -->
+    <div class="space-y-6">
+
         <!-- Quick Actions -->
-        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-            <h2 class="text-xl font-serif font-bold text-slate-900 italic mb-6">Quick Actions</h2>
-            <div class="grid grid-cols-2 gap-4">
-                <a href="{{ route('admin.bookings') }}" class="flex flex-col items-center justify-center p-4 bg-slate-50 rounded-xl hover:bg-[#A89070] hover:text-white transition-colors group text-slate-600">
-                    <svg class="w-6 h-6 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                    </svg>
-                    <span class="text-sm font-medium">New Booking</span>
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
+            <h2 class="text-lg font-serif font-bold text-slate-900 italic mb-4">Quick Actions</h2>
+            <div class="grid grid-cols-2 gap-3">
+                <a href="{{ route('admin.bookings.create') }}" class="flex flex-col items-center justify-center gap-2 p-4 bg-slate-50 rounded-xl hover:bg-[#A89070] hover:text-white transition-colors text-slate-600 text-center">
+                    <i class="bi bi-plus-circle text-xl"></i>
+                    <span class="text-xs font-medium leading-tight">New Booking</span>
                 </a>
-                <a href="#" class="flex flex-col items-center justify-center p-4 bg-slate-50 rounded-xl hover:bg-[#A89070] hover:text-white transition-colors group text-slate-600">
-                    <svg class="w-6 h-6 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
-                    </svg>
-                    <span class="text-sm font-medium">Payments</span>
+                <a href="{{ route('admin.bookings') }}" class="flex flex-col items-center justify-center gap-2 p-4 bg-slate-50 rounded-xl hover:bg-[#A89070] hover:text-white transition-colors text-slate-600 text-center">
+                    <i class="bi bi-calendar3 text-xl"></i>
+                    <span class="text-xs font-medium leading-tight">All Bookings</span>
                 </a>
-                <a href="{{ route('admin.room_type.index') }}" class="flex flex-col items-center justify-center text-center p-4 bg-slate-50 rounded-xl hover:bg-[#A89070] hover:text-white transition-colors group text-slate-600">
-                    <svg class="w-6 h-6 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-                    </svg>
-                    <span class="text-sm font-medium">Room Management</span>
+                <a href="{{ route('admin.room_type.index') }}" class="flex flex-col items-center justify-center gap-2 p-4 bg-slate-50 rounded-xl hover:bg-[#A89070] hover:text-white transition-colors text-slate-600 text-center">
+                    <i class="bi bi-building text-xl"></i>
+                    <span class="text-xs font-medium leading-tight">Rooms</span>
                 </a>
-                <a href="{{ route('admin.info') }}" class="flex flex-col items-center justify-center p-4 bg-slate-50 rounded-xl hover:bg-[#A89070] hover:text-white transition-colors group text-slate-600">
-                    <svg class="w-6 h-6 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                    </svg>
-                    <span class="text-sm font-medium">Settings</span>
+                <a href="{{ route('admin.info') }}" class="flex flex-col items-center justify-center gap-2 p-4 bg-slate-50 rounded-xl hover:bg-[#A89070] hover:text-white transition-colors text-slate-600 text-center">
+                    <i class="bi bi-gear text-xl"></i>
+                    <span class="text-xs font-medium leading-tight">Settings</span>
                 </a>
             </div>
         </div>
 
         <!-- Room Availability -->
-        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-            <h2 class="text-xl font-serif font-bold text-slate-900 italic mb-4">Availability</h2>
-            <div class="space-y-4">
-                @foreach ($roomTypes as $roomType)
-                @php
-                $totalRooms = $roomType->rooms()->count();
-                $availableRooms = $roomType->rooms()->where('status', 'available')->count();
-                $percentage = $totalRooms > 0 ? round(($availableRooms / $totalRooms) * 100) : 0;
-                @endphp
-                <div>
-                    <div class="flex justify-between text-sm mb-1">
-                        <span class="text-slate-600">{{ $roomType->name }}</span>
-                        <span class="font-medium text-slate-900">{{ $availableRooms }}/{{ $totalRooms }}</span>
-                    </div>
-                    <div class="w-full bg-slate-100 rounded-full h-2">
-                        <div class="bg-[#A89070] h-2 rounded-full" style="width: {{ $percentage }}%"></div>
-                    </div>
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
+            <h2 class="text-lg font-serif font-bold text-slate-900 italic mb-4">Availability</h2>
+            @forelse($roomTypes as $roomType)
+            @php
+                $total     = $roomType->rooms()->count();
+                $available = $roomType->rooms()->where('status', 'available')->count();
+                $pct       = $total > 0 ? round(($available / $total) * 100) : 0;
+                $barColor  = $pct >= 50 ? 'bg-[#A89070]' : ($pct > 0 ? 'bg-amber-400' : 'bg-red-400');
+            @endphp
+            <div class="mb-3 last:mb-0">
+                <div class="flex justify-between text-sm mb-1.5">
+                    <span class="text-slate-600 font-medium truncate pr-2">{{ $roomType->name }}</span>
+                    <span class="text-slate-900 font-semibold flex-shrink-0">{{ $available }}<span class="text-slate-400 font-normal">/{{ $total }}</span></span>
                 </div>
-                @endforeach
+                <div class="w-full bg-slate-100 rounded-full h-1.5">
+                    <div class="{{ $barColor }} h-1.5 rounded-full transition-all" style="width: {{ $pct }}%"></div>
+                </div>
             </div>
+            @empty
+            <p class="text-sm text-slate-400 italic">No room types configured.</p>
+            @endforelse
         </div>
+
     </div>
 </div>
+
+<!-- Bottom Row -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+    <!-- Recent Inquiries -->
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+        <div class="p-5 border-b border-slate-100 flex justify-between items-center">
+            <h2 class="text-lg font-serif font-bold text-slate-900 italic">Unreplied Inquiries</h2>
+            <a href="{{ route('admin.inquiry') }}" class="text-[#A89070] text-sm font-medium hover:underline">View All</a>
+        </div>
+        <div class="divide-y divide-slate-100">
+            @forelse($recentInquiries as $inquiry)
+            <div class="px-5 py-4 flex items-start gap-3">
+                <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 flex-shrink-0 mt-0.5">
+                    <i class="bi bi-person text-sm"></i>
+                </div>
+                <div class="min-w-0 flex-1">
+                    <div class="flex items-center gap-2 mb-0.5 flex-wrap">
+                        <span class="font-semibold text-slate-900 text-sm">{{ $inquiry->name }}</span>
+                        <span class="text-xs px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 capitalize">{{ str_replace('_', ' ', $inquiry->inquiry_type) }}</span>
+                    </div>
+                    <p class="text-xs text-slate-500 truncate">{{ $inquiry->message }}</p>
+                </div>
+                <span class="text-xs text-slate-400 flex-shrink-0 mt-0.5">{{ $inquiry->created_at->diffForHumans(null, true) }}</span>
+            </div>
+            @empty
+            <div class="px-5 py-8 text-center text-slate-400 text-sm italic">
+                <i class="bi bi-check2-circle text-2xl block mb-2 text-green-400"></i>
+                No unreplied inquiries.
+            </div>
+            @endforelse
+        </div>
+    </div>
+
+    <!-- Revenue Snapshot -->
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5">
+        <div class="flex justify-between items-center mb-5">
+            <h2 class="text-lg font-serif font-bold text-slate-900 italic">Revenue Snapshot</h2>
+            <span class="text-xs px-2.5 py-1 rounded-lg bg-slate-100 text-slate-500 font-medium">{{ now()->format('F Y') }}</span>
+        </div>
+
+        @php
+            $billed    = (float) $monthRevenueBilled;
+            $collected = (float) $monthRevenueCollected;
+            $outstanding = max(0, $billed - $collected);
+            $collectPct  = $billed > 0 ? min(100, round(($collected / $billed) * 100)) : 0;
+        @endphp
+
+        <div class="space-y-4">
+            <div>
+                <div class="flex justify-between text-sm mb-2">
+                    <span class="text-slate-500">Total Billed</span>
+                    <span class="font-bold text-slate-900">Rs. {{ number_format($billed, 0) }}</span>
+                </div>
+                <div class="flex justify-between text-sm mb-2">
+                    <span class="text-slate-500">Collected</span>
+                    <span class="font-bold text-green-700">Rs. {{ number_format($collected, 0) }}</span>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <span class="text-slate-500">Outstanding</span>
+                    <span class="font-bold {{ $outstanding > 0 ? 'text-rose-600' : 'text-slate-400' }}">Rs. {{ number_format($outstanding, 0) }}</span>
+                </div>
+            </div>
+
+            <div>
+                <div class="flex justify-between text-xs text-slate-500 mb-1.5">
+                    <span>Collection rate</span>
+                    <span class="font-semibold text-slate-700">{{ $collectPct }}%</span>
+                </div>
+                <div class="w-full bg-slate-100 rounded-full h-2.5">
+                    <div class="h-2.5 rounded-full transition-all {{ $collectPct >= 80 ? 'bg-green-500' : ($collectPct >= 50 ? 'bg-amber-400' : 'bg-rose-400') }}"
+                        style="width: {{ $collectPct }}%"></div>
+                </div>
+            </div>
+
+            @if($billed == 0)
+            <p class="text-xs text-slate-400 italic text-center pt-2">No bookings with check-ins this month yet.</p>
+            @endif
+        </div>
+    </div>
+
+</div>
+
+@push('scripts')
+<script>
+function switchAndGoToInfo(locationId) {
+    fetch('{{ route('admin.switch-location') }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+        },
+        body: JSON.stringify({ location_id: locationId }),
+    }).then(() => {
+        window.location.href = '{{ route('admin.info') }}';
+    });
+}
+</script>
+@endpush
+
 @endsection

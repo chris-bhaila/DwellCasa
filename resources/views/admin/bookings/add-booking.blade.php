@@ -1,6 +1,7 @@
 @extends('layouts.admin')
 
 @section('title', 'Add New Booking - DwellCasa Admin')
+@section('header_title', 'Add Booking')
 
 @section('content')
 
@@ -11,8 +12,8 @@
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
         </a>
         <div>
-            <h1 class="text-3xl font-serif font-bold text-slate-900 italic">Add New Booking</h1>
-            <p class="text-slate-500 mt-1">Manually create a new reservation for a guest.</p>
+            <h1 class="text-3xl font-serif font-bold text-slate-900 italic lg:hidden">Add New Booking</h1>
+        <p class="text-slate-500 mt-1">Manually create a new reservation for a guest.</p>
         </div>
     </div>
 </div>

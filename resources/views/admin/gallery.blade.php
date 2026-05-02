@@ -1,6 +1,7 @@
 @extends('layouts.admin')
 
 @section('title', 'Gallery Management - DwellCasa Admin')
+@section('header_title', 'Gallery')
 
 @section('content')
 
@@ -11,7 +12,7 @@ $categories = ['interior', 'exterior', 'dining', 'amenities', 'other'];
 <!-- Header -->
 <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
     <div>
-        <h1 class="text-3xl font-serif font-bold text-slate-900 italic">Gallery Management</h1>
+        <h1 class="text-3xl font-serif font-bold text-slate-900 italic lg:hidden">Gallery Management</h1>
         <p class="text-slate-500 mt-1">Manage images across different categories for your property.</p>
     </div>
     <div class="flex items-center gap-3">
@@ -101,7 +102,7 @@ $categories = ['interior', 'exterior', 'dining', 'amenities', 'other'];
                 <!-- Upload Destination -->
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-2">Upload Destination <span class="text-red-500">*</span></label>
-                    <select name="upload_type" id="upload_type" onchange="toggleUploadType()" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors">
+                    <select name="upload_type" id="upload_type" onchange="toggleUploadType()" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors">
                         <option value="general">General Website</option>
                         <option value="room_type">Specific Room Type</option>
                     </select>
@@ -110,13 +111,13 @@ $categories = ['interior', 'exterior', 'dining', 'amenities', 'other'];
                 <!-- Image File Input -->
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-2">Image Files (Multiple allowed) <span class="text-red-500">*</span></label>
-                    <input type="file" name="images[]" accept="image/*" multiple class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors" required>
+                    <input type="file" name="images[]" accept="image/*" multiple class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors" required>
                 </div>
 
                 <div class="grid grid-cols-2 gap-5">
                     <div id="general_category_wrapper">
                         <label class="block text-sm font-medium text-slate-700 mb-2">Sub Category</label>
-                        <select name="category" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors">
+                        <select name="category" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors">
                             @foreach($categories as $category)
                             <option value="{{ $category }}">{{ ucfirst($category) }}</option>
                             @endforeach
@@ -124,7 +125,7 @@ $categories = ['interior', 'exterior', 'dining', 'amenities', 'other'];
                     </div>
                     <div id="room_type_wrapper" style="display: none;">
                         <label class="block text-sm font-medium text-slate-700 mb-2">Select Room Type</label>
-                        <select name="room_type_id" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors" disabled>
+                        <select name="room_type_id" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors" disabled>
                             @foreach($roomTypes as $rt)
                             <option value="{{ $rt->id }}">{{ $rt->name }}</option>
                             @endforeach
@@ -132,13 +133,13 @@ $categories = ['interior', 'exterior', 'dining', 'amenities', 'other'];
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-2">Alt Text</label>
-                        <input type="text" name="alt_text" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors">
+                        <input type="text" name="alt_text" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors">
                     </div>
                 </div>
 
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-2">Caption</label>
-                    <input type="text" name="caption" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors">
+                    <input type="text" name="caption" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors">
                 </div>
 
                 <div class="flex items-center gap-6">

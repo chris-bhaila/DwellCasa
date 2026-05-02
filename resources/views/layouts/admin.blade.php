@@ -54,7 +54,7 @@
                 <i class="bi bi-x-lg text-xl"></i>
             </button>
         </div>
-        <nav class="flex-1 px-4 py-6 space-y-2">
+        <nav class="flex-1 overflow-y-auto px-4 py-6 space-y-2">
             <a href="{{ route('admin') }}" class="sidebar-link flex items-center px-4 py-3 rounded-lg transition-colors {{ request()->routeIs('admin') ? 'active' : '' }}">
                 <i class="bi bi-grid-1x2-fill sidebar-icon text-slate-400 mr-3 text-lg"></i>
                 <span class="font-medium">Dashboard</span>
@@ -156,12 +156,17 @@
 
     <!-- Main Content -->
     <div class="flex-1 flex flex-col overflow-hidden w-full">
-        <header class="bg-white border-b border-slate-200 h-20 flex items-center justify-between lg:justify-end px-4 lg:px-8 shadow-sm z-10">
-            <button @click="sidebarOpen = true" class="text-slate-500 hover:text-[#A89070] focus:outline-none lg:hidden">
-                <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-            </button>
+        <header class="bg-white border-b border-slate-200 h-20 flex items-center justify-between px-4 lg:px-8 shadow-sm z-10">
+            <div class="flex items-center gap-4">
+                <button @click="sidebarOpen = true" class="text-slate-500 hover:text-[#A89070] focus:outline-none lg:hidden">
+                    <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
+                @hasSection('header_title')
+                <h2 class="hidden lg:block text-3xl font-serif font-bold italic text-slate-800">@yield('header_title')</h2>
+                @endif
+            </div>
             <div class="flex items-center">
                 @if(auth()->user()->hasRole('super_admin'))
                 <div class="flex items-center gap-3">

@@ -1,6 +1,7 @@
 @extends('layouts.admin')
 
 @section('title', 'Add Room Type - DwellCasa Admin')
+@section('header_title', 'Add Room Type')
 
 @section('content')
 
@@ -11,8 +12,8 @@
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
         </a>
         <div>
-            <h1 class="text-3xl font-serif font-bold text-slate-900 italic">Add New Room Type</h1>
-            <p class="text-slate-500 mt-1">Create a new room category for your property.</p>
+            <h1 class="text-3xl font-serif font-bold text-slate-900 italic lg:hidden">Add New Room Type</h1>
+        <p class="text-slate-500 mt-1">Create a new room category for your property.</p>
         </div>
     </div>
 </div>

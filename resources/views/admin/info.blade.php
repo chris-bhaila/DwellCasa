@@ -1,14 +1,63 @@
 @extends('layouts.admin')
 
 @section('title', 'Website Information - DwellCasa Admin')
+@section('header_title', 'Website Information')
 
 @section('content')
+@php
+    $currentLocationId = session('selected_location_id');
+    $otherLocations = \App\Models\Location::where('is_active', true)
+        ->when($currentLocationId, fn($q) => $q->where('id', '!=', $currentLocationId))
+        ->orderBy('name')
+        ->get();
+@endphp
+
 <!-- Header -->
-<div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
     <div>
-        <h1 class="text-3xl font-serif font-bold text-slate-900 italic">Website Information</h1>
+        <h1 class="text-3xl font-serif font-bold text-slate-900 italic lg:hidden">Website Information</h1>
         <p class="text-slate-500 mt-1">Manage global content, headings, and settings for the public website.</p>
     </div>
+
+    @if($otherLocations->isNotEmpty())
+    <div x-data="{ open: false, loading: false }" class="relative self-start md:self-auto">
+        <button
+            @click="open = !open"
+            :disabled="loading"
+            class="inline-flex items-center gap-2 border border-slate-200 bg-white text-slate-700 px-4 py-2.5 rounded-xl font-medium hover:bg-slate-50 transition-all shadow-sm text-sm disabled:opacity-60">
+            <template x-if="!loading">
+                <i class="bi bi-download"></i>
+            </template>
+            <template x-if="loading">
+                <i class="bi bi-hourglass-split animate-spin"></i>
+            </template>
+            <span x-text="loading ? 'Importing...' : 'Import Data From'"></span>
+            <i class="bi bi-chevron-down text-xs transition-transform duration-200" :class="open ? 'rotate-180' : ''"></i>
+        </button>
+
+        <div
+            x-show="open"
+            x-transition:enter="transition ease-out duration-150"
+            x-transition:enter-start="opacity-0 scale-95"
+            x-transition:enter-end="opacity-100 scale-100"
+            x-transition:leave="transition ease-in duration-100"
+            x-transition:leave-start="opacity-100 scale-100"
+            x-transition:leave-end="opacity-0 scale-95"
+            @click.outside="open = false"
+            class="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-slate-100 py-1 z-50"
+            x-cloak>
+            @foreach($otherLocations as $loc)
+            <button
+                type="button"
+                @click="loading = true; open = false; importFrom({{ $loc->id }}).finally(() => loading = false)"
+                class="w-full text-left px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2 transition-colors">
+                <i class="bi bi-geo-alt text-slate-400"></i>
+                {{ $loc->name }}
+            </button>
+            @endforeach
+        </div>
+    </div>
+    @endif
 </div>
 
 <form id="website-info-form" action="#" method="POST" class="space-y-8" enctype="multipart/form-data">
@@ -173,34 +222,69 @@
 
 @push('scripts')
 <script>
+const imageFields = ['homepage_main_image', 'homepage_end_image', 'about_image'];
+
+function fillForm(data) {
+    const form = document.getElementById('website-info-form');
+
+    Object.keys(data).forEach(key => {
+        const input = form.elements[key];
+        if (input) {
+            if (input.type === 'time' && data[key]) {
+                input.value = data[key].substring(0, 5);
+            } else if (input.type !== 'file') {
+                input.value = data[key] || '';
+            }
+        }
+
+        const preview = document.getElementById(key + '_preview');
+        if (preview && data[key]) {
+            preview.src = '/storage/' + data[key];
+            preview.classList.remove('hidden');
+        }
+    });
+}
+
+async function loadImageIntoInput(storagePath, inputName) {
+    try {
+        const res = await fetch('/storage/' + storagePath);
+        if (!res.ok) return;
+        const blob = await res.blob();
+        const filename = storagePath.split('/').pop();
+        const file = new File([blob], filename, { type: blob.type });
+        const dt = new DataTransfer();
+        dt.items.add(file);
+        const input = document.querySelector(`input[name="${inputName}"]`);
+        if (input) input.files = dt.files;
+    } catch (e) {
+        console.warn('Could not import image for', inputName, e);
+    }
+}
+
+window.importFrom = async function(locationId) {
+    const response = await fetch(`/api/website-info?location_id=${locationId}`);
+    const result = await response.json();
+
+    if (!response.ok || !result.data) {
+        alert('Could not load data for that location.');
+        return;
+    }
+
+    fillForm(result.data);
+
+    await Promise.all(
+        imageFields
+            .filter(field => result.data[field])
+            .map(field => loadImageIntoInput(result.data[field], field))
+    );
+};
+
 document.addEventListener('DOMContentLoaded', async function() {
     try {
         const locationId = '{{ session('selected_location_id') }}';
         const response = await fetch(`/api/website-info?location_id=${locationId}`);
         const result = await response.json();
-        
-        if (response.ok && result.data) {
-            const data = result.data;
-            const form = document.getElementById('website-info-form');
-            
-            Object.keys(data).forEach(key => {
-                const input = form.elements[key];
-                if (input) {
-                    // Format time down to H:i to match the 'time' input parsing and validation rules
-                    if (input.type === 'time' && data[key]) {
-                        input.value = data[key].substring(0, 5);
-                    } else if (input.type !== 'file') {
-                        input.value = data[key] || '';
-                    }
-                }
-
-                const preview = document.getElementById(key + '_preview');
-                if (preview && data[key]) {
-                    preview.src = '/storage/' + data[key];
-                    preview.classList.remove('hidden');
-                }
-            });
-        }
+        if (response.ok && result.data) fillForm(result.data);
     } catch (error) {
         console.error('Error fetching website info:', error);
     }

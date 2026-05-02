@@ -1,6 +1,7 @@
 @extends('layouts.admin')
 
 @section('title', 'Room Management - DwellCasa Admin')
+@section('header_title', 'Room Types')
 
 @section('content')
 
@@ -9,7 +10,7 @@
 <!-- Header -->
 <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
     <div>
-        <h1 class="text-3xl font-serif font-bold text-slate-900 italic">Room Management</h1>
+        <h1 class="text-3xl font-serif font-bold text-slate-900 italic lg:hidden">Room Management</h1>
         <p class="text-slate-500 mt-1">Manage your property's room categories, pricing, and inventory.</p>
     </div>
     @if($filter !== 'trashed')

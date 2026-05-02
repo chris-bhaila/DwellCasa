@@ -7,6 +7,10 @@ use App\Contracts\RoomRepositoryInterface;
 use App\Contracts\RoomTypeRepositoryInterface;
 use App\Models\Activity;
 use App\Models\Booking;
+use App\Models\Inquiry;
+use App\Models\Location;
+use App\Models\Review;
+use App\Models\Room;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
@@ -32,7 +36,42 @@ class AdminController extends Controller
         $checkIns  = $checkInRepository->all();
         $bookings  = Booking::with(['guest', 'roomType'])->latest()->take(5)->get();
 
-        return view('admin.home', compact('rooms', 'roomTypes', 'checkIns', 'bookings'));
+        $incompleteLocations = collect();
+        if (auth()->user()->hasRole('super_admin')) {
+            $incompleteLocations = Location::where('is_active', true)
+                ->whereDoesntHave('websiteInfo', fn($q) => $q->withoutGlobalScopes()->whereNotNull('front_page_main_heading'))
+                ->orderBy('name')
+                ->get();
+        }
+
+        $today      = now()->toDateString();
+        $monthStart = now()->startOfMonth();
+        $monthEnd   = now()->endOfMonth();
+
+        // Top KPI cards
+        $todayArrivals      = Booking::whereDate('check_in_date', $today)->whereIn('status', ['confirmed', 'pending'])->count();
+        $inHouseCount       = Booking::where('status', 'checked_in')->count();
+        $monthlyRevenue     = Booking::whereBetween('check_in_date', [$monthStart, $monthEnd])->sum('amount_paid');
+        $unrepliedInquiries = Inquiry::where('status', 'unreplied')->count();
+
+        // Secondary stats
+        $todayDepartures  = Booking::whereDate('check_out_date', $today)->where('status', 'checked_in')->count();
+        $availableRooms   = Room::where('status', 'available')->count();
+        $totalRooms       = Room::count();
+        $avgRating        = Review::approved()->whereNotNull('rating')->avg('rating');
+        $monthlyBookings  = Booking::whereBetween('check_in_date', [$monthStart, $monthEnd])->count();
+
+        // Bottom panels
+        $recentInquiries      = Inquiry::where('status', 'unreplied')->latest()->take(5)->get();
+        $monthRevenueBilled   = Booking::whereBetween('check_in_date', [$monthStart, $monthEnd])->sum('total_amount');
+        $monthRevenueCollected = $monthlyRevenue;
+
+        return view('admin.home', compact(
+            'rooms', 'roomTypes', 'checkIns', 'bookings', 'incompleteLocations',
+            'todayArrivals', 'inHouseCount', 'monthlyRevenue', 'unrepliedInquiries',
+            'todayDepartures', 'availableRooms', 'totalRooms', 'avgRating', 'monthlyBookings',
+            'recentInquiries', 'monthRevenueBilled', 'monthRevenueCollected'
+        ));
     }
 
     public function activityLogPage()
