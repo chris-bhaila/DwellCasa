@@ -100,7 +100,7 @@
 <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
 
     <div class="bg-white rounded-xl border border-slate-100 shadow-sm px-5 py-4 flex items-center gap-4">
-        <div class="w-9 h-9 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500 flex-shrink-0">
+        <div class="w-9 h-9 rounded-lg bg-orange-50 flex items-center justify-center text-orange-400 flex-shrink-0">
             <i class="bi bi-box-arrow-right"></i>
         </div>
         <div>
@@ -110,7 +110,7 @@
     </div>
 
     <div class="bg-white rounded-xl border border-slate-100 shadow-sm px-5 py-4 flex items-center gap-4">
-        <div class="w-9 h-9 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500 flex-shrink-0">
+        <div class="w-9 h-9 rounded-lg bg-teal-50 flex items-center justify-center text-teal-500 flex-shrink-0">
             <i class="bi bi-door-open"></i>
         </div>
         <div>
@@ -133,7 +133,7 @@
     </div>
 
     <div class="bg-white rounded-xl border border-slate-100 shadow-sm px-5 py-4 flex items-center gap-4">
-        <div class="w-9 h-9 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500 flex-shrink-0">
+        <div class="w-9 h-9 rounded-lg bg-violet-50 flex items-center justify-center text-violet-500 flex-shrink-0">
             <i class="bi bi-calendar-check"></i>
         </div>
         <div>
@@ -226,7 +226,7 @@
                     <i class="bi bi-building text-xl"></i>
                     <span class="text-xs font-medium leading-tight">Rooms</span>
                 </a>
-                <a href="{{ route('admin.info') }}" class="flex flex-col items-center justify-center gap-2 p-4 bg-slate-50 rounded-xl hover:bg-[#A89070] hover:text-white transition-colors text-slate-600 text-center">
+                <a href="{{ route('admin.settings') }}" class="flex flex-col items-center justify-center gap-2 p-4 bg-slate-50 rounded-xl hover:bg-[#A89070] hover:text-white transition-colors text-slate-600 text-center">
                     <i class="bi bi-gear text-xl"></i>
                     <span class="text-xs font-medium leading-tight">Settings</span>
                 </a>
@@ -236,20 +236,26 @@
         <!-- Room Availability -->
         <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
             <h2 class="text-lg font-serif font-bold text-slate-900 italic mb-4">Availability</h2>
+            @php
+            $barPalette = ['#A89070', '#60a5fa', '#34d399', '#f472b6', '#a78bfa', '#fb923c'];
+            @endphp
             @forelse($roomTypes as $roomType)
             @php
                 $total     = $roomType->rooms()->count();
                 $available = $roomType->rooms()->where('status', 'available')->count();
                 $pct       = $total > 0 ? round(($available / $total) * 100) : 0;
-                $barColor  = $pct >= 50 ? 'bg-[#A89070]' : ($pct > 0 ? 'bg-amber-400' : 'bg-red-400');
+                $color     = $barPalette[$loop->index % count($barPalette)];
             @endphp
             <div class="mb-3 last:mb-0">
                 <div class="flex justify-between text-sm mb-1.5">
-                    <span class="text-slate-600 font-medium truncate pr-2">{{ $roomType->name }}</span>
+                    <span class="flex items-center gap-1.5 text-slate-600 font-medium truncate pr-2">
+                        <span class="inline-block w-2 h-2 rounded-full flex-shrink-0" style="background-color: {{ $color }}"></span>
+                        {{ $roomType->name }}
+                    </span>
                     <span class="text-slate-900 font-semibold flex-shrink-0">{{ $available }}<span class="text-slate-400 font-normal">/{{ $total }}</span></span>
                 </div>
                 <div class="w-full bg-slate-100 rounded-full h-1.5">
-                    <div class="{{ $barColor }} h-1.5 rounded-full transition-all" style="width: {{ $pct }}%"></div>
+                    <div class="h-1.5 rounded-full transition-all" style="width: {{ $pct }}%; background-color: {{ $color }}"></div>
                 </div>
             </div>
             @empty
@@ -297,7 +303,7 @@
     <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5">
         <div class="flex justify-between items-center mb-5">
             <h2 class="text-lg font-serif font-bold text-slate-900 italic">Revenue Snapshot</h2>
-            <span class="text-xs px-2.5 py-1 rounded-lg bg-slate-100 text-slate-500 font-medium">{{ now()->format('F Y') }}</span>
+            <a href="{{ route('admin.revenue') }}" class="text-[#A89070] text-sm font-medium hover:underline">View Details</a>
         </div>
 
         @php

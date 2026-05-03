@@ -48,4 +48,12 @@ class WebsiteInfoRepository implements WebsiteInfoRepositoryInterface
             $data
         );
     }
+
+    public function updateOrCreateGlobal(array $data): WebsiteInfo
+    {
+        return WebsiteInfo::withoutGlobalScopes()->updateOrCreate(
+            ['location_id' => null],
+            $data
+        );
+    }
 }

@@ -127,6 +127,7 @@ Route::middleware(['web', 'auth'])->group(function () {
     Route::middleware('permission:manage website info')->group(function () {
         Route::get('website-info', [WebsiteInfoController::class, 'show']);
         Route::post('website-info', [WebsiteInfoController::class, 'update']);
+        Route::post('home-info', [WebsiteInfoController::class, 'updateGlobal']);
         Route::apiResource('property-settings', PropertySettingController::class);
     });
 

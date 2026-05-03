@@ -90,7 +90,7 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             <div>
                                 <label class="block text-sm font-medium text-slate-700 mb-2">Stay Type</label>
-                                <select name="stay_type" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors">
+                                <select name="stay_type" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors">
                                     <option value="short_term" {{ old('stay_type', $booking->stay_type) == 'short_term' ? 'selected' : '' }}>Short Term</option>
                                     <option value="long_term" {{ old('stay_type', $booking->stay_type) == 'long_term' ? 'selected' : '' }}>Long Term</option>
                                 </select>

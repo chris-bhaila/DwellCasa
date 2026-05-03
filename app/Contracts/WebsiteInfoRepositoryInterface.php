@@ -8,4 +8,5 @@ interface WebsiteInfoRepositoryInterface
     public function getGlobal(): ?\App\Models\WebsiteInfo;
     public function update(array $data): \App\Models\WebsiteInfo;
     public function updateOrCreateForLocation(int $locationId, array $data): \App\Models\WebsiteInfo;
+    public function updateOrCreateGlobal(array $data): \App\Models\WebsiteInfo;
 }

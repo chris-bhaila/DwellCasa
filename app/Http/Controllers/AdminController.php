@@ -90,6 +90,41 @@ class AdminController extends Controller
         return view('admin.activity-log', compact('logs'));
     }
 
+    public function revenue(Request $request)
+    {
+        $from = $request->query('from', now()->startOfMonth()->toDateString());
+        $to   = $request->query('to',   now()->endOfMonth()->toDateString());
+
+        $bookings = Booking::with(['guest', 'roomType'])
+            ->whereBetween('check_in_date', [$from, $to])
+            ->whereNotIn('status', ['cancelled'])
+            ->orderBy('check_in_date')
+            ->get();
+
+        $billed      = $bookings->sum('total_amount');
+        $collected   = $bookings->sum('amount_paid');
+        $outstanding = max(0, $billed - $collected);
+        $collectPct  = $billed > 0 ? min(100, round(($collected / $billed) * 100)) : 0;
+
+        $byRoomType = $bookings->groupBy(fn($b) => $b->roomType?->name ?? 'Unknown')
+            ->map(fn($group) => [
+                'count'       => $group->count(),
+                'billed'      => $group->sum('total_amount'),
+                'collected'   => $group->sum('amount_paid'),
+                'outstanding' => max(0, $group->sum('total_amount') - $group->sum('amount_paid')),
+            ]);
+
+        return view('admin.revenue', compact(
+            'from', 'to', 'bookings',
+            'billed', 'collected', 'outstanding', 'collectPct', 'byRoomType'
+        ));
+    }
+
+    public function settings()
+    {
+        return view('admin.settings');
+    }
+
     public function profile()
     {
         return view('admin.profile');

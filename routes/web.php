@@ -63,9 +63,11 @@ Route::post('/admin/logout', [AuthController::class, 'logout'])->name('admin.log
 Route::middleware('auth')->prefix('admin')->group(function () {
 
     Route::get('/', [AdminController::class, 'dashboard'])->name('admin');
+    Route::get('/settings', [AdminController::class, 'settings'])->name('admin.settings');
 
     Route::middleware('permission:view bookings')->group(function () {
         Route::get('/bookings/bookings', [BookingController::class, 'page'])->name('admin.bookings');
+        Route::get('/revenue', [AdminController::class, 'revenue'])->name('admin.revenue');
     });
 
     Route::middleware('permission:create bookings')->group(function () {
@@ -105,6 +107,10 @@ Route::middleware('auth')->prefix('admin')->group(function () {
 
     Route::middleware('permission:manage website info')->group(function () {
         Route::get('/info', [WebsiteInfoController::class, 'page'])->name('admin.info');
+    });
+
+    Route::middleware('role:super_admin')->group(function () {
+        Route::get('/home-info', [WebsiteInfoController::class, 'pageGlobal'])->name('admin.home-info');
     });
 
     Route::middleware('permission:manage reviews')->group(function () {

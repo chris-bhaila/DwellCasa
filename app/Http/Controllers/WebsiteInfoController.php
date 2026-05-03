@@ -5,11 +5,10 @@ namespace App\Http\Controllers;
 use App\Contracts\WebsiteInfoRepositoryInterface;
 use App\Http\Requests\UpdateWebsiteInfoRequest;
 use Illuminate\Http\Request;
-use Spatie\Activitylog\Facades\Activity;
 
 class WebsiteInfoController extends Controller
 {
-    protected $websiteInfoRepository;
+    protected WebsiteInfoRepositoryInterface $websiteInfoRepository;
 
     public function __construct(WebsiteInfoRepositoryInterface $websiteInfoRepository)
     {
@@ -62,5 +61,36 @@ class WebsiteInfoController extends Controller
     public function page()
     {
         return view('admin.info');
+    }
+
+    public function pageGlobal()
+    {
+        $info = $this->websiteInfoRepository->getGlobal();
+        return view('admin.home-info', compact('info'));
+    }
+
+    public function updateGlobal(UpdateWebsiteInfoRequest $request)
+    {
+        $data = $request->validated();
+
+        $imageFields = ['homepage_main_image', 'homepage_end_image'];
+        foreach ($imageFields as $field) {
+            if ($request->hasFile($field)) {
+                $data[$field] = $request->file($field)->store('website', 'public');
+            }
+        }
+
+        $info = $this->websiteInfoRepository->updateOrCreateGlobal($data);
+
+        activity()
+            ->causedBy(auth()->user())
+            ->performedOn($info)
+            ->log('Updated global home page info');
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Home page info updated successfully',
+            'data'    => $info,
+        ]);
     }
 }

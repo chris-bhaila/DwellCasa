@@ -58,12 +58,12 @@
     <main class="pt-24">
 
         {{-- Location Cards --}}
-        <section id="locations" class="py-28 px-6">
+        <section id="locations" class="pt-10 pb-28 px-6">
             <div class="max-w-6xl mx-auto">
 
                 <div class="text-center mb-20" data-aos="fade-up">
-                    <span class="uppercase tracking-[0.12em] text-xs font-bold text-[#A89070] mb-4 block">Our Properties</span>
-                    <h2 class="font-serif text-4xl md:text-6xl font-bold italic text-slate-900">Where Would You Like to Stay?</h2>
+                    <span class="uppercase tracking-[0.12em] text-md font-bold text-[#A89070] mb-4 block">{{ $webInfo?->front_page_sub_heading_1 ?? 'Our Properties' }}</span>
+                    <h2 class="font-serif text-4xl md:text-6xl font-bold italic text-slate-900">{{ $webInfo?->front_page_main_heading ?? 'Where Would You Like to Stay?' }}</h2>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
@@ -106,12 +106,10 @@
         <section class="py-24 bg-white">
             <div class="max-w-4xl mx-auto px-6 text-center" data-aos="fade-up">
                 <h2 class="font-serif text-4xl md:text-5xl font-bold italic text-slate-900 mb-8">
-                    The DwellCasa Standard
+                    {{ $webInfo?->front_page_end_heading ?? 'The DwellCasa Standard' }}
                 </h2>
                 <p class="text-slate-500 text-lg leading-relaxed max-w-2xl mx-auto">
-                    Whether in the cultural heart of Patan or the vibrant energy of Thamel,
-                    every DwellCasa property delivers the same promise — thoughtful design,
-                    genuine hospitality, and an unmistakably Nepali sense of place.
+                    {{ $webInfo?->front_page_sub_heading_2 ?? 'Whether in the cultural heart of Patan or the vibrant energy of Thamel, every DwellCasa property delivers the same promise — thoughtful design, genuine hospitality, and an unmistakably Nepali sense of place.' }}
                 </p>
             </div>
         </section>

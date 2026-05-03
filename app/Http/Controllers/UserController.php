@@ -267,7 +267,8 @@ class UserController extends AdminController
 
         $users = User::with(['roles', 'permissions', 'location'])
             ->when($locationId, fn ($q) => $q->where('location_id', $locationId))
-            ->whereDoesntHave('roles', fn ($q) => $q->whereIn('name', ['super_admin', 'admin']))
+            ->whereDoesntHave('roles', fn ($q) => $q->where('name', 'super_admin'))
+            ->when(!$isSuperAdmin, fn ($q) => $q->whereDoesntHave('roles', fn ($q) => $q->where('name', 'admin')))
             ->where('id', '!=', $authUser->id)
             ->orderBy('name')
             ->get();

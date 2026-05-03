@@ -83,11 +83,16 @@
                 </div>
 
             </div>
-            <div class="p-6 bg-slate-50/50 border-t border-slate-100 flex items-center justify-end gap-4">
-                <a href="{{ route('admin.room_type.index') }}" class="text-sm font-medium text-slate-600 hover:text-slate-900">Cancel</a>
-                <button type="submit" class="bg-primary text-white px-6 py-2.5 rounded-xl font-medium hover:bg-[#8E795E] transition-all shadow-sm">
-                    Save Changes
+            <div class="p-6 bg-slate-50/50 border-t border-slate-100 flex items-center justify-between gap-4">
+                <button type="button" onclick="deleteRoom({{ $room->id }})" class="bg-red-50 text-red-600 border border-red-200 px-4 py-2.5 rounded-xl font-medium hover:bg-red-100 transition-all flex items-center gap-2">
+                    <i class="bi bi-trash"></i> Delete Room
                 </button>
+                <div class="flex items-center gap-4">
+                    <a href="{{ route('admin.room_type.index') }}" class="text-sm font-medium text-slate-600 hover:text-slate-900">Cancel</a>
+                    <button type="submit" class="bg-primary text-white px-6 py-2.5 rounded-xl font-medium hover:bg-[#8E795E] transition-all shadow-sm">
+                        Save Changes
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -96,6 +101,30 @@
 
 @push('scripts')
 <script>
+    window.deleteRoom = async function(id) {
+        if (!confirm('Are you sure you want to delete this room? This action cannot be undone.')) return;
+
+        try {
+            const response = await fetch(`/api/rooms/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                }
+            });
+
+            if (response.ok) {
+                window.location.href = "{{ route('admin.room_type.index') }}#inventory";
+            } else {
+                const errorData = await response.json();
+                alert('Error deleting room: ' + (errorData.message || 'Unknown error'));
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('An error occurred while deleting the room.');
+        }
+    };
+
     document.getElementById('edit-room-form').addEventListener('submit', async function(e) {
         e.preventDefault();
         const formData = new FormData(this);
