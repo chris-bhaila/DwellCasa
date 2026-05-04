@@ -111,18 +111,26 @@
                 <a href="#rooms" class="w-full sm:w-auto bg-white text-slate-900 px-10 py-4 rounded-full font-bold hover:bg-slate-100 transition-all transform hover:-translate-y-1 shadow-xl">
                     Explore Suites
                 </a>
-                <a href="#booking-form" class="w-full sm:w-auto border border-white/40 backdrop-blur-md px-10 py-4 rounded-full font-semibold hover:bg-white/20 transition-all">
+                <!-- <a href="#booking-form" class="w-full sm:w-auto border border-white/40 backdrop-blur-md px-10 py-4 rounded-full font-semibold hover:bg-white/20 transition-all">
                     Quick Booking
-                </a>
+                </a> -->
             </div>
         </div>
     </section>
 
-    <section id="booking-form" class="relative z-30 -mt-10 md:-mt-14 px-4">
+    <section id="booking-form" class="relative z-30 -mt-10 md:-mt-14 px-4 scroll-mt-24">
         <div class="max-w-6xl mx-auto">
             <div class="glass shadow-2xl rounded-3xl md:rounded-full p-2 md:p-3" data-aos="zoom-in" data-aos-delay="200">
                 @if(isset($location))
                 <form action="{{ route('booking.create', $location->slug) }}" method="GET" class="flex flex-col md:flex-row items-center gap-1">
+                    <div class="w-full md:flex-1 px-8 py-4 border-b md:border-b-0 md:border-r border-slate-200/50">
+                        <label class="block text-[10px] uppercase tracking-widest text-slate-400 mb-1 font-bold">Room Type</label>
+                        <select id="loc-roomtype" name="room_type_id" class="bg-transparent border-none p-0 focus:ring-0 text-sm font-semibold w-full text-slate-800 appearance-none cursor-pointer">
+                            @foreach($featuredRoomTypes as $roomType)
+                            <option value="{{ $roomType->id }}" data-max="{{ $roomType->max_occupancy }}">{{ $roomType->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
                     <div class="w-full md:flex-1 px-8 py-4 border-b md:border-b-0 md:border-r border-slate-200/50">
                         <label class="block text-[10px] uppercase tracking-widest text-slate-400 mb-1 font-bold">Check In</label>
                         <input type="text" id="loc-checkin" name="check_in_date" placeholder="Select date" readonly
@@ -134,17 +142,17 @@
                             class="bg-transparent border-none p-0 focus:ring-0 text-sm font-semibold w-full text-slate-800 cursor-pointer placeholder-slate-300">
                     </div>
                     <div class="w-full md:flex-1 px-8 py-4">
-                        <label class="block text-[10px] uppercase tracking-widest text-slate-400 mb-1 font-bold">Room Type</label>
-                        <select id="loc-roomtype" name="room_type_id" class="bg-transparent border-none p-0 focus:ring-0 text-sm font-semibold w-full text-slate-800 appearance-none cursor-pointer">
-                            @foreach($featuredRoomTypes as $roomType)
-                            <option value="{{ $roomType->id }}">{{ $roomType->name }}</option>
-                            @endforeach
+                        <label class="block text-[10px] uppercase tracking-widest text-slate-400 mb-1 font-bold">Guests</label>
+                        <select id="loc-guests" name="guests" class="bg-transparent border-none p-0 focus:ring-0 text-sm font-semibold w-full text-slate-800 appearance-none cursor-pointer">
+                            @for ($i = 1; $i <= ($featuredRoomTypes->first()?->max_occupancy ?? 1); $i++)
+                                <option value="{{ $i }}">{{ $i }} guest{{ $i > 1 ? 's' : '' }}</option>
+                                @endfor
                         </select>
                     </div>
                     <div class="w-full md:w-auto p-1">
-                        <button type="submit" class="w-full md:px-10 py-4 md:py-5 rounded-2xl md:rounded-full bg-primary text-white hover:bg-primary-dark
-                        transition-all uppercase tracking-widest text-xs font-bold shadow-lg transform hover:scale-[1.02]">
-                            Check Availability
+                        <button type="submit" class="w-full md:px-10 py-4 md:py-5 cursor-pointer rounded-2xl md:rounded-full bg-primary text-white hover:bg-primary-dark
+                        transition-all uppercase tracking-widest text-sm font-bold shadow-lg transform hover:scale-[1.02]">
+                            Quick Booking
                         </button>
                     </div>
                 </form>
@@ -298,93 +306,124 @@
 
 @push('scripts')
 <script>
-(function () {
-    const BOOKED_BY_RT = @json($bookedDatesByRoomType ?? []);
+    (function() {
+        const BOOKED_BY_RT = @json($bookedDatesByRoomType ?? []);
 
-    const checkinInput  = document.getElementById('loc-checkin');
-    const checkoutInput = document.getElementById('loc-checkout');
-    const roomTypeSelect = document.getElementById('loc-roomtype');
+        const checkinInput = document.getElementById('loc-checkin');
+        const checkoutInput = document.getElementById('loc-checkout');
+        const roomTypeSelect = document.getElementById('loc-roomtype');
 
-    if (!checkinInput || !checkoutInput) return;
+        if (!checkinInput || !checkoutInput) return;
 
-    function toLocalYMD(date) {
-        return date.getFullYear() + '-'
-            + String(date.getMonth() + 1).padStart(2, '0') + '-'
-            + String(date.getDate()).padStart(2, '0');
-    }
+        function toLocalYMD(date) {
+            return date.getFullYear() + '-' +
+                String(date.getMonth() + 1).padStart(2, '0') + '-' +
+                String(date.getDate()).padStart(2, '0');
+        }
 
-    function getBooked() {
-        const id = roomTypeSelect ? roomTypeSelect.value : null;
-        return (id && BOOKED_BY_RT[id]) ? BOOKED_BY_RT[id] : [];
-    }
+        function getBooked() {
+            const id = roomTypeSelect ? roomTypeSelect.value : null;
+            return (id && BOOKED_BY_RT[id]) ? BOOKED_BY_RT[id] : [];
+        }
 
-    let checkinPicker  = null;
-    let checkoutPicker = null;
+        let checkinPicker = null;
+        let checkoutPicker = null;
 
-    function initPickers() {
-        const booked = getBooked();
-        let checkInDate  = null;
-        let checkOutDate = null;
+        function initPickers() {
+            const booked = getBooked();
+            let checkInDate = null;
+            let checkOutDate = null;
 
-        if (checkinPicker)  { checkinPicker.destroy();  checkinPicker  = null; }
-        if (checkoutPicker) { checkoutPicker.destroy(); checkoutPicker = null; }
-
-        checkoutPicker = flatpickr(checkoutInput, {
-            minDate: 'today',
-            dateFormat: 'Y-m-d',
-            altInput: true,
-            altFormat: 'M j, Y',
-            disable: [d => booked.includes(toLocalYMD(d))],
-            disableMobile: true,
-            onChange(selected) {
-                checkOutDate = selected[0] || null;
+            if (checkinPicker) {
+                checkinPicker.destroy();
+                checkinPicker = null;
             }
-        });
+            if (checkoutPicker) {
+                checkoutPicker.destroy();
+                checkoutPicker = null;
+            }
 
-        checkinPicker = flatpickr(checkinInput, {
-            minDate: 'today',
-            dateFormat: 'Y-m-d',
-            altInput: true,
-            altFormat: 'M j, Y',
-            disable: [d => booked.includes(toLocalYMD(d))],
-            disableMobile: true,
-            onChange(selected) {
-                checkInDate = selected[0] || null;
-
-                if (checkInDate && checkOutDate && checkOutDate <= checkInDate) {
-                    checkOutDate = null;
-                    checkoutPicker.clear();
+            checkoutPicker = flatpickr(checkoutInput, {
+                minDate: 'today',
+                dateFormat: 'Y-m-d',
+                altInput: true,
+                altFormat: 'M j, Y',
+                disable: [d => booked.includes(toLocalYMD(d))],
+                disableMobile: true,
+                onChange(selected) {
+                    checkOutDate = selected[0] || null;
                 }
+            });
 
-                if (checkoutPicker) {
-                    checkoutPicker.set('minDate', checkInDate
-                        ? new Date(checkInDate.getTime() + 86400000)
-                        : 'today');
+            checkinPicker = flatpickr(checkinInput, {
+                minDate: 'today',
+                dateFormat: 'Y-m-d',
+                altInput: true,
+                altFormat: 'M j, Y',
+                disable: [d => booked.includes(toLocalYMD(d))],
+                disableMobile: true,
+                onChange(selected) {
+                    checkInDate = selected[0] || null;
 
-                    // block checkout past the next booked date after checkin
-                    let maxDate = null;
-                    if (checkInDate) {
-                        const ciStr = toLocalYMD(checkInDate);
-                        for (const d of [...booked].sort()) {
-                            if (d > ciStr) { maxDate = d; break; }
-                        }
-                    }
-                    checkoutPicker.set('maxDate', maxDate);
-
-                    if (maxDate && checkOutDate && toLocalYMD(checkOutDate) > maxDate) {
+                    if (checkInDate && checkOutDate && checkOutDate <= checkInDate) {
                         checkOutDate = null;
                         checkoutPicker.clear();
                     }
+
+                    if (checkoutPicker) {
+                        checkoutPicker.set('minDate', checkInDate ?
+                            new Date(checkInDate.getTime() + 86400000) :
+                            'today');
+
+                        // block checkout past the next booked date after checkin
+                        let maxDate = null;
+                        if (checkInDate) {
+                            const ciStr = toLocalYMD(checkInDate);
+                            for (const d of [...booked].sort()) {
+                                if (d > ciStr) {
+                                    maxDate = d;
+                                    break;
+                                }
+                            }
+                        }
+                        checkoutPicker.set('maxDate', maxDate);
+
+                        if (maxDate && checkOutDate && toLocalYMD(checkOutDate) > maxDate) {
+                            checkOutDate = null;
+                            checkoutPicker.clear();
+                        }
+                    }
                 }
+            });
+        }
+
+        initPickers();
+
+        const guestsSelect = document.getElementById('loc-guests');
+
+        function rebuildGuests() {
+            if (!roomTypeSelect || !guestsSelect) return;
+            const selected = roomTypeSelect.options[roomTypeSelect.selectedIndex];
+            const max = parseInt(selected.dataset.max) || 1;
+            const current = parseInt(guestsSelect.value) || 1;
+            guestsSelect.innerHTML = '';
+            for (let i = 1; i <= max; i++) {
+                const opt = document.createElement('option');
+                opt.value = i;
+                opt.textContent = i === 1 ? '1 guest' : `${i} guests`;
+                if (i === Math.min(current, max)) opt.selected = true;
+                guestsSelect.appendChild(opt);
             }
-        });
-    }
+        }
 
-    initPickers();
+        if (roomTypeSelect) {
+            roomTypeSelect.addEventListener('change', () => {
+                initPickers();
+                rebuildGuests();
+            });
+        }
 
-    if (roomTypeSelect) {
-        roomTypeSelect.addEventListener('change', initPickers);
-    }
-})();
+        rebuildGuests();
+    })();
 </script>
 @endpush

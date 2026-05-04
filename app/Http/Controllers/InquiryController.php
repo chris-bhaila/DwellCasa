@@ -96,7 +96,9 @@ class InquiryController extends Controller
         $inquiry = $this->inquiryRepository->find($id);
 
         try {
-            Mail::to($inquiry->email)->queue(new InquiryReplyMail($inquiry, $request->input('subject'), $request->input('message')));
+            Mail::to($inquiry->email)->send(new InquiryReplyMail($inquiry, $request->input('subject'), $request->input('message')));
+
+            $this->inquiryRepository->update($id, ['status' => 'replied']);
 
             activity()
                 ->causedBy(auth()->user())

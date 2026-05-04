@@ -21,6 +21,8 @@ class UpdateWebsiteInfoRequest extends FormRequest
             'front_page_end_sub_heading'=> 'nullable|string|max:255',
             'gallery_heading'           => 'nullable|string|max:255',
             'gallery_sub_heading'       => 'nullable|string|max:255',
+            'reviews_sub_heading'       => 'nullable|string|max:255',
+            'reviews_heading'           => 'nullable|string|max:255',
             'about_heading'             => 'nullable|string|max:255',
             'about_sub_description'     => 'nullable|string',
             'about_main_description'    => 'nullable|string',

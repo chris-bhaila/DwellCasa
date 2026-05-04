@@ -114,6 +114,7 @@ Route::middleware(['web', 'auth'])->group(function () {
     // ── Inquiries ─────────────────────────────────────────────────────
     Route::middleware('permission:manage inquiries')->group(function () {
         Route::apiResource('inquiries', InquiryController::class);
+        Route::post('inquiries/{id}/reply', [InquiryController::class, 'reply']);
         Route::apiResource('booking-inquiries', BookingInquiryController::class);
     });
 

@@ -119,8 +119,8 @@
         <section class="py-24 bg-slate-50 overflow-hidden">
             <div class="max-w-7xl mx-auto px-6 mb-16">
                 <div class="text-center" data-aos="fade-up">
-                    <span class="uppercase tracking-[0.1em] text-xs text-[#A89070] font-bold mb-4 block">Guest Experiences</span>
-                    <h2 class="font-serif font-bold text-4xl md:text-5xl text-black italic">What They Say</h2>
+                    <span class="uppercase tracking-[0.1em] text-xs text-[#A89070] font-bold mb-4 block">{{ $webInfo->reviews_sub_heading ?? 'Guest Experiences' }}</span>
+                    <h2 class="font-serif font-bold text-4xl md:text-5xl text-black italic">{{ $webInfo->reviews_heading ?? 'What They Say' }}</h2>
                     <div class="w-24 h-1 bg-black mx-auto mt-8"></div>
                 </div>
             </div>

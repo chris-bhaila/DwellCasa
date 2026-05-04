@@ -10,7 +10,7 @@
 <section class="pt-10 pb-20 bg-[#fbfbf9]">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-16">
-            <h1 class="text-5xl md:text-6xl font-serif italic font-bold text-slate-900 mb-4">{{ $webInfo->gallery_heading }}</h1>
+            <h1 class="text-5xl md:text-6xl !font-sans font-bold text-slate-900 mb-4">{{ $webInfo->gallery_heading }}</h1>
             <p class="text-lg text-slate-700 max-w-2xl mx-auto">
                 {{ $webInfo->gallery_sub_heading }}
             </p>

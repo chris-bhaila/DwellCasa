@@ -6,7 +6,7 @@
 <section class="pt-10 pb-20 bg-[#fbfbf9]">
     <div class="relative pb-24 px-4 sm:px-6 lg:px-22 text-center overflow-hidden">
         <div class="text-center mb-16">
-            <h1 class="text-5xl md:text-6xl font-serif italic font-bold text-slate-900 mb-4">Our Rooms</h1>
+            <h1 class="text-5xl md:text-6xl !font-sans font-bold text-slate-900 mb-4">Our Rooms</h1>
             <p class="text-lg text-slate-700 max-w-2xl mx-auto">
                 Choose from our selection of beautifully designed rooms and suites, each offering comfort and luxury.
             </p>
@@ -34,7 +34,7 @@
 
                 <!-- Info Section -->
                 <div class="w-full md:w-1/2 p-8 md:p-12 lg:p-16 flex flex-col justify-center">
-                    <h3 class="text-3xl md:text-4xl font-serif italic font-bold text-slate-900 mb-4 group-hover:text-primary transition-colors">
+                    <h3 class="text-3xl md:text-4xl !font-sans font-bold text-slate-900 mb-4 group-hover:text-primary transition-colors">
                         {{ $roomType->name }}
                     </h3>
                     

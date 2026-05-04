@@ -20,6 +20,8 @@ class WebsiteInfo extends Model
         'front_page_end_sub_heading',
         'gallery_heading',
         'gallery_sub_heading',
+        'reviews_sub_heading',
+        'reviews_heading',
         'about_heading',
         'about_sub_description',
         'about_main_description',

@@ -129,6 +129,22 @@
             </div>
         </div>
 
+        <!-- Reviews Section -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+            <h2 class="text-xl font-serif font-bold text-slate-900 italic mb-6 border-b border-slate-100 pb-4">Reviews Section</h2>
+
+            <div class="space-y-5">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Sub Heading</label>
+                    <input type="text" name="reviews_sub_heading" placeholder="Guest Experiences" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Heading</label>
+                    <input type="text" name="reviews_heading" placeholder="What They Say" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary">
+                </div>
+            </div>
+        </div>
+
         <!-- Contact & Policies -->
         <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
             <h2 class="text-xl font-serif font-bold text-slate-900 italic mb-6 border-b border-slate-100 pb-4">Contact & Policies</h2>

@@ -83,7 +83,7 @@
         <div class="max-w-7xl mx-auto px-6 md:px-12">
             <div class="flex justify-between items-center">
                 <div class="flex items-center">
-                    <a href="{{ route('home') }}"
+                    <a href="{{ $location ? route('location.home', $location->slug) : route('home') }}"
                         class="text-2xl font-bold tracking-tighter nav-transition"
                         :class="{{ request()->routeIs('home', 'location.home') ? '!scrolled' : 'false' }} ? 'text-white' : 'text-slate-900'">
                         DwellCasa<span class="text-primary">.</span>
@@ -110,11 +110,11 @@
                 </div>
 
                 <div class="flex items-center space-x-4">
-                    <!-- <a href="#"
+                    <a href="#booking-form"
                         class="px-6 py-2.5 rounded-full text-sm font-bold tracking-wider uppercase transition-all shadow-lg active:scale-95"
-                        :class="scrolled ? 'bg-primary text-white hover:bg-white hover:text-primary' : 'bg-white text-primary hover:bg-[#A89070] hover:text-white'">
+                        :class="scrolled ? 'bg-white text-primary hover:bg-[#A89070] hover:text-white':'bg-primary text-white hover:bg-white hover:text-primary'">
                         Book Now
-                    </a> -->
+                    </a>
 
                     <button class="md:hidden p-2" @click="mobileMenu = true">
                         <svg class="w-6 h-6" :class="{{ request()->routeIs('home', 'location.home') ? '!scrolled' : 'false' }} ? 'text-white' : 'text-slate-900'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -135,22 +135,42 @@
                 x-transition:leave="transition ease-in duration-200 transform"
                 x-transition:leave-start="translate-x-0"
                 x-transition:leave-end="translate-x-full"
-                class="fixed inset-0 z-[200] bg-primary flex flex-col justify-center items-center text-center p-6" x-cloak>
+                class="fixed inset-0 z-[200] bg-primary flex flex-col" x-cloak>
 
-                <button @click="mobileMenu = false" class="absolute top-8 right-8 text-white/50 hover:text-white">
-                    <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
-                </button>
+                <!-- Header -->
+                <div class="flex items-center justify-between px-8 py-6 border-b border-white/20">
+                    <a href="{{ route('home') }}" @click="mobileMenu = false" class="text-2xl font-bold tracking-tighter text-white">
+                        DwellCasa<span class="text-white/60">.</span>
+                    </a>
+                    <button @click="mobileMenu = false" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
 
-                <div class="space-y-8">
+                <!-- Nav links -->
+                <nav class="flex-1 flex flex-col justify-center px-8 space-y-2">
                     @foreach($navItems as $name => $route)
                     <a href="{{ $location ? route($route, $location->slug) : '#' }}"
-                        class="text-md font-medium tracking-wide uppercase hover:opacity-100 transition-opacity nav-transition"
-                        :class="{{ request()->routeIs('home', 'location.home') ? '!scrolled' : 'false' }} ? 'text-white/80 hover:text-white' : 'text-black font-bold hover:text-primary'">
-                        {{ $name }}
+                        @click="mobileMenu = false"
+                        class="flex items-center justify-between group py-4 border-b border-white/10 last:border-0">
+                        <span class="text-2xl font-bold tracking-wide text-white group-hover:text-white/70 transition-colors">{{ $name }}</span>
+                        <svg class="w-5 h-5 text-white/40 group-hover:text-white/70 group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
                     </a>
                     @endforeach
+                </nav>
+
+                <!-- Footer -->
+                <div class="px-8 py-6 border-t border-white/20">
+                    <div class="flex items-center gap-6">
+                        @if(isset($webInfo))
+                        <a href="{{ $webInfo->facebook_link }}" class="text-sm font-medium text-white/60 hover:text-white transition-colors uppercase tracking-widest">Facebook</a>
+                        <a href="{{ $webInfo->instagram_link }}" class="text-sm font-medium text-white/60 hover:text-white transition-colors uppercase tracking-widest">Instagram</a>
+                        @endif
+                    </div>
                 </div>
             </div>
         </template>

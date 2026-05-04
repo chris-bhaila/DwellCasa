@@ -44,93 +44,109 @@
 <body class="flex h-screen antialiased bg-slate-50 overflow-hidden" x-data="{ sidebarOpen: false }">
 
     <!-- Mobile sidebar backdrop -->
-    <div x-show="sidebarOpen" x-transition.opacity class="fixed inset-0 z-20 bg-slate-900/80 backdrop-blur-sm lg:hidden" @click="sidebarOpen = false" x-cloak></div>
+    <div x-show="sidebarOpen"
+         x-transition:enter="transition-opacity ease-out duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition-opacity ease-in duration-200"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         class="fixed inset-0 z-20 bg-slate-900/80 backdrop-blur-sm lg:hidden"
+         @click="sidebarOpen = false"
+         x-cloak></div>
 
     <!-- Sidebar -->
-    <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'" class="fixed inset-y-0 left-0 z-30 w-64 bg-slate-900 text-slate-300 flex flex-col flex-shrink-0 transition-transform duration-300 ease-in-out lg:static lg:translate-x-0">
-        <div class="flex items-center justify-center h-20 border-b border-slate-800 relative">
+    <aside :class="sidebarOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'"
+           class="fixed inset-y-0 left-0 z-30 w-72 lg:w-64 bg-slate-900 text-slate-300 flex flex-col flex-shrink-0 transition-transform duration-300 ease-in-out lg:static lg:translate-x-0 lg:shadow-none">
+
+        <!-- Sidebar header -->
+        <div class="flex items-center justify-between px-5 h-20 border-b border-slate-800 flex-shrink-0">
             <h1 class="text-2xl font-serif font-bold italic text-white tracking-wide">DwellCasa</h1>
-            <button @click="sidebarOpen = false" class="absolute right-4 text-slate-400 hover:text-white lg:hidden">
-                <i class="bi bi-x-lg text-xl"></i>
+            <button @click="sidebarOpen = false"
+                    class="lg:hidden w-9 h-9 flex items-center justify-center rounded-lg text-slate-400 hover:text-white hover:bg-slate-700 transition-colors">
+                <i class="bi bi-x-lg text-lg"></i>
             </button>
         </div>
-        <nav class="flex-1 overflow-y-auto px-4 py-6 space-y-2">
+
+        <!-- Nav links -->
+        <nav class="flex-1 overflow-y-auto px-3 py-5 space-y-1">
             <a href="{{ route('admin') }}" class="sidebar-link flex items-center px-4 py-3 rounded-lg transition-colors {{ request()->routeIs('admin') ? 'active' : '' }}">
-                <i class="bi bi-grid-1x2-fill sidebar-icon text-slate-400 mr-3 text-lg"></i>
+                <i class="bi bi-grid-1x2-fill sidebar-icon text-slate-400 mr-3 text-lg flex-shrink-0"></i>
                 <span class="font-medium">Dashboard</span>
             </a>
 
             @can('view bookings')
             <a href="{{ route('admin.bookings') }}" class="sidebar-link flex items-center px-4 py-3 rounded-lg transition-colors {{ request()->routeIs('admin.bookings*') ? 'active' : '' }}">
-                <i class="bi bi-calendar-check sidebar-icon text-slate-400 mr-3 text-lg"></i>
+                <i class="bi bi-calendar-check sidebar-icon text-slate-400 mr-3 text-lg flex-shrink-0"></i>
                 <span class="font-medium">Bookings</span>
             </a>
             @endcan
 
             @can('manage room types')
             <a href="{{ route('admin.room_type.index') }}" class="sidebar-link flex items-center px-4 py-3 rounded-lg transition-colors {{ request()->routeIs('admin.room_type*') ? 'active' : '' }}">
-                <i class="bi bi-door-open sidebar-icon text-slate-400 mr-3 text-lg"></i>
+                <i class="bi bi-door-open sidebar-icon text-slate-400 mr-3 text-lg flex-shrink-0"></i>
                 <span class="font-medium">Rooms</span>
             </a>
             @endcan
 
             @can('manage amenities')
             <a href="{{ route('admin.amenities') }}" class="sidebar-link flex items-center px-4 py-3 rounded-lg transition-colors {{ request()->is('admin/amenities*') ? 'active' : '' }}">
-                <i class="bi bi-gem sidebar-icon text-slate-400 mr-3 text-lg"></i>
+                <i class="bi bi-gem sidebar-icon text-slate-400 mr-3 text-lg flex-shrink-0"></i>
                 <span class="font-medium">Amenities</span>
             </a>
             @endcan
 
             @can('manage gallery')
             <a href="{{ route('admin.gallery') }}" class="sidebar-link flex items-center px-4 py-3 rounded-lg transition-colors {{ request()->is('admin/gallery*') ? 'active' : '' }}">
-                <i class="bi bi-images sidebar-icon text-slate-400 mr-3 text-lg"></i>
+                <i class="bi bi-images sidebar-icon text-slate-400 mr-3 text-lg flex-shrink-0"></i>
                 <span class="font-medium">Gallery</span>
             </a>
             @endcan
 
             @can('manage inquiries')
             <a href="{{ route('admin.inquiry') }}" class="sidebar-link flex items-center px-4 py-3 rounded-lg transition-colors {{ request()->is('admin/inquiry*') ? 'active' : '' }}">
-                <i class="bi bi-chat-left-text sidebar-icon text-slate-400 mr-3 text-lg"></i>
+                <i class="bi bi-chat-left-text sidebar-icon text-slate-400 mr-3 text-lg flex-shrink-0"></i>
                 <span class="font-medium">Inquiries</span>
             </a>
             @endcan
 
             @can('view inventory')
             <a href="{{ route('admin.inventory') }}" class="sidebar-link flex items-center px-4 py-3 rounded-lg transition-colors {{ request()->routeIs('admin.inventory*') ? 'active' : '' }}">
-                <i class="bi bi-box-seam sidebar-icon text-slate-400 mr-3 text-lg"></i>
+                <i class="bi bi-box-seam sidebar-icon text-slate-400 mr-3 text-lg flex-shrink-0"></i>
                 <span class="font-medium">Inventory</span>
             </a>
             @endcan
 
             @can('manage reviews')
             <a href="{{ route('admin.reviews') }}" class="sidebar-link flex items-center px-4 py-3 rounded-lg transition-colors {{ request()->routeIs('admin.reviews*') ? 'active' : '' }}">
-                <i class="bi bi-star-half sidebar-icon text-slate-400 mr-3 text-lg"></i>
+                <i class="bi bi-star-half sidebar-icon text-slate-400 mr-3 text-lg flex-shrink-0"></i>
                 <span class="font-medium">Reviews</span>
             </a>
             @endcan
 
             @can('manage users')
             <a href="{{ route('admin.users') }}" class="sidebar-link flex items-center px-4 py-3 rounded-lg transition-colors {{ request()->routeIs('admin.users*') ? 'active' : '' }}">
-                <i class="bi bi-people sidebar-icon text-slate-400 mr-3 text-lg"></i>
+                <i class="bi bi-people sidebar-icon text-slate-400 mr-3 text-lg flex-shrink-0"></i>
                 <span class="font-medium">Users</span>
             </a>
             @endcan
-
         </nav>
-        <div class="p-4 border-t border-slate-800">
-            <a href="{{ route('admin.profile') }}" class="flex items-center">
-                <div class="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center font-bold text-white flex-shrink-0">
+
+        <!-- Profile & logout -->
+        <div class="flex-shrink-0 border-t border-slate-800 p-4 space-y-2">
+            <a href="{{ route('admin.profile') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-800 transition-colors group">
+                <div class="w-10 h-10 rounded-full bg-[#A89070] flex items-center justify-center font-bold text-white text-sm flex-shrink-0">
                     {{ substr(Auth::user()->name, 0, 1) }}
                 </div>
-                <div class="ml-3 overflow-hidden">
-                    <p class="text-sm font-semibold text-white truncate">{{ Auth::user()->name }}</p>
+                <div class="overflow-hidden">
+                    <p class="text-sm font-semibold text-white truncate group-hover:text-[#A89070] transition-colors">{{ Auth::user()->name }}</p>
                     <p class="text-xs text-slate-400 truncate">{{ Auth::user()->email }}</p>
                 </div>
             </a>
             <form method="POST" action="{{ route('admin.logout') }}">
                 @csrf
-                <button type="submit" class="w-full text-left flex items-center mt-4 px-4 py-2 rounded-lg text-slate-400 hover:bg-red-500/20 hover:text-red-300 transition-colors">
-                    <i class="bi bi-box-arrow-left mr-3 text-lg"></i>
+                <button type="submit" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-400 hover:bg-red-500/20 hover:text-red-300 transition-colors">
+                    <i class="bi bi-box-arrow-left text-lg flex-shrink-0"></i>
                     <span class="text-sm font-medium">Logout</span>
                 </button>
             </form>
@@ -169,7 +185,7 @@
                 @endif
             </div>
         </header>
-        <main class="flex-1 overflow-x-hidden overflow-y-auto bg-slate-50 p-8">
+        <main class="flex-1 overflow-x-hidden overflow-y-auto bg-slate-50 p-4 md:p-8">
             @yield('content')
         </main>
     </div>

@@ -6,7 +6,7 @@
 <section class="pt-10 pb-20 bg-[#fbfbf9]">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-16">
-            <h1 class="text-5xl md:text-6xl font-serif italic font-bold text-slate-900 mb-4">Contact Us</h1>
+            <h1 class="text-5xl md:text-6xl !font-sans font-bold text-slate-900 mb-4">Contact Us</h1>
             <p class="text-lg text-slate-700 max-w-2xl mx-auto">
                 {{ $webInfo->contact_sub_heading }}
             </p>
@@ -15,7 +15,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
             <!-- Contact Form -->
             <div class="bg-white p-10 rounded-2xl shadow-lg border border-slate-100">
-                <h2 class="text-3xl font-serif italic font-bold text-slate-900 mb-8">Send us a Message</h2>
+                <h2 class="text-3xl !font-sans font-bold text-slate-900 mb-8">Send us a Message</h2>
                 <form id="contact-form" action="#" method="POST">
                     @csrf
                     <div class="mb-6">
@@ -44,7 +44,7 @@
                         <label class="block text-sm font-medium text-slate-700 mb-2">Message</label>
                         <textarea name="message" rows="5" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" required></textarea>
                     </div>
-                    <button type="submit" class="w-full bg-primary text-white px-6 py-4 rounded-lg font-semibold hover:shadow-lg hover:bg-primary-dark transition-all">
+                    <button type="submit" class="w-full cursor-pointer bg-primary text-white px-6 py-4 rounded-lg font-semibold hover:shadow-lg hover:bg-primary-dark transition-all">
                         Send Message
                     </button>
                 </form>
@@ -53,14 +53,14 @@
             <!-- Contact Information -->
             <div>
                 <div class="bg-white p-10 rounded-2xl shadow-lg border border-slate-100 mb-8">
-                    <h2 class="text-3xl font-serif italic font-bold text-slate-900 mb-8">Get in Touch</h2>
+                    <h2 class="text-3xl !font-sans font-bold text-slate-900 mb-8">Get in Touch</h2>
                     <div class="space-y-6">
                         <div class="flex items-start gap-4">
                             <div class="w-14 h-14 bg-blue-50 rounded-full flex items-center justify-center flex-shrink-0 border-2 border-blue-200">
                                 <span class="text-2xl">📍</span>
                             </div>
                             <div>
-                                <h3 class="font-bold text-slate-900 text-lg">Address</h3>
+                                <h3 class="!font-sans font-bold text-slate-900 text-lg">Address</h3>
                                 <p class="text-slate-700 mt-1">{{ $webInfo->contact_address }}</p>
                             </div>
                         </div>
@@ -70,7 +70,7 @@
                                 <span class="text-2xl">📞</span>
                             </div>
                             <div>
-                                <h3 class="font-bold text-slate-900 text-lg">Phone</h3>
+                                <h3 class="!font-sans font-bold text-slate-900 text-lg">Phone</h3>
                                 <p class="text-slate-700 mt-1">{{ $webInfo->contact_phone }}</p>
                             </div>
                         </div>
@@ -80,7 +80,7 @@
                                 <span class="text-2xl">✉️</span>
                             </div>
                             <div>
-                                <h3 class="font-bold text-slate-900 text-lg">Email</h3>
+                                <h3 class="!font-sans font-bold text-slate-900 text-lg">Email</h3>
                                 <p class="text-slate-700 mt-1">{{ $webInfo->contact_email }}</p>
                             </div>
                         </div>
@@ -90,7 +90,7 @@
                                 <span class="text-2xl">🕒</span>
                             </div>
                             <div>
-                                <h3 class="font-bold text-slate-900 text-lg">Business Hours</h3>
+                                <h3 class="!font-sans font-bold text-slate-900 text-lg">Business Hours</h3>
                                 <p class="text-slate-700 mt-1">Check-in: {{ \Carbon\Carbon::parse($webInfo->check_in)->format('g:i A') }}<br>Check-out: {{ \Carbon\Carbon::parse($webInfo->check_out)->format('g:i A') }}</p>
                             </div>
                         </div>
