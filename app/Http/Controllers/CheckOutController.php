@@ -90,7 +90,7 @@ class CheckOutController extends Controller
             if ($emailData) {
                 try {
                     Mail::to($emailData['booking']->guest->email)
-                        ->queue(new ReviewRequestMail($emailData['booking'], $emailData['token']));
+                        ->send(new ReviewRequestMail($emailData['booking'], $emailData['token']));
                 } catch (\Exception $e) {
                     Log::error("Review request email failed: {$e->getMessage()}");
                 }

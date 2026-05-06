@@ -19,6 +19,7 @@ class InquiryReplyMail extends Mailable
         $this->inquiry = $inquiry;
         $this->replySubject = $replySubject;
         $this->replyMessage = $replyMessage;
+        $inquiry->loadMissing('location');
     }
 
     public function build()

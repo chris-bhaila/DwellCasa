@@ -16,12 +16,14 @@ class ReviewRequestMail extends Mailable
     public function __construct(
         public Booking $booking,
         public string $token
-    ) {}
+    ) {
+        $booking->loadMissing('location');
+    }
 
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'How was your stay at DwellCasa?',
+            subject: 'How was your stay at ' . ($this->booking->location->name ?? 'DwellCasa') . '?',
         );
     }
 

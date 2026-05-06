@@ -228,11 +228,11 @@
                 window.location.reload();
             } else {
                 const data = await response.json();
-                alert('Error updating status: ' + (data.message || 'Unknown error'));
+                adminToast('Error updating status: ' + (data.message || 'Unknown error'));
             }
         } catch (error) {
             console.error('Error:', error);
-            alert('An error occurred while updating the review status.');
+            adminToast('An error occurred while updating the review status.');
         }
     }
 
@@ -242,7 +242,7 @@
     // Handle Delete
     document.querySelectorAll('.delete-review-btn').forEach(btn => {
         btn.addEventListener('click', async function() {
-            if (!confirm('Are you sure you want to delete this review? This action cannot be undone.')) return;
+            if (!await adminConfirm('Are you sure you want to delete this review? This action cannot be undone.', { confirmLabel: 'Delete', type: 'danger' })) return;
 
             const id = this.dataset.id;
 
@@ -259,11 +259,11 @@
                     window.location.reload();
                 } else {
                     const error = await response.json();
-                    alert('Error deleting review: ' + (error.message || 'Unknown error'));
+                    adminToast('Error deleting review: ' + (error.message || 'Unknown error'));
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('An error occurred while deleting the review.');
+                adminToast('An error occurred while deleting the review.');
             }
         });
     });

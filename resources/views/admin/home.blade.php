@@ -190,10 +190,15 @@
                             @endif
                         </td>
                         <td class="px-5 py-3.5 text-right">
-                            @if($booking->amount_paid > 0)
-                            <p class="font-semibold text-slate-900 text-sm">Rs. {{ number_format($booking->amount_paid, 0) }}</p>
+                            @if($booking->amount_paid !== null)
+                            <p class="font-semibold text-slate-900 text-sm">
+                                Rs. {{ number_format($booking->amount_paid, 0) }}
+                                <span class="text-slate-400 font-normal">/ {{ number_format($booking->total_amount, 0) }}</span>
+                            </p>
+                            @elseif($booking->total_amount > 0)
+                            <p class="font-medium text-slate-900 text-sm">Rs. {{ number_format($booking->total_amount, 0) }}</p>
                             @else
-                            <p class="text-slate-400 text-xs italic">Not paid</p>
+                            <p class="text-slate-400 text-xs italic">Not set</p>
                             @endif
                         </td>
                     </tr>
@@ -241,8 +246,9 @@
             @endphp
             @forelse($roomTypes as $roomType)
             @php
-                $total     = $roomType->rooms()->count();
-                $available = $roomType->rooms()->where('status', 'available')->count();
+                $total     = $roomType->rooms_count;
+                $booked    = $roomType->active_bookings_count;
+                $available = max(0, $total - $booked);
                 $pct       = $total > 0 ? round(($available / $total) * 100) : 0;
                 $color     = $barPalette[$loop->index % count($barPalette)];
             @endphp
@@ -262,6 +268,80 @@
             <p class="text-sm text-slate-400 italic">No room types configured.</p>
             @endforelse
         </div>
+
+    </div>
+</div>
+
+<!-- Inventory Snapshot -->
+<div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 mb-6">
+    <div class="flex justify-between items-center mb-4">
+        <h2 class="text-lg font-serif font-bold text-slate-900 italic">Inventory Alerts</h2>
+        <a href="{{ route('admin.inventory') }}"
+           class="text-[#A89070] text-sm font-medium hover:underline">
+            View Inventory
+        </a>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+
+        <!-- Low Stock -->
+        <a href="{{ route('admin.inventory.supplies') }}"
+           class="flex items-center gap-4 p-4 rounded-xl border transition-colors
+               {{ $inventoryLowStock > 0
+                   ? 'bg-amber-50 border-amber-200 hover:bg-amber-100'
+                   : 'bg-slate-50 border-slate-100 hover:bg-slate-100' }}">
+            <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0
+                {{ $inventoryLowStock > 0 ? 'bg-amber-100' : 'bg-slate-100' }}">
+                <i class="bi bi-exclamation-triangle
+                    {{ $inventoryLowStock > 0 ? 'text-amber-500' : 'text-slate-400' }} text-lg"></i>
+            </div>
+            <div>
+                <p class="text-2xl font-bold
+                    {{ $inventoryLowStock > 0 ? 'text-amber-700' : 'text-slate-900' }}">
+                    {{ $inventoryLowStock }}
+                </p>
+                <p class="text-xs text-slate-500 font-medium">Low Stock Items</p>
+            </div>
+        </a>
+
+        <!-- Out of Stock -->
+        <a href="{{ route('admin.inventory.supplies') }}"
+           class="flex items-center gap-4 p-4 rounded-xl border transition-colors
+               {{ $inventoryOutOfStock > 0
+                   ? 'bg-rose-50 border-rose-200 hover:bg-rose-100'
+                   : 'bg-slate-50 border-slate-100 hover:bg-slate-100' }}">
+            <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0
+                {{ $inventoryOutOfStock > 0 ? 'bg-rose-100' : 'bg-slate-100' }}">
+                <i class="bi bi-x-circle
+                    {{ $inventoryOutOfStock > 0 ? 'text-rose-500' : 'text-slate-400' }} text-lg"></i>
+            </div>
+            <div>
+                <p class="text-2xl font-bold
+                    {{ $inventoryOutOfStock > 0 ? 'text-rose-700' : 'text-slate-900' }}">
+                    {{ $inventoryOutOfStock }}
+                </p>
+                <p class="text-xs text-slate-500 font-medium">Out of Stock</p>
+            </div>
+        </a>
+
+        <!-- Damaged Equipment -->
+        <a href="{{ route('admin.inventory.equipment') }}"
+           class="flex items-center gap-4 p-4 rounded-xl border transition-colors
+               {{ $inventoryDamaged > 0
+                   ? 'bg-orange-50 border-orange-200 hover:bg-orange-100'
+                   : 'bg-slate-50 border-slate-100 hover:bg-slate-100' }}">
+            <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0
+                {{ $inventoryDamaged > 0 ? 'bg-orange-100' : 'bg-slate-100' }}">
+                <i class="bi bi-tools
+                    {{ $inventoryDamaged > 0 ? 'text-orange-500' : 'text-slate-400' }} text-lg"></i>
+            </div>
+            <div>
+                <p class="text-2xl font-bold
+                    {{ $inventoryDamaged > 0 ? 'text-orange-700' : 'text-slate-900' }}">
+                    {{ $inventoryDamaged }}
+                </p>
+                <p class="text-xs text-slate-500 font-medium">Damaged / Under Repair</p>
+            </div>
+        </a>
 
     </div>
 </div>

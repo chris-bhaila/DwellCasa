@@ -170,11 +170,11 @@
                 window.location.href = "{{ route('admin.room_type.index') }}";
             } else {
                 const error = await response.json();
-                alert('Error creating room type: ' + (error.message || 'Unknown error'));
+                adminToast('Error creating room type: ' + (error.message || 'Unknown error'));
             }
         } catch (error) {
             console.error('Error:', error);
-            alert('An error occurred creating the room type.');
+            adminToast('An error occurred creating the room type.');
         }
     });
 </script>

@@ -282,7 +282,7 @@
     });
 
     window.deleteLocation = async function(id) {
-        if (!confirm('Are you sure you want to delete this location? This action cannot be undone.')) return;
+        if (!await adminConfirm('Are you sure you want to delete this location? This action cannot be undone.', { confirmLabel: 'Delete', type: 'danger' })) return;
         
         try {
             const response = await fetch(`/api/locations/${id}`, {
@@ -297,11 +297,11 @@
                 window.location.reload();
             } else {
                 const error = await response.json();
-                alert('Error deleting location: ' + (error.message || 'Unknown error'));
+                adminToast('Error deleting location: ' + (error.message || 'Unknown error'));
             }
         } catch (error) {
             console.error('Error:', error);
-            alert('An error occurred while attempting to delete.');
+            adminToast('An error occurred while attempting to delete.');
         }
     };
 </script>

@@ -44,6 +44,12 @@ $groups = [
                 'label' => 'Activity Logs',
                 'desc'  => 'Review a full audit trail of admin actions.',
             ] : null,
+            auth()->user()->can('manage users') ? [
+                'route' => 'admin.users',
+                'icon'  => 'bi-people',
+                'label' => 'Users',
+                'desc'  => 'Grant/Revoke permissions.',
+            ] : null,
         ],
     ],
 ];

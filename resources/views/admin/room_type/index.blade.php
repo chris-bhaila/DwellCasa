@@ -219,8 +219,8 @@
 @push('scripts')
 @if($filter === 'trashed')
 <script>
-function restoreRoomType(id, name) {
-    if (!confirm(`Restore room type "${name}"?`)) return;
+async function restoreRoomType(id, name) {
+    if (!await adminConfirm(`Restore room type "${name}"?`, { confirmLabel: 'Restore', type: 'primary' })) return;
 
     fetch(`/api/room-types/${id}/restore`, {
         method: 'POST',
@@ -232,13 +232,13 @@ function restoreRoomType(id, name) {
     .then(r => r.json())
     .then(data => {
         if (data.success) window.location.reload();
-        else alert(data.message ?? 'Restore failed.');
+        else adminToast(data.message ?? 'Restore failed.');
     })
-    .catch(() => alert('Restore failed.'));
+    .catch(() => adminToast('Restore failed.'));
 }
 
-function forceDeleteRoomType(id, name) {
-    if (!confirm(`Permanently delete room type "${name}"? This cannot be undone.`)) return;
+async function forceDeleteRoomType(id, name) {
+    if (!await adminConfirm(`Permanently delete room type "${name}"? This cannot be undone.`, { confirmLabel: 'Delete Permanently', type: 'danger' })) return;
 
     fetch(`/api/room-types/${id}/force`, {
         method: 'DELETE',
@@ -250,13 +250,13 @@ function forceDeleteRoomType(id, name) {
     .then(r => r.json())
     .then(data => {
         if (data.success) window.location.reload();
-        else alert(data.message ?? 'Delete failed.');
+        else adminToast(data.message ?? 'Delete failed.');
     })
-    .catch(() => alert('Delete failed.'));
+    .catch(() => adminToast('Delete failed.'));
 }
 
-function restoreRoom(id, number) {
-    if (!confirm(`Restore room "${number}"?`)) return;
+async function restoreRoom(id, number) {
+    if (!await adminConfirm(`Restore room "${number}"?`, { confirmLabel: 'Restore', type: 'primary' })) return;
 
     fetch(`/api/rooms/${id}/restore`, {
         method: 'POST',
@@ -268,13 +268,13 @@ function restoreRoom(id, number) {
     .then(r => r.json())
     .then(data => {
         if (data.success) window.location.reload();
-        else alert(data.message ?? 'Restore failed.');
+        else adminToast(data.message ?? 'Restore failed.');
     })
-    .catch(() => alert('Restore failed.'));
+    .catch(() => adminToast('Restore failed.'));
 }
 
-function forceDeleteRoom(id, number) {
-    if (!confirm(`Permanently delete room "${number}"? This cannot be undone.`)) return;
+async function forceDeleteRoom(id, number) {
+    if (!await adminConfirm(`Permanently delete room "${number}"? This cannot be undone.`, { confirmLabel: 'Delete Permanently', type: 'danger' })) return;
 
     fetch(`/api/rooms/${id}/force`, {
         method: 'DELETE',
@@ -286,9 +286,9 @@ function forceDeleteRoom(id, number) {
     .then(r => r.json())
     .then(data => {
         if (data.success) window.location.reload();
-        else alert(data.message ?? 'Delete failed.');
+        else adminToast(data.message ?? 'Delete failed.');
     })
-    .catch(() => alert('Delete failed.'));
+    .catch(() => adminToast('Delete failed.'));
 }
 </script>
 @endif

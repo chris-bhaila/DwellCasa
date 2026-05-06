@@ -25,8 +25,17 @@ class StoreBookingRequest extends FormRequest
             'stay_type'       => 'required|in:short_term,long_term',
             'guest_name'      => 'required|string|max:255',
             'guest_email'     => 'required|email|max:255',
-            'guest_phone'     => 'nullable|string|max:20',
+            'guest_phone'      => 'nullable|string|max:30',
+            'status'           => 'nullable|in:pending,confirmed,checked_in,checked_out,cancelled,no_show',
+            'rate_per_night'   => 'nullable|numeric|min:0',
+            'rate_per_month'   => 'nullable|numeric|min:0',
+            'total_amount'     => 'nullable|numeric|min:0',
+            'discount'         => 'nullable|numeric|min:0',
+            'deposit_amount'   => 'nullable|numeric|min:0',
+            'amount_paid'      => 'nullable|numeric|min:0',
+            'payment_status'   => 'nullable|in:unpaid,deposit_paid,partially_paid,fully_paid,refunded',
             'special_requests' => 'nullable|string',
+            'admin_notes'      => 'nullable|string',
         ];
     }
 
@@ -38,10 +47,18 @@ class StoreBookingRequest extends FormRequest
 
         $merge = [
             'booking_ref' => 'BKG-' . strtoupper(Str::random(8)),
+            'amount_paid' => $this->amount_paid ?? null,
         ];
 
         if ($email) {
-            $locationId = $this->route('location')?->id;
+            $user = auth()->user();
+            if ($user) {
+                $locationId = $user->hasRole('super_admin')
+                    ? session('selected_location_id')
+                    : $user->location_id;
+            } else {
+                $locationId = $this->route('location')?->id;
+            }
 
             $guest = Guest::firstOrCreate(
                 ['email' => $email, 'location_id' => $locationId],

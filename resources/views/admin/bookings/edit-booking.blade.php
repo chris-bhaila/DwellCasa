@@ -96,16 +96,20 @@
                                 </select>
                             </div>
                             <div id="rate-per-night-wrapper">
-                                <label class="block text-sm font-medium text-slate-700 mb-2">Rate Per Night <span class="text-red-500">*</span></label>
+                                <label class="block text-sm font-medium text-slate-700 mb-2">Rate Per Night</label>
                                 <input type="number" name="rate_per_night" value="{{ old('rate_per_night', !is_null($booking->rate_per_night) ? round($booking->rate_per_night) : '') }}" step="1" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors">
                             </div>
-                            <div id="rate-per-month-wrapper" class="hidden">
-                                <label class="block text-sm font-medium text-slate-700 mb-2">Rate Per Month <span class="text-red-500">*</span></label>
+                            <div id="rate-per-month-wrapper">
+                                <label class="block text-sm font-medium text-slate-700 mb-2">Rate Per Month</label>
                                 <input type="number" name="rate_per_month" value="{{ old('rate_per_month', !is_null($booking->rate_per_month) ? round($booking->rate_per_month) : '') }}" step="1" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-slate-700 mb-2">Total Amount <span class="text-red-500">*</span></label>
                                 <input type="number" name="total_amount" value="{{ old('total_amount', !is_null($booking->total_amount) ? round($booking->total_amount) : '') }}" step="1" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-2">Discount</label>
+                                <input type="number" name="discount" value="{{ old('discount', !is_null($booking->discount) ? round($booking->discount) : '') }}" step="1" min="0" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-slate-700 mb-2">Deposit Amount</label>
@@ -335,11 +339,11 @@
                 if (error.errors) {
                     errorMessage += '\n' + Object.values(error.errors).flat().join('\n');
                 }
-                alert(errorMessage);
+                adminToast(errorMessage);
             }
         } catch (error) {
             console.error('Error:', error);
-            alert('An error occurred while updating the booking.');
+            adminToast('An error occurred while updating the booking.');
         }
     });
 
@@ -394,11 +398,11 @@
                 if (error.errors) {
                     errorMessage += '\n' + Object.values(error.errors).flat().join('\n');
                 }
-                alert(errorMessage);
+                adminToast(errorMessage);
             }
         } catch (error) {
             console.error('Error:', error);
-            alert('An error occurred during check-in.');
+            adminToast('An error occurred during check-in.');
         }
     });
 
@@ -464,17 +468,17 @@
                 if (error.errors) {
                     errorMessage += '\n' + Object.values(error.errors).flat().join('\n');
                 }
-                alert(errorMessage);
+                adminToast(errorMessage);
             }
         } catch (error) {
             console.error('Error:', error);
-            alert('An error occurred during check-out.');
+            adminToast('An error occurred during check-out.');
         }
     });
 
     // Confirm booking (pending → confirmed)
     async function confirmBooking() {
-        if (!confirm('Are you sure you want to confirm this booking?')) return;
+        if (!await adminConfirm('Are you sure you want to confirm this booking?', { confirmLabel: 'Confirm Booking', type: 'primary' })) return;
 
         try {
             const response = await fetch(`/api/bookings/{{ $booking->id }}`, {
@@ -492,15 +496,15 @@
             if (response.ok) {
                 window.location.reload();
             } else {
-                alert('Error confirming booking.');
+                adminToast('Error confirming booking.');
             }
         } catch (error) {
-            alert('An error occurred.');
+            adminToast('An error occurred.');
         }
     }
 
     async function cancelBooking() {
-        if (!confirm('Are you sure you want to cancel this booking? This cannot be undone.')) return;
+        if (!await adminConfirm('Are you sure you want to cancel this booking? This cannot be undone.', { confirmLabel: 'Cancel Booking', type: 'danger' })) return;
 
         try {
             const response = await fetch(`/api/bookings/{{ $booking->id }}`, {
@@ -518,10 +522,10 @@
             if (response.ok) {
                 window.location.href = "{{ route('admin.bookings') }}";
             } else {
-                alert('Error cancelling booking.');
+                adminToast('Error cancelling booking.');
             }
         } catch (error) {
-            alert('An error occurred.');
+            adminToast('An error occurred.');
         }
     }
 
@@ -530,9 +534,6 @@
         const roomTypeSelect = document.querySelector('select[name="room_type_id"]');
         const checkInInput = document.querySelector('input[name="check_in_date"]');
         const checkOutInput = document.querySelector('input[name="check_out_date"]');
-
-        const ratePerNightWrapper = document.getElementById('rate-per-night-wrapper');
-        const ratePerMonthWrapper = document.getElementById('rate-per-month-wrapper');
         const ratePerNightInput = document.querySelector('input[name="rate_per_night"]');
         const ratePerMonthInput = document.querySelector('input[name="rate_per_month"]');
         const totalAmountInput = document.querySelector('input[name="total_amount"]');
@@ -546,51 +547,23 @@
 
             if (stayTypeSelect.value === 'short_term') {
                 ratePerNightInput.value = Math.round(priceNight);
-
                 const checkInDate = new Date(checkInInput.value);
                 const checkOutDate = new Date(checkOutInput.value);
-
                 if (checkInInput.value && checkOutInput.value && checkOutDate > checkInDate) {
-                    const diffTime = Math.abs(checkOutDate - checkInDate);
-                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    const diffDays = Math.ceil(Math.abs(checkOutDate - checkInDate) / (1000 * 60 * 60 * 24));
                     totalAmountInput.value = Math.round(priceNight * diffDays);
                 }
-            } else { // long_term
+            } else {
                 ratePerMonthInput.value = Math.round(priceMonth);
                 totalAmountInput.value = Math.round(priceMonth);
             }
         }
 
-        if (stayTypeSelect && ratePerNightWrapper && ratePerMonthWrapper && roomTypeSelect) {
-            function toggleRateFields(isInitialLoad = false) {
-                if (stayTypeSelect.value === 'short_term') {
-                    ratePerNightWrapper.classList.remove('hidden');
-                    ratePerNightInput.required = true;
-
-                    ratePerMonthWrapper.classList.add('hidden');
-                    ratePerMonthInput.required = false;
-                    if (!isInitialLoad) ratePerMonthInput.value = '';
-                } else { // long_term
-                    ratePerNightWrapper.classList.add('hidden');
-                    ratePerNightInput.required = false;
-                    if (!isInitialLoad) ratePerNightInput.value = '';
-
-                    ratePerMonthWrapper.classList.remove('hidden');
-                    ratePerMonthInput.required = true;
-                }
-                if (!isInitialLoad) {
-                    calculateTotal();
-                }
-            }
-
-            // Pass true on initial load so it doesn't overwrite existing DB values
-            toggleRateFields(true);
-
-            stayTypeSelect.addEventListener('change', () => toggleRateFields(false));
-
+        if (roomTypeSelect) {
             roomTypeSelect.addEventListener('change', calculateTotal);
             checkInInput.addEventListener('change', calculateTotal);
             checkOutInput.addEventListener('change', calculateTotal);
+            stayTypeSelect.addEventListener('change', calculateTotal);
         }
     });
 </script>

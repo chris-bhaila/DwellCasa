@@ -16,6 +16,51 @@ class GuestController extends Controller
         $this->guestRepository = $guestRepository;
     }
 
+    public function page(\Illuminate\Http\Request $request)
+    {
+        $filter = $request->query('filter', 'all');
+
+        if ($filter === 'trashed') {
+            $guests = \App\Models\Guest::onlyTrashed()
+                ->withCount('bookings')
+                ->with(['bookings' => fn($q) => $q->with('roomType')->latest()])
+                ->latest('deleted_at')
+                ->get();
+            return view('admin.guests', compact('guests', 'filter') + ['guestJson' => collect()]);
+        }
+
+        $guests = \App\Models\Guest::withCount('bookings')
+            ->with(['bookings' => fn($q) => $q->with('roomType')->latest()])
+            ->latest()
+            ->get();
+
+        $guestJson = $guests->map(function ($g) {
+            return [
+                'id'        => $g->id,
+                'full_name' => $g->full_name,
+                'email'     => $g->email,
+                'phone'     => $g->phone,
+                'bookings'  => $g->bookings->map(function ($b) {
+                    return [
+                        'id'             => $b->id,
+                        'booking_ref'    => $b->booking_ref,
+                        'room_type_name' => $b->roomType?->name ?? 'N/A',
+                        'check_in_date'  => $b->check_in_date?->format('M d, Y'),
+                        'check_out_date' => $b->check_out_date?->format('M d, Y'),
+                        'nights'         => ($b->check_in_date && $b->check_out_date)
+                                            ? $b->check_in_date->diffInDays($b->check_out_date)
+                                            : 0,
+                        'status'         => $b->status,
+                        'total_amount'   => $b->total_amount,
+                        'amount_paid'    => $b->amount_paid,
+                    ];
+                })->values(),
+            ];
+        })->keyBy('id');
+
+        return view('admin.guests', compact('guests', 'filter', 'guestJson'));
+    }
+
     public function index()
     {
         $guests = $this->guestRepository->all();
@@ -84,7 +129,7 @@ class GuestController extends Controller
 
     public function forceDelete($id)
     {
-        $guest = Guest::onlyTrashed()->findOrFail($id);
+        Guest::onlyTrashed()->findOrFail($id);
         $this->guestRepository->forceDelete($id);
         return response()->json([
             'success' => true,

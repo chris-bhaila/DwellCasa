@@ -206,6 +206,40 @@ class UserController extends AdminController
         ], 200);
     }
 
+    public function toggle($id)
+    {
+        if (auth()->id() == $id) {
+            return response()->json(['message' => 'Cannot disable your own account.'], 403);
+        }
+
+        $authUser = auth()->user();
+        $user = User::findOrFail($id);
+
+        if (!$authUser->hasRole('super_admin') && $user->location_id !== $authUser->location_id) {
+            return response()->json(['message' => 'Unauthorized.'], 403);
+        }
+
+        if ($user->hasRole('super_admin')) {
+            return response()->json(['message' => 'Cannot disable a super admin.'], 403);
+        }
+
+        $user->is_active = !$user->is_active;
+        $user->save();
+
+        $action = $user->is_active ? 'Enabled' : 'Disabled';
+        activity()
+            ->causedBy($authUser)
+            ->performedOn($user)
+            ->withProperties(['location_id' => $user->location_id])
+            ->log("{$action} user {$user->name} ({$user->email})");
+
+        return response()->json([
+            'success'   => true,
+            'is_active' => $user->is_active,
+            'message'   => "User {$action} successfully",
+        ]);
+    }
+
     public function storeRole(Request $request)
     {
         // Only super_admin can create roles
@@ -230,6 +264,37 @@ class UserController extends AdminController
             'message' => 'Role created successfully',
             'data'    => $role
         ], 201);
+    }
+
+    public function deleteRole($id)
+    {
+        abort_unless(auth()->user()->hasRole('super_admin'), 403, 'Only super admin can delete roles.');
+
+        $role = Role::findOrFail($id);
+
+        if (in_array($role->name, ['super_admin', 'admin'])) {
+            return response()->json(['message' => 'Cannot delete built-in roles.'], 403);
+        }
+
+        $affectedUsers = User::role($role->name)->get();
+        foreach ($affectedUsers as $user) {
+            $user->removeRole($role);
+            $user->is_active = false;
+            $user->save();
+        }
+
+        activity()
+            ->causedBy(auth()->user())
+            ->withProperties(['location_id' => null, 'affected_users' => $affectedUsers->count()])
+            ->log('Deleted role ' . $role->name . ' and disabled ' . $affectedUsers->count() . ' user(s)');
+
+        $role->delete();
+
+        return response()->json([
+            'success'        => true,
+            'message'        => 'Role deleted successfully.',
+            'affected_users' => $affectedUsers->count(),
+        ]);
     }
 
     public function updateRolePermissions(Request $request, $id)

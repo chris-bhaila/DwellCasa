@@ -25,7 +25,7 @@
     <div class="container">
         <div class="header">
             <h1>DwellCasa</h1>
-            <p>REPLY TO YOUR INQUIRY</p>
+            <p>{{ strtoupper($inquiry->location?->name ?? 'DwellCasa') }}</p>
         </div>
         <div class="body">
             <p class="greeting">Dear {{ $inquiry->name ?? 'Valued Guest' }},</p>
@@ -44,7 +44,7 @@
             </div>
         </div>
         <div class="footer">
-            <p>DwellCasa — Kathmandu, Nepal</p>
+            <p>{{ $inquiry->location?->name ?? 'DwellCasa' }}</p>
             <p>If you have any further questions, please reply directly to this email.</p>
         </div>
     </div>

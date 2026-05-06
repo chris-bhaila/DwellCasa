@@ -8,6 +8,8 @@ use App\Contracts\RoomTypeRepositoryInterface;
 use App\Models\Activity;
 use App\Models\Booking;
 use App\Models\Inquiry;
+use App\Models\InventoryEquipment;
+use App\Models\InventoryStock;
 use App\Models\Location;
 use App\Models\Review;
 use App\Models\Room;
@@ -33,6 +35,10 @@ class AdminController extends Controller
     ) {
         $rooms     = $roomRepository->all();
         $roomTypes = $roomTypeRepository->all();
+        $roomTypes->loadCount([
+            'rooms',
+            'bookings as active_bookings_count' => fn($q) => $q->whereIn('status', ['confirmed', 'checked_in']),
+        ]);
         $checkIns  = $checkInRepository->all();
         $bookings  = Booking::with(['guest', 'roomType'])->latest()->take(5)->get();
 
@@ -56,8 +62,9 @@ class AdminController extends Controller
 
         // Secondary stats
         $todayDepartures  = Booking::whereDate('check_out_date', $today)->where('status', 'checked_in')->count();
-        $availableRooms   = Room::where('status', 'available')->count();
         $totalRooms       = Room::count();
+        $activeBookings   = Booking::whereIn('status', ['confirmed', 'checked_in'])->count();
+        $availableRooms   = max(0, $totalRooms - $activeBookings);
         $avgRating        = Review::approved()->whereNotNull('rating')->avg('rating');
         $monthlyBookings  = Booking::whereBetween('check_in_date', [$monthStart, $monthEnd])->count();
 
@@ -66,11 +73,17 @@ class AdminController extends Controller
         $monthRevenueBilled   = Booking::whereBetween('check_in_date', [$monthStart, $monthEnd])->sum('total_amount');
         $monthRevenueCollected = $monthlyRevenue;
 
+        // Inventory snapshot for dashboard widget
+        $inventoryLowStock   = InventoryStock::where('status', 'low_stock')->count();
+        $inventoryOutOfStock = InventoryStock::where('status', 'out_of_stock')->count();
+        $inventoryDamaged    = InventoryEquipment::whereIn('condition', ['damaged', 'under_repair'])->count();
+
         return view('admin.home', compact(
             'rooms', 'roomTypes', 'checkIns', 'bookings', 'incompleteLocations',
             'todayArrivals', 'inHouseCount', 'monthlyRevenue', 'unrepliedInquiries',
             'todayDepartures', 'availableRooms', 'totalRooms', 'avgRating', 'monthlyBookings',
-            'recentInquiries', 'monthRevenueBilled', 'monthRevenueCollected'
+            'recentInquiries', 'monthRevenueBilled', 'monthRevenueCollected',
+            'inventoryLowStock', 'inventoryOutOfStock', 'inventoryDamaged'
         ));
     }
 
@@ -92,31 +105,53 @@ class AdminController extends Controller
 
     public function revenue(Request $request)
     {
-        $from = $request->query('from', now()->startOfMonth()->toDateString());
-        $to   = $request->query('to',   now()->endOfMonth()->toDateString());
+        $from     = $request->query('from', now()->startOfMonth()->toDateString());
+        $to       = $request->query('to',   now()->endOfMonth()->toDateString());
+        $filter   = $request->query('filter');    // 'outstanding' | 'collected' | 'discounted' | null
+        $roomType = $request->query('room_type'); // room type name or null
 
-        $bookings = Booking::with(['guest', 'roomType'])
+        $allBookings = Booking::with(['guest', 'roomType'])
             ->whereBetween('check_in_date', [$from, $to])
             ->whereNotIn('status', ['cancelled'])
             ->orderBy('check_in_date')
             ->get();
 
-        $billed      = $bookings->sum('total_amount');
-        $collected   = $bookings->sum('amount_paid');
-        $outstanding = max(0, $billed - $collected);
-        $collectPct  = $billed > 0 ? min(100, round(($collected / $billed) * 100)) : 0;
+        // Summary stats are always computed from all bookings — filters only affect the table
+        $billed            = $allBookings->sum('total_amount');
+        $collected         = $allBookings->sum('amount_paid');
+        $totalDiscount     = $allBookings->sum('discount');
+        $netBilled         = max(0, $billed - $totalDiscount);
+        $outstanding       = max(0, $netBilled - $collected);
+        $collectPct        = $netBilled > 0 ? min(100, round(($collected / $netBilled) * 100)) : 0;
+        $totalBookingCount = $allBookings->count();
 
-        $byRoomType = $bookings->groupBy(fn($b) => $b->roomType?->name ?? 'Unknown')
+        // Apply room type filter first, then dashboard filter
+        $bookings = $allBookings;
+
+        if ($roomType) {
+            $bookings = $bookings->filter(fn($b) => ($b->roomType?->name ?? 'Unknown') === $roomType)->values();
+        }
+
+        $bookings = match ($filter) {
+            'outstanding' => $bookings->filter(fn($b) => ($b->total_amount - ($b->discount ?? 0) - ($b->amount_paid ?? 0)) > 0)->values(),
+            'collected'   => $bookings->filter(fn($b) => ($b->amount_paid ?? 0) > 0 && ($b->amount_paid ?? 0) >= ($b->total_amount - ($b->discount ?? 0)))->values(),
+            'discounted'  => $bookings->filter(fn($b) => ($b->discount ?? 0) > 0)->values(),
+            default       => $bookings,
+        };
+
+        $byRoomType = $allBookings->groupBy(fn($b) => $b->roomType?->name ?? 'Unknown')
             ->map(fn($group) => [
                 'count'       => $group->count(),
                 'billed'      => $group->sum('total_amount'),
                 'collected'   => $group->sum('amount_paid'),
-                'outstanding' => max(0, $group->sum('total_amount') - $group->sum('amount_paid')),
+                'discount'    => $group->sum('discount'),
+                'outstanding' => max(0, $group->sum('total_amount') - $group->sum('discount') - $group->sum('amount_paid')),
             ]);
 
         return view('admin.revenue', compact(
-            'from', 'to', 'bookings',
-            'billed', 'collected', 'outstanding', 'collectPct', 'byRoomType'
+            'from', 'to', 'bookings', 'filter', 'roomType',
+            'billed', 'collected', 'outstanding', 'collectPct', 'byRoomType',
+            'totalDiscount', 'totalBookingCount'
         ));
     }
 

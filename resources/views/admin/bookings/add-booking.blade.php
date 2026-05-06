@@ -76,14 +76,13 @@
                 </div>
             </div>
 
-            <!-- Conditional Rate Fields -->
             <div id="rate-per-night-wrapper">
-                <label class="block text-sm font-medium text-slate-700 mb-2">Rate Per Night <span class="text-red-500">*</span></label>
-                <input type="number" name="rate_per_night" step="1" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors" required>
+                <label class="block text-sm font-medium text-slate-700 mb-2">Rate Per Night</label>
+                <input type="number" name="rate_per_night" step="1" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors">
             </div>
 
-            <div id="rate-per-month-wrapper" class="hidden">
-                <label class="block text-sm font-medium text-slate-700 mb-2">Rate Per Month <span class="text-red-500">*</span></label>
+            <div id="rate-per-month-wrapper">
+                <label class="block text-sm font-medium text-slate-700 mb-2">Rate Per Month</label>
                 <input type="number" name="rate_per_month" step="1" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors">
             </div>
 
@@ -93,26 +92,31 @@
                     <input type="number" name="total_amount" step="1" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors" required>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-2">Deposit Amount</label>
-                    <input type="number" name="deposit_amount" step="1" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors">
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Discount</label>
+                    <input type="number" name="discount" step="1" min="0" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors">
                 </div>
             </div>
 
             <div class="grid grid-cols-2 gap-4">
                 <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Deposit Amount</label>
+                    <input type="number" name="deposit_amount" step="1" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors">
+                </div>
+                <div>
                     <label class="block text-sm font-medium text-slate-700 mb-2">Amount Paid</label>
                     <input type="number" name="amount_paid" step="1" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors">
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-2">Payment Status</label>
-                    <select name="payment_status" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors">
-                        <option value="unpaid">Unpaid</option>
-                        <option value="deposit_paid">Deposit Paid</option>
-                        <option value="partially_paid">Partially Paid</option>
-                        <option value="fully_paid">Fully Paid</option>
-                        <option value="refunded">Refunded</option>
-                    </select>
-                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-2">Payment Status</label>
+                <select name="payment_status" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors">
+                    <option value="unpaid">Unpaid</option>
+                    <option value="deposit_paid">Deposit Paid</option>
+                    <option value="partially_paid">Partially Paid</option>
+                    <option value="fully_paid">Fully Paid</option>
+                    <option value="refunded">Refunded</option>
+                </select>
             </div>
 
             <div>
@@ -158,11 +162,11 @@
                 window.location.href = "{{ route('admin.bookings') }}";
             } else {
                 const error = await response.json();
-                alert('Error adding booking: ' + (error.message || 'Unknown error'));
+                adminToast('Error adding booking: ' + (error.message || 'Unknown error'));
             }
         } catch (error) {
             console.error('Error:', error);
-            alert('An error occurred.');
+            adminToast('An error occurred.');
         }
     });
 
@@ -171,13 +175,10 @@
         const roomTypeSelect = document.querySelector('select[name="room_type_id"]');
         const checkInInput = document.querySelector('input[name="check_in_date"]');
         const checkOutInput = document.querySelector('input[name="check_out_date"]');
-        
-        const ratePerNightWrapper = document.getElementById('rate-per-night-wrapper');
-        const ratePerMonthWrapper = document.getElementById('rate-per-month-wrapper');
         const ratePerNightInput = document.querySelector('input[name="rate_per_night"]');
         const ratePerMonthInput = document.querySelector('input[name="rate_per_month"]');
         const totalAmountInput = document.querySelector('input[name="total_amount"]');
-        
+
         function calculateTotal() {
             if (!roomTypeSelect.value) return;
 
@@ -187,47 +188,23 @@
 
             if (stayTypeSelect.value === 'short_term') {
                 ratePerNightInput.value = Math.round(priceNight);
-                
                 const checkInDate = new Date(checkInInput.value);
                 const checkOutDate = new Date(checkOutInput.value);
-                
                 if (checkInInput.value && checkOutInput.value && checkOutDate > checkInDate) {
-                    const diffTime = Math.abs(checkOutDate - checkInDate);
-                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    const diffDays = Math.ceil(Math.abs(checkOutDate - checkInDate) / (1000 * 60 * 60 * 24));
                     totalAmountInput.value = Math.round(priceNight * diffDays);
                 }
-            } else { // long_term
+            } else {
                 ratePerMonthInput.value = Math.round(priceMonth);
                 totalAmountInput.value = Math.round(priceMonth);
             }
         }
 
-        if (stayTypeSelect && ratePerNightWrapper && ratePerMonthWrapper && roomTypeSelect) {
-            function toggleRateFields() {
-                if (stayTypeSelect.value === 'short_term') {
-                    ratePerNightWrapper.classList.remove('hidden');
-                    ratePerNightInput.required = true;
-                    
-                    ratePerMonthWrapper.classList.add('hidden');
-                    ratePerMonthInput.required = false;
-                    ratePerMonthInput.value = '';
-                } else { // long_term
-                    ratePerNightWrapper.classList.add('hidden');
-                    ratePerNightInput.required = false;
-                    ratePerNightInput.value = '';
-
-                    ratePerMonthWrapper.classList.remove('hidden');
-                    ratePerMonthInput.required = true;
-                }
-                calculateTotal();
-            }
-
-            toggleRateFields();
-            stayTypeSelect.addEventListener('change', toggleRateFields);
-            
+        if (roomTypeSelect) {
             roomTypeSelect.addEventListener('change', calculateTotal);
             checkInInput.addEventListener('change', calculateTotal);
             checkOutInput.addEventListener('change', calculateTotal);
+            stayTypeSelect.addEventListener('change', calculateTotal);
         }
     });
 </script>

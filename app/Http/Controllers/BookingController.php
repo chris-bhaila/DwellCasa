@@ -56,6 +56,7 @@ class BookingController extends Controller
         $status = $request->input('status', 'pending');
         $data = $request->validated();
         $data['location_id'] = $locationId;
+        $data['status'] = $status;
 
         try {
             $booking = DB::transaction(function () use ($request, $status, $data) {
@@ -135,11 +136,18 @@ class BookingController extends Controller
             ->log("Updated booking {$updatedBooking->booking_ref} — status: {$updatedBooking->status}");
 
         if ($oldStatus !== 'confirmed' && $updatedBooking->status === 'confirmed') {
-            try {
-                Mail::to($updatedBooking->guest->email)
-                    ->queue(new BookingConfirmationMail($updatedBooking));
-            } catch (\Exception $e) {
-                Log::error("Booking confirmation email failed: {$e->getMessage()}");
+            $updatedBooking->load('guest');
+            $guest = $updatedBooking->guest;
+            if ($guest?->email) {
+                try {
+                    Mail::to($guest->email)
+                        ->send(new BookingConfirmationMail($updatedBooking));
+                    Log::info("Booking confirmation email sent to {$guest->email} for {$updatedBooking->booking_ref}");
+                } catch (\Exception $e) {
+                    Log::error("Booking confirmation email failed for {$updatedBooking->booking_ref}: {$e->getMessage()}");
+                }
+            } else {
+                Log::warning("Booking confirmation email skipped — no guest email on booking {$updatedBooking->booking_ref}");
             }
         }
 
@@ -252,7 +260,12 @@ class BookingController extends Controller
             return view('admin.bookings.bookings', compact('bookings', 'filter'));
         }
 
-        $query = Booking::with(['guest', 'roomType']);
+        $relations = ['guest', 'roomType'];
+        if ($filter !== 'upcoming') {
+            $relations[] = 'checkIn';
+            $relations[] = 'checkOut';
+        }
+        $query = Booking::with($relations);
         match ($filter) {
             'upcoming'  => $query->whereIn('status', ['pending', 'confirmed']),
             'inhouse'   => $query->where('status', 'checked_in'),

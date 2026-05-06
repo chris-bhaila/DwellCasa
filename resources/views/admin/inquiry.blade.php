@@ -238,14 +238,14 @@
             const data = await response.json();
 
             if (response.ok && data.success) {
-                alert('Reply sent successfully!');
+                adminToast('Reply sent successfully!', 'success');
                 window.location.reload();
             } else {
-                alert('Error sending reply: ' + (data.message || 'Unknown error'));
+                adminToast('Error sending reply: ' + (data.message || 'Unknown error'));
             }
         } catch (error) {
             console.error('Error:', error);
-            alert('An error occurred while sending the reply.');
+            adminToast('An error occurred while sending the reply.');
         } finally {
             submitBtn.innerHTML = originalHtml;
             submitBtn.disabled = false;
@@ -254,7 +254,7 @@
 
     // Handle Phone Reply
     document.getElementById('modal-phone-reply-btn').addEventListener('click', async function() {
-        if (!confirm('Are you sure you want to mark this inquiry as replied via phone?')) return;
+        if (!await adminConfirm('Are you sure you want to mark this inquiry as replied via phone?', { confirmLabel: 'Mark as Replied', type: 'primary' })) return;
 
         const id = document.getElementById('reply-inquiry-id').value;
         const submitBtn = this;
@@ -279,13 +279,13 @@
             if (response.ok && data.success) {
                 window.location.reload();
             } else {
-                alert('Error updating inquiry: ' + (data.message || 'Unknown error'));
+                adminToast('Error updating inquiry: ' + (data.message || 'Unknown error'));
                 submitBtn.innerHTML = originalHtml;
                 submitBtn.disabled = false;
             }
         } catch (error) {
             console.error('Error:', error);
-            alert('An error occurred while updating the inquiry.');
+            adminToast('An error occurred while updating the inquiry.');
             submitBtn.innerHTML = originalHtml;
             submitBtn.disabled = false;
         }
@@ -294,7 +294,7 @@
     // Handle Delete
     document.querySelectorAll('.delete-inquiry-btn').forEach(btn => {
         btn.addEventListener('click', async function() {
-            if (!confirm('Are you sure you want to delete this inquiry?')) return;
+            if (!await adminConfirm('Are you sure you want to delete this inquiry?', { confirmLabel: 'Delete', type: 'danger' })) return;
 
             const id = this.dataset.id;
 
@@ -311,11 +311,11 @@
                     window.location.reload();
                 } else {
                     const error = await response.json();
-                    alert('Error deleting inquiry: ' + (error.message || 'Unknown error'));
+                    adminToast('Error deleting inquiry: ' + (error.message || 'Unknown error'));
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('An error occurred while deleting the inquiry.');
+                adminToast('An error occurred while deleting the inquiry.');
             }
         });
     });

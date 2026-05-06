@@ -3,9 +3,10 @@
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AmenityController;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\GuestController;
 use App\Http\Controllers\GalleryImageController;
 use App\Http\Controllers\InquiryController;
-use App\Http\Controllers\InventoryController;
+use App\Http\Controllers\InventoryItemController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\MapController;
 use App\Http\Controllers\ReviewController;
@@ -67,7 +68,14 @@ Route::middleware('auth')->prefix('admin')->group(function () {
 
     Route::middleware('permission:view bookings')->group(function () {
         Route::get('/bookings/bookings', [BookingController::class, 'page'])->name('admin.bookings');
+    });
+
+    Route::middleware('permission:view revenue')->group(function () {
         Route::get('/revenue', [AdminController::class, 'revenue'])->name('admin.revenue');
+    });
+
+    Route::middleware('permission:manage guests')->group(function () {
+        Route::get('/guests', [GuestController::class, 'page'])->name('admin.guests');
     });
 
     Route::middleware('permission:create bookings')->group(function () {
@@ -79,7 +87,12 @@ Route::middleware('auth')->prefix('admin')->group(function () {
     });
 
     Route::middleware('permission:view inventory')->group(function () {
-        Route::get('/inventory', [InventoryController::class, 'page'])->name('admin.inventory');
+        Route::get('/inventory', [InventoryItemController::class, 'inventoryDashboard'])
+            ->name('admin.inventory');
+        Route::get('/inventory/supplies', [InventoryItemController::class, 'suppliesPage'])
+            ->name('admin.inventory.supplies');
+        Route::get('/inventory/equipment', [InventoryItemController::class, 'equipmentPage'])
+            ->name('admin.inventory.equipment');
     });
 
     Route::middleware('permission:manage inquiries')->group(function () {

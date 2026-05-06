@@ -102,7 +102,7 @@
 @push('scripts')
 <script>
     window.deleteRoom = async function(id) {
-        if (!confirm('Are you sure you want to delete this room? This action cannot be undone.')) return;
+        if (!await adminConfirm('Are you sure you want to delete this room? This action cannot be undone.', { confirmLabel: 'Delete', type: 'danger' })) return;
 
         try {
             const response = await fetch(`/api/rooms/${id}`, {
@@ -117,11 +117,11 @@
                 window.location.href = "{{ route('admin.room_type.index') }}#inventory";
             } else {
                 const errorData = await response.json();
-                alert('Error deleting room: ' + (errorData.message || 'Unknown error'));
+                adminToast('Error deleting room: ' + (errorData.message || 'Unknown error'));
             }
         } catch (error) {
             console.error('Error:', error);
-            alert('An error occurred while deleting the room.');
+            adminToast('An error occurred while deleting the room.');
         }
     };
 
@@ -153,11 +153,11 @@
                 if (errorData.errors) {
                     errorMessage += '\n' + Object.values(errorData.errors).flat().join('\n');
                 }
-                alert(errorMessage);
+                adminToast(errorMessage);
             }
         } catch (error) {
             console.error('Error:', error);
-            alert('An error occurred while updating the room.');
+            adminToast('An error occurred while updating the room.');
         }
     });
 </script>

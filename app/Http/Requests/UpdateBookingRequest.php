@@ -23,10 +23,10 @@ class UpdateBookingRequest extends FormRequest
     {
         return [
             'guest_id' => 'sometimes|nullable|exists:guests,id',
-            'booking_ref' => 'sometimes|required|string|max:255|unique:bookings,booking_ref,' . $this->route('id'),
+            'booking_ref' => 'sometimes|required|string|max:255|unique:bookings,booking_ref,' . $this->route('booking'),
             'guest_name' => 'sometimes|required|string|max:255',
             'guest_email' => 'sometimes|required|email|max:255',
-            'guest_phone' => 'nullable|string|max:20',
+            'guest_phone' => 'nullable|string|max:30',
             'room_type' => 'sometimes|required_without:room_type_id|string|max:255',
             'room_type_id' => 'sometimes|required_without:room_type|exists:room_types,id',
             'check_in_date' => 'sometimes|required|date',
@@ -35,6 +35,7 @@ class UpdateBookingRequest extends FormRequest
             'num_guests' => 'nullable|integer|min:1',
             'stay_type' => 'nullable|string|in:short_term,long_term',
             'total_amount' => 'nullable|numeric|min:0',
+            'discount' => 'nullable|numeric|min:0',
             'deposit_amount' => 'nullable|numeric|min:0',
             'amount_paid' => 'nullable|numeric|min:0',
             'payment_status' => 'nullable|in:unpaid,deposit_paid,partially_paid,fully_paid,refunded',
@@ -72,9 +73,11 @@ class UpdateBookingRequest extends FormRequest
         $phone = $this->guest_phone ?? $this->phone ?? null;
 
         if ($email && $name) {
+            $locationId = \App\Models\Booking::where('id', $this->route('booking'))->value('location_id');
+
             $guest = \App\Models\Guest::updateOrCreate(
-                ['email' => $email],
-                ['full_name' => $name, 'phone' => $phone]
+                ['email' => $email, 'location_id' => $locationId],
+                ['full_name' => $name, 'phone' => $phone, 'location_id' => $locationId]
             );
             $merge['guest_id'] = $guest->id;
         }

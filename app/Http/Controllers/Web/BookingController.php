@@ -118,7 +118,7 @@ class BookingController extends Controller
             throw $e;
         }
 
-        return redirect()->route('home')
+        return redirect()->route('location.home', $location)
             ->with('success', 'Booking submitted successfully! We will contact you soon to confirm.');
     }
 }

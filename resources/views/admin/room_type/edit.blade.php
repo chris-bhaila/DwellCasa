@@ -235,16 +235,16 @@
                 window.location.reload();
             } else {
                 const error = await response.json();
-                alert('Error updating room type: ' + (error.message || 'Unknown error'));
+                adminToast('Error updating room type: ' + (error.message || 'Unknown error'));
             }
         } catch (error) {
             console.error('Error:', error);
-            alert('An error occurred updating the room type.');
+            adminToast('An error occurred updating the room type.');
         }
     });
 
     window.deleteGalleryImage = async function(imageId) {
-        if (!confirm('Are you sure you want to delete this image?')) return;
+        if (!await adminConfirm('Are you sure you want to delete this image?', { confirmLabel: 'Delete', type: 'danger' })) return;
 
         try {
             const response = await fetch(`/room-types/{{ $roomType->id }}/images/${imageId}`, {
@@ -259,11 +259,11 @@
                 window.location.reload();
             } else {
                 const error = await response.json();
-                alert('Error deleting image: ' + (error.message || 'Unknown error'));
+                adminToast('Error deleting image: ' + (error.message || 'Unknown error'));
             }
         } catch (error) {
             console.error('Error:', error);
-            alert('An error occurred deleting the image.');
+            adminToast('An error occurred deleting the image.');
         }
     };
 

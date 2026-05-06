@@ -17,7 +17,10 @@ use App\Http\Controllers\CheckOutController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PropertySettingController;
 use App\Http\Controllers\WebsiteInfoController;
-use App\Http\Controllers\InventoryController;
+use App\Http\Controllers\InventoryCategoryController;
+use App\Http\Controllers\InventoryItemController;
+use App\Http\Controllers\InventoryStockController;
+use App\Http\Controllers\InventoryEquipmentController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\LocationController;
 
@@ -76,11 +79,47 @@ Route::middleware(['web', 'auth'])->group(function () {
 
     // ── Inventory ─────────────────────────────────────────────────────
     Route::middleware('permission:view inventory')->group(function () {
-        Route::apiResource('inventory', InventoryController::class)->only(['index', 'show']);
+        // Categories
+        Route::get('inventory-categories', [InventoryCategoryController::class, 'index']);
+
+        // Items
+        Route::get('inventory-items', [InventoryItemController::class, 'index']);
+        Route::get('inventory-items/{id}', [InventoryItemController::class, 'show']);
+
+        // Stock logs
+        Route::get('inventory-items/{itemId}/stock/logs', [InventoryStockController::class, 'logs']);
+
+        // Equipment units + logs
+        Route::get('inventory-items/{itemId}/equipment', [InventoryEquipmentController::class, 'index']);
+        Route::get('inventory-equipment/{id}/logs', [InventoryEquipmentController::class, 'logs']);
     });
 
     Route::middleware('permission:edit inventory')->group(function () {
-        Route::apiResource('inventory', InventoryController::class)->only(['store', 'update', 'destroy']);
+        // Categories — admin only actions
+        Route::post('inventory-categories', [InventoryCategoryController::class, 'store']);
+        Route::put('inventory-categories/{id}', [InventoryCategoryController::class, 'update']);
+        Route::delete('inventory-categories/{id}', [InventoryCategoryController::class, 'destroy']);
+
+        // Items — admin only actions
+        Route::post('inventory-items', [InventoryItemController::class, 'store']);
+        Route::put('inventory-items/{id}', [InventoryItemController::class, 'update']);
+        Route::delete('inventory-items/{id}', [InventoryItemController::class, 'destroy']);
+
+        // Equipment units — admin only actions
+        Route::post('inventory-equipment', [InventoryEquipmentController::class, 'store']);
+        Route::put('inventory-equipment/{id}', [InventoryEquipmentController::class, 'update']);
+        Route::delete('inventory-equipment/{id}/write-off', [InventoryEquipmentController::class, 'writeOff']);
+    });
+
+    Route::middleware('permission:view inventory')->group(function () {
+        // Stock operations — staff can perform these
+        Route::post('inventory-items/{itemId}/restock', [InventoryStockController::class, 'restock']);
+        Route::post('inventory-items/{itemId}/use', [InventoryStockController::class, 'use']);
+
+        // Equipment movement — staff can perform these
+        Route::post('inventory-equipment/{id}/assign', [InventoryEquipmentController::class, 'assign']);
+        Route::post('inventory-equipment/{id}/return', [InventoryEquipmentController::class, 'return']);
+        Route::patch('inventory-equipment/{id}/condition', [InventoryEquipmentController::class, 'updateCondition']);
     });
 
     // ── Room Types ────────────────────────────────────────────────────
@@ -140,10 +179,12 @@ Route::middleware(['web', 'auth'])->group(function () {
     // ── Users & Roles ─────────────────────────────────────────────────
     Route::middleware('permission:manage users')->group(function () {
         Route::apiResource('users', UserController::class);
+        Route::patch('users/{id}/toggle', [UserController::class, 'toggle']);
     });
 
     Route::middleware('role:super_admin')->group(function () {
         Route::post('roles', [UserController::class, 'storeRole']);
         Route::patch('roles/{id}/permissions', [UserController::class, 'updateRolePermissions']);
+        Route::delete('roles/{id}', [UserController::class, 'deleteRole']);
     });
 });

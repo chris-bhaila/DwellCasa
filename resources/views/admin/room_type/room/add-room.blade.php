@@ -123,11 +123,11 @@
                 if (errorData.errors) {
                     errorMessage += '\n' + Object.values(errorData.errors).flat().join('\n');
                 }
-                alert(errorMessage);
+                adminToast(errorMessage);
             }
         } catch (error) {
             console.error('Error:', error);
-            alert('An error occurred while adding the room.');
+            adminToast('An error occurred while adding the room.');
         }
     });
 </script>

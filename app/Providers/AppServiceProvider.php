@@ -39,6 +39,14 @@ use App\Contracts\ReviewRepositoryInterface;
 use App\Repositories\ReviewRepository;
 use App\Contracts\LocationRepositoryInterface;
 use App\Repositories\LocationRepository;
+use App\Contracts\InventoryCategoryRepositoryInterface;
+use App\Repositories\InventoryCategoryRepository;
+use App\Contracts\InventoryItemRepositoryInterface;
+use App\Repositories\InventoryItemRepository;
+use App\Contracts\InventoryStockRepositoryInterface;
+use App\Repositories\InventoryStockRepository;
+use App\Contracts\InventoryEquipmentRepositoryInterface;
+use App\Repositories\InventoryEquipmentRepository;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -65,6 +73,10 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(InventoryRepositoryInterface::class, InventoryRepository::class);
         $this->app->bind(ReviewRepositoryInterface::class, ReviewRepository::class);
         $this->app->bind(LocationRepositoryInterface::class, LocationRepository::class);
+        $this->app->bind(InventoryCategoryRepositoryInterface::class, InventoryCategoryRepository::class);
+        $this->app->bind(InventoryItemRepositoryInterface::class, InventoryItemRepository::class);
+        $this->app->bind(InventoryStockRepositoryInterface::class, InventoryStockRepository::class);
+        $this->app->bind(InventoryEquipmentRepositoryInterface::class, InventoryEquipmentRepository::class);
     }
 
     /**

@@ -24,6 +24,7 @@ class User extends Authenticatable
         'email',
         'password',
         'location_id',
+        'is_active',
     ];
 
     /**
@@ -45,7 +46,8 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
-            'password' => 'hashed',
+            'password'          => 'hashed',
+            'is_active'         => 'boolean',
         ];
     }
     public function location(): \Illuminate\Database\Eloquent\Relations\BelongsTo

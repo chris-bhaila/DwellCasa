@@ -282,7 +282,7 @@ window.importFrom = async function(locationId) {
     const result = await response.json();
 
     if (!response.ok || !result.data) {
-        alert('Could not load data for that location.');
+        adminToast('Could not load data for that location.');
         return;
     }
 
@@ -333,7 +333,7 @@ document.getElementById('website-info-form').addEventListener('submit', async fu
         });
 
         if (response.ok) {
-            alert('Website information updated successfully.');
+            adminToast('Website information updated successfully.', 'success');
             window.location.reload();
         } else {
             const error = await response.json();
@@ -341,11 +341,11 @@ document.getElementById('website-info-form').addEventListener('submit', async fu
             if (error.errors) {
                 errorMsg += '\n' + Object.values(error.errors).flat().join('\n');
             }
-            alert(errorMsg);
+            adminToast(errorMsg);
         }
     } catch (error) {
         console.error('Error:', error);
-        alert('An error occurred while saving the changes.');
+        adminToast('An error occurred while saving the changes.');
     } finally {
         submitBtn.innerHTML = originalText;
         submitBtn.disabled = false;

@@ -430,7 +430,7 @@ $categories = ['interior', 'exterior', 'dining', 'amenities', 'other'];
             window.location.reload();
         } catch (error) {
             console.error('Error:', error);
-            alert('Error uploading image(s):\n' + error.message);
+            adminToast('Error uploading image(s):\n' + error.message);
             
             // Reset button state on failure
             submitBtn.innerText = originalText;
@@ -439,7 +439,7 @@ $categories = ['interior', 'exterior', 'dining', 'amenities', 'other'];
     });
 
     window.deleteImage = async function(id) {
-        if (!confirm('Are you sure you want to delete this image?')) return;
+        if (!await adminConfirm('Are you sure you want to delete this image?', { confirmLabel: 'Delete', type: 'danger' })) return;
 
         try {
             const response = await fetch(`/api/gallery-images/${id}`, {
@@ -454,11 +454,11 @@ $categories = ['interior', 'exterior', 'dining', 'amenities', 'other'];
                 window.location.reload();
             } else {
                 const error = await response.json();
-                alert('Error deleting image: ' + (error.message || 'Unknown error'));
+                adminToast('Error deleting image: ' + (error.message || 'Unknown error'));
             }
         } catch (error) {
             console.error('Error:', error);
-            alert('An error occurred.');
+            adminToast('An error occurred.');
         }
     };
 </script>

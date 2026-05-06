@@ -341,17 +341,17 @@
                 if (error.errors) {
                     errorMsg += '\n' + Object.values(error.errors).flat().join('\n');
                 }
-                alert('Error saving item: ' + errorMsg);
+                adminToast('Error saving item: ' + errorMsg);
             }
         } catch (error) {
             console.error('Error:', error);
-            alert('An error occurred.');
+            adminToast('An error occurred.');
         }
     });
 
     document.querySelectorAll('.delete-btn').forEach(btn => {
         btn.addEventListener('click', async function() {
-            if (!confirm('Are you sure you want to delete this item?')) return;
+            if (!await adminConfirm('Are you sure you want to delete this item?', { confirmLabel: 'Delete', type: 'danger' })) return;
             
             const id = this.dataset.id;
             try {
@@ -367,11 +367,11 @@
                     window.location.reload();
                 } else {
                     const error = await response.json();
-                    alert('Error deleting item: ' + (error.message || 'Unknown error'));
+                    adminToast('Error deleting item: ' + (error.message || 'Unknown error'));
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('An error occurred.');
+                adminToast('An error occurred.');
             }
         });
     });

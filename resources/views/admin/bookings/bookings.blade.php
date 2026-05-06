@@ -86,24 +86,50 @@
                             {{ $booking->roomType->name ?? "Room ID: {$booking->room_type_id}" }}
                         </td>
                         <td class="p-4 text-slate-700">
-                            <div class="font-medium text-slate-900">
-                                {{ $booking->check_in_date ? \Carbon\Carbon::parse($booking->check_in_date)->format('M d, Y') : 'N/A' }}
-                            </div>
-                            <div class="text-xs text-slate-500 mt-0.5">
-                                to {{ $booking->check_out_date ? \Carbon\Carbon::parse($booking->check_out_date)->format('M d, Y') : 'N/A' }}
-                            </div>
+                            @php
+                                $useActualTimes = $filter === 'inhouse' || $filter === 'completed'
+                                    || in_array($booking->status, ['checked_in', 'checked_out']);
+                            @endphp
+                            @if($useActualTimes)
+                                <div class="font-medium text-slate-900">
+                                    {{ $booking->checkIn?->checked_in_at?->format('M d, Y H:i:s') ?? 'N/A' }}
+                                </div>
+                                @if($filter !== 'inhouse')
+                                <div class="text-xs text-slate-500 mt-0.5">
+                                    @if($filter === 'completed' || $booking->status === 'checked_out')
+                                        to {{ $booking->checkOut?->checked_out_at?->format('M d, Y H:i:s') ?? 'N/A' }}
+                                    @else
+                                        to {{ $booking->check_out_date ? \Carbon\Carbon::parse($booking->check_out_date)->format('M d, Y') : 'N/A' }}
+                                    @endif
+                                </div>
+                                @endif
+                            @else
+                                <div class="font-medium text-slate-900">
+                                    {{ $booking->check_in_date ? \Carbon\Carbon::parse($booking->check_in_date)->format('M d, Y') : 'N/A' }}
+                                </div>
+                                <div class="text-xs text-slate-500 mt-0.5">
+                                    to {{ $booking->check_out_date ? \Carbon\Carbon::parse($booking->check_out_date)->format('M d, Y') : 'N/A' }}
+                                </div>
+                            @endif
                         </td>
                         <td class="p-4 text-slate-700 font-medium">
                             {{ $booking->num_guests ?? 'N/A' }}
                         </td>
                         <td class="p-4">
                             @if($booking->total_amount > 0)
-                            <div class="font-medium text-slate-900">Rs. {{ number_format($booking->total_amount, 0) }}</div>
+                                @if($booking->amount_paid !== null)
+                                <div class="font-medium text-slate-900">
+                                    Rs. {{ number_format($booking->amount_paid, 0) }}
+                                    <span class="text-slate-400 font-normal">/ {{ number_format($booking->total_amount, 0) }}</span>
+                                </div>
+                                @else
+                                <div class="font-medium text-slate-900">Rs. {{ number_format($booking->total_amount, 0) }}</div>
+                                @endif
                             @else
                             <div class="font-medium text-slate-400 italic text-xs">Not set</div>
                             @endif
                             @if($booking->payment_status === 'fully_paid')
-                            <span class="text-xs text-green-600 font-medium flex items-center mt-1"><span class="w-1.5 h-1.5 rounded-full bg-green-500 mr-1.5"></span>Fully Paid</span>
+                            <span class="text-xs text-green-600 font-medium flex items-center mt-1"><span class="w-1.5 h-1.5 rounded-full bg-green-500 mr-1.5"></span>Fully Paid{{ ($booking->discount ?? 0) > 0 ? ' + Discount' : '' }}</span>
                             @elseif($booking->payment_status === 'deposit_paid')
                             <span class="text-xs text-blue-600 font-medium flex items-center mt-1"><span class="w-1.5 h-1.5 rounded-full bg-blue-500 mr-1.5"></span>Deposit Paid</span>
                             @elseif($booking->payment_status === 'partially_paid')
@@ -176,8 +202,8 @@
 @push('scripts')
 @if($filter === 'trashed')
 <script>
-function restoreBooking(id, ref) {
-    if (!confirm(`Restore booking ${ref}?`)) return;
+async function restoreBooking(id, ref) {
+    if (!await adminConfirm(`Restore booking ${ref}?`, { confirmLabel: 'Restore', type: 'primary' })) return;
 
     fetch(`/api/bookings/${id}/restore`, {
         method: 'POST',
@@ -189,13 +215,13 @@ function restoreBooking(id, ref) {
     .then(r => r.json())
     .then(data => {
         if (data.success) window.location.reload();
-        else alert(data.message ?? 'Restore failed.');
+        else adminToast(data.message ?? 'Restore failed.');
     })
-    .catch(() => alert('Restore failed.'));
+    .catch(() => adminToast('Restore failed.'));
 }
 
-function forceDeleteBooking(id, ref) {
-    if (!confirm(`Permanently delete booking ${ref}? This cannot be undone.`)) return;
+async function forceDeleteBooking(id, ref) {
+    if (!await adminConfirm(`Permanently delete booking ${ref}? This cannot be undone.`, { confirmLabel: 'Delete Permanently', type: 'danger' })) return;
 
     fetch(`/api/bookings/${id}/force`, {
         method: 'DELETE',
@@ -207,9 +233,9 @@ function forceDeleteBooking(id, ref) {
     .then(r => r.json())
     .then(data => {
         if (data.success) window.location.reload();
-        else alert(data.message ?? 'Delete failed.');
+        else adminToast(data.message ?? 'Delete failed.');
     })
-    .catch(() => alert('Delete failed.'));
+    .catch(() => adminToast('Delete failed.'));
 }
 </script>
 @endif

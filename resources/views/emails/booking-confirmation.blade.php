@@ -111,12 +111,12 @@
     <div class="container">
         <div class="header">
             <h1>DwellCasa</h1>
-            <p>LUXURY STAYS IN THE HEART OF NEPAL</p>
+            <p>{{ strtoupper($booking->location?->name ?? 'DwellCasa') }}</p>
         </div>
         <div class="body">
             <p class="greeting">Dear {{ $booking->guest->full_name ?? 'Valued Guest' }},</p>
             <p class="message">
-                Thank you for choosing DwellCasa. Your booking request has been received and approved.
+                Thank you for choosing Dwellcasa. Your booking request has been received and approved.
                 Check in time is 2PM, so please arrive at your convenience.
             </p>
             <div class="details-card">
@@ -155,7 +155,7 @@
             </p>
         </div>
         <div class="footer">
-            <p>DwellCasa — Kathmandu, Nepal</p>
+            <p>{{ $booking->location?->name ?? 'DwellCasa' }}</p>
             <p>This is an automated message, please do not reply directly to this email.</p>
         </div>
     </div>

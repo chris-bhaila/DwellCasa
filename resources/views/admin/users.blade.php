@@ -6,8 +6,8 @@
 @section('content')
 @php
 $permissionGroups = [
-'Bookings' => ['view bookings', 'create bookings', 'edit bookings', 'cancel bookings'],
-'Operations' => ['check-in guests', 'check-out guests'],
+'Bookings' => ['view bookings', 'create bookings', 'edit bookings', 'cancel bookings', 'view revenue'],
+'Operations' => ['check-in guests', 'check-out guests', 'manage guests'],
 'Inventory' => ['view inventory', 'edit inventory'],
 'Content' => ['manage room types', 'manage rooms', 'manage amenities', 'manage gallery', 'manage website info'],
 'Communication' => ['manage inquiries', 'manage reviews'],
@@ -63,8 +63,13 @@ $superAdminOnlyPerms = ['manage users', 'manage locations', 'manage logs'];
                 </thead>
                 <tbody class="text-sm divide-y divide-slate-100">
                     @foreach($users as $user)
-                    <tr class="hover:bg-slate-50/50 transition-colors">
-                        <td class="p-4 font-bold text-slate-900">{{ $user->name }}</td>
+                    <tr class="hover:bg-slate-50/50 transition-colors {{ !$user->is_active ? 'opacity-60' : '' }}">
+                        <td class="p-4 font-bold text-slate-900">
+                            {{ $user->name }}
+                            @if(!$user->is_active)
+                            <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-600">Disabled</span>
+                            @endif
+                        </td>
                         <td class="p-4 text-slate-600">{{ $user->email }}</td>
                         <td class="p-4">
                             @if($user->location)
@@ -98,6 +103,12 @@ $superAdminOnlyPerms = ['manage users', 'manage locations', 'manage logs'];
                                     <i class="bi bi-pencil-square"></i>
                                 </button>
                                 @if(auth()->id() !== $user->id)
+                                <button type="button"
+                                    class="w-8 h-8 flex items-center justify-center rounded-md transition-colors {{ $user->is_active ? 'text-slate-400 hover:text-amber-600 hover:bg-amber-50' : 'text-amber-500 hover:text-green-600 hover:bg-green-50' }}"
+                                    onclick="toggleUser({{ $user->id }}, {{ $user->is_active ? 'true' : 'false' }})"
+                                    title="{{ $user->is_active ? 'Disable user' : 'Enable user' }}">
+                                    <i class="bi {{ $user->is_active ? 'bi-slash-circle' : 'bi-check-circle' }}"></i>
+                                </button>
                                 <button type="button" class="w-8 h-8 flex items-center justify-center text-red-400 hover:bg-red-50 hover:text-red-600 rounded-md transition-colors"
                                     onclick="deleteUser({{ $user->id }})">
                                     <i class="bi bi-trash"></i>
@@ -123,13 +134,24 @@ $superAdminOnlyPerms = ['manage users', 'manage locations', 'manage logs'];
                         <h3 class="text-xl font-bold text-slate-900 capitalize">{{ str_replace('_', ' ', $role->name) }}</h3>
                         @if($role->name === 'super_admin')
                         <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-800 text-white shadow-sm">All Access</span>
+                        @elseif($role->name === 'admin')
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-200 text-slate-600 shadow-sm">Built-in</span>
                         @endif
                     </div>
-                    @if($role->name !== 'super_admin')
-                    <button type="submit" class="bg-primary text-white px-5 py-2 rounded-xl font-medium hover:bg-[#8E795E] transition-all shadow-sm">
-                        Save Changes
-                    </button>
-                    @endif
+                    <div class="flex items-center gap-3">
+                        @if(!in_array($role->name, ['super_admin', 'admin']))
+                        <button type="button"
+                            onclick="deleteRole({{ $role->id }}, '{{ $role->name }}')"
+                            class="px-4 py-2 rounded-xl font-medium text-red-500 border border-red-200 hover:bg-red-50 transition-all text-sm flex items-center gap-1.5">
+                            <i class="bi bi-trash"></i> Delete Role
+                        </button>
+                        @endif
+                        @if($role->name !== 'super_admin')
+                        <button type="submit" class="bg-primary text-white px-5 py-2 rounded-xl font-medium hover:bg-[#8E795E] transition-all shadow-sm">
+                            Save Changes
+                        </button>
+                        @endif
+                    </div>
                 </div>
 
                 <div id="role-error-{{ $role->id }}" class="hidden mb-4 p-3 bg-red-50 border border-red-200 text-red-600 rounded-lg text-sm"></div>
@@ -308,6 +330,7 @@ $usersJson = $users->map(fn($u) => [
 'email' => $u->email,
 'role' => $u->roles->first()?->name,
 'location_id' => $u->location_id,
+'is_active' => (bool) $u->is_active,
 'permissions' => $u->permissions->pluck('name')->toArray(),
 ]);
 $rolesJson = $roles->map(fn($r) => [
@@ -490,8 +513,62 @@ $rolesJson = $roles->map(fn($r) => [
         }
     });
 
+    window.toggleUser = async function(id, currentlyActive) {
+        const action = currentlyActive ? 'disable' : 'enable';
+        if (!await adminConfirm(`Are you sure you want to ${action} this user?`, { confirmLabel: currentlyActive ? 'Disable' : 'Enable', type: currentlyActive ? 'warning' : 'primary' })) return;
+
+        try {
+            const response = await fetch(`/api/users/${id}/toggle`, {
+                method: 'PATCH',
+                credentials: 'same-origin',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                }
+            });
+
+            if (response.ok) {
+                window.location.reload();
+            } else {
+                const error = await response.json();
+                adminToast('Error: ' + (error.message || 'Unknown error'));
+            }
+        } catch (error) {
+            adminToast('An error occurred.');
+        }
+    };
+
+    window.deleteRole = async function(id, name) {
+        const label = name.replace(/_/g, ' ');
+        if (!await adminConfirm(`Delete role "${label}"?\n\nAny users assigned to this role will be disabled until a new role is assigned to them.`, { confirmLabel: 'Delete Role', type: 'danger' })) return;
+
+        try {
+            const response = await fetch(`/api/roles/${id}`, {
+                method: 'DELETE',
+                credentials: 'same-origin',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                }
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                if (result.affected_users > 0) {
+                    adminToast(`Role deleted. ${result.affected_users} user(s) have been disabled and will need a new role assigned.`, 'warning');
+                }
+                window.location.reload();
+            } else {
+                adminToast('Error: ' + (result.message || 'Unknown error'));
+            }
+        } catch (error) {
+            adminToast('An error occurred while deleting the role.');
+        }
+    };
+
     window.deleteUser = async function(id) {
-        if (!confirm('Are you sure you want to delete this user? This action cannot be undone.')) return;
+        if (!await adminConfirm('Are you sure you want to delete this user? This action cannot be undone.', { confirmLabel: 'Delete', type: 'danger' })) return;
 
         try {
             const response = await fetch(`/api/users/${id}`, {
@@ -507,11 +584,11 @@ $rolesJson = $roles->map(fn($r) => [
                 window.location.reload();
             } else {
                 const error = await response.json();
-                alert('Error deleting user: ' + (error.message || 'Unknown error'));
+                adminToast('Error deleting user: ' + (error.message || 'Unknown error'));
             }
         } catch (error) {
             console.error('Error:', error);
-            alert('An error occurred while deleting the user.');
+            adminToast('An error occurred while deleting the user.');
         }
     };
 

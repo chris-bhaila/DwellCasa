@@ -402,17 +402,17 @@ $amenities = collect([
                     window.location.reload();
                 } else {
                     const error = await response.json();
-                    alert('Error adding amenity: ' + (error.message || 'Unknown error'));
+                    adminToast('Error adding amenity: ' + (error.message || 'Unknown error'));
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('An error occurred.');
+                adminToast('An error occurred.');
             }
         });
 
         document.querySelectorAll('.delete-amenity-btn').forEach(btn => {
             btn.addEventListener('click', async function() {
-                if (!confirm('Are you sure you want to delete this amenity?')) return;
+                if (!await adminConfirm('Are you sure you want to delete this amenity?', { confirmLabel: 'Delete', type: 'danger' })) return;
 
                 const id = this.dataset.id;
                 try {
@@ -428,11 +428,11 @@ $amenities = collect([
                         window.location.reload();
                     } else {
                         const error = await response.json();
-                        alert('Error deleting amenity: ' + (error.message || 'Unknown error'));
+                        adminToast('Error deleting amenity: ' + (error.message || 'Unknown error'));
                     }
                 } catch (error) {
                     console.error('Error:', error);
-                    alert('An error occurred.');
+                    adminToast('An error occurred.');
                 }
             });
         });

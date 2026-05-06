@@ -33,6 +33,7 @@ class Booking extends Model
         'rate_per_night',
         'rate_per_month',
         'total_amount',
+        'discount',
         'deposit_amount',
         'amount_paid',
         'status',
@@ -50,6 +51,7 @@ class Booking extends Model
         'rate_per_night' => 'decimal:2',
         'rate_per_month' => 'decimal:2',
         'total_amount' => 'decimal:2',
+        'discount' => 'decimal:2',
         'deposit_amount' => 'decimal:2',
         'amount_paid' => 'decimal:2',
         'checked_in_at' => 'datetime',
@@ -83,6 +85,11 @@ class Booking extends Model
     public function checkOut(): HasOne
     {
         return $this->hasOne(CheckOut::class);
+    }
+
+    public function location(): BelongsTo
+    {
+        return $this->belongsTo(Location::class);
     }
 
     protected static function booted(): void

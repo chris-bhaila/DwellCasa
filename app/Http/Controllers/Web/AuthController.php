@@ -35,6 +35,13 @@ class AuthController extends Controller
 
             $user = Auth::user();
 
+            if (!$user->is_active) {
+                Auth::logout();
+                return back()->withErrors([
+                    'email' => 'Your account has been disabled. Please contact your administrator.',
+                ])->onlyInput('email');
+            }
+
             // Super admin — store selected location in session
             if ($user->hasRole('super_admin')) {
                 $defaultLocation = $request->input('location_id')

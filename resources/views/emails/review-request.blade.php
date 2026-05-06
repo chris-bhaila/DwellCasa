@@ -120,7 +120,7 @@
     <div class="container">
         <div class="header">
             <h1>DwellCasa</h1>
-            <p>LUXURY STAYS IN THE HEART OF NEPAL</p>
+            <p>{{ strtoupper($booking->location?->name ?? 'DwellCasa') }}</p>
         </div>
         <div class="body">
             <p class="greeting">Dear {{ $booking->guest->full_name }},</p>
@@ -145,7 +145,7 @@
             <p class="note">This link is unique to your stay and can only be used once.</p>
         </div>
         <div class="footer">
-            <p>DwellCasa — Kathmandu, Nepal</p>
+            <p>Dwellcasa, {{ $booking->location?->name ?? 'DwellCasa' }}</p>
             <p>If you did not stay with us recently, please ignore this email.</p>
         </div>
     </div>
