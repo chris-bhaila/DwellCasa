@@ -45,7 +45,7 @@
                             @endif
                             <div>
                                 <div class="font-bold text-slate-900">{{ $item->name }}</div>
-                                <div class="text-xs text-slate-500 capitalize mt-0.5">{{ str_replace('_', ' ', $item->category) }}</div>
+                                <div class="text-sm text-slate-500 capitalize mt-0.5">{{ str_replace('_', ' ', $item->category) }}</div>
                             </div>
                         </div>
                     </td>
@@ -54,7 +54,7 @@
                             {{ floatval($item->stock) }} {{ $item->unit }}
                         </div>
                         @if($item->minimum_stock > 0)
-                            <div class="text-xs text-slate-400 mt-0.5">Min: {{ floatval($item->minimum_stock) }}</div>
+                            <div class="text-sm text-slate-400 mt-0.5">Min: {{ floatval($item->minimum_stock) }}</div>
                         @endif
                     </td>
                     <td class="p-4 font-medium text-slate-700">
@@ -69,11 +69,11 @@
                     </td>
                     <td class="p-4">
                         @if($item->status === 'available')
-                            <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-green-50 text-green-700 border border-green-200">Available</span>
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-sm font-medium bg-green-50 text-green-700 border border-green-200">Available</span>
                         @elseif($item->status === 'low_stock')
-                            <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-yellow-50 text-yellow-700 border border-yellow-200">Low Stock</span>
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-sm font-medium bg-yellow-50 text-yellow-700 border border-yellow-200">Low Stock</span>
                         @else
-                            <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-red-50 text-red-700 border border-red-200">Out of Stock</span>
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-sm font-medium bg-red-50 text-red-700 border border-red-200">Out of Stock</span>
                         @endif
                     </td>
                     <td class="p-4 text-right">
@@ -215,7 +215,7 @@
     <!-- Caption -->
     <div class="absolute bottom-0 left-0 w-full p-6 text-center z-10 bg-gradient-to-t from-black/80 to-transparent">
         <h3 id="lightbox-caption" class="text-white text-lg font-serif italic mb-1"></h3>
-        <p id="lightbox-category" class="text-primary text-xs font-bold uppercase tracking-wider"></p>
+        <p id="lightbox-category" class="text-primary text-sm font-bold uppercase tracking-wider"></p>
     </div>
 </div>
 @endsection

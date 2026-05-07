@@ -97,14 +97,93 @@
                     </div>
                 </div>
 
-                <!-- Map Placeholder -->
+                <!-- Map -->
+                @if($webInfo->map_lat && $webInfo->map_lng)
+                <div id="property-map" class="h-72 rounded-2xl overflow-hidden shadow-lg border border-slate-200"></div>
+                @else
                 <div class="bg-gradient-to-br from-slate-200 to-slate-300 h-72 rounded-2xl flex items-center justify-center shadow-lg border border-slate-200">
                     <span class="text-slate-600 font-medium">Interactive Map</span>
                 </div>
+                @endif
             </div>
         </div>
     </div>
 </section>
+
+@push('head')
+@if($webInfo->map_lat && $webInfo->map_lng)
+<script>
+    window.__mapLat     = {{ (float) $webInfo->map_lat }};
+    window.__mapLng     = {{ (float) $webInfo->map_lng }};
+    window.__mapName    = @json($location->name ?? 'DwellCasa');
+    window.__mapAddress = @json($webInfo->contact_address ?? '');
+    window.__mapPhone   = @json($webInfo->contact_phone ?? '');
+
+    window.initPropertyMap = function() {
+        const center = { lat: window.__mapLat, lng: window.__mapLng };
+
+        const mapStyles = [
+            { elementType: 'geometry',            stylers: [{ color: '#f5f4f0' }] },
+            { elementType: 'labels.text.fill',    stylers: [{ color: '#6b7280' }] },
+            { elementType: 'labels.text.stroke',  stylers: [{ color: '#f5f4f0' }] },
+            { featureType: 'road',              elementType: 'geometry',         stylers: [{ color: '#ffffff' }] },
+            { featureType: 'road',              elementType: 'labels.text.fill', stylers: [{ color: '#9ca3af' }] },
+            { featureType: 'road.highway',      elementType: 'geometry',         stylers: [{ color: '#e5e1db' }] },
+            { featureType: 'water',             elementType: 'geometry',         stylers: [{ color: '#c8d9e8' }] },
+            { featureType: 'water',             elementType: 'labels.text.fill', stylers: [{ color: '#9ca3af' }] },
+            { featureType: 'poi',               elementType: 'geometry',         stylers: [{ color: '#ede8e0' }] },
+            { featureType: 'poi.park',          elementType: 'geometry',         stylers: [{ color: '#dce8d6' }] },
+            { featureType: 'poi',               elementType: 'labels',           stylers: [{ visibility: 'off' }] },
+            { featureType: 'transit',           elementType: 'geometry',         stylers: [{ color: '#e8e4de' }] },
+            { featureType: 'administrative',    elementType: 'geometry.stroke',  stylers: [{ color: '#d1c9be' }] },
+            { featureType: 'administrative',    elementType: 'labels.text.fill', stylers: [{ color: '#A89070' }] },
+        ];
+
+        const map = new google.maps.Map(document.getElementById('property-map'), {
+            center,
+            zoom: 15,
+            styles: mapStyles,
+            disableDefaultUI: true,
+            zoomControl: true,
+            zoomControlOptions: { position: google.maps.ControlPosition.RIGHT_BOTTOM },
+        });
+
+        const markerSvg = `
+            <svg xmlns="http://www.w3.org/2000/svg" width="36" height="44" viewBox="0 0 36 44">
+                <path d="M18 0C8.06 0 0 8.06 0 18c0 13.5 18 26 18 26S36 31.5 36 18C36 8.06 27.94 0 18 0z"
+                      fill="#A89070"/>
+                <circle cx="18" cy="18" r="7" fill="#ffffff"/>
+            </svg>`;
+
+        const marker = new google.maps.Marker({
+            position: center,
+            map,
+            icon: {
+                url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(markerSvg),
+                scaledSize: new google.maps.Size(36, 44),
+                anchor: new google.maps.Point(18, 44),
+            },
+            title: window.__mapName,
+        });
+
+        const infoContent = `
+            <div style="font-family:sans-serif;padding:4px 2px;max-width:220px;">
+                <p style="font-weight:700;color:#1e293b;margin:0 0 4px;">${window.__mapName}</p>
+                ${window.__mapAddress ? `<p style="color:#475569;font-size:13px;margin:0 0 3px;">${window.__mapAddress}</p>` : ''}
+                ${window.__mapPhone   ? `<p style="color:#475569;font-size:13px;margin:0;">${window.__mapPhone}</p>` : ''}
+            </div>`;
+
+        const infoWindow = new google.maps.InfoWindow({ content: infoContent });
+
+        marker.addListener('click', () => infoWindow.open({ anchor: marker, map }));
+        infoWindow.open({ anchor: marker, map });
+    };
+</script>
+<script
+    src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google_maps.key') }}&callback=initPropertyMap"
+    async defer></script>
+@endif
+@endpush
 
 @push('scripts')
 <script>

@@ -25,11 +25,11 @@
                 <div class="flex flex-wrap gap-2 justify-center">
                     @foreach(auth()->user()->roles as $role)
                         @if($role->name === 'super_admin')
-                            <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-800 text-white shadow-sm">Super Admin</span>
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-sm font-medium bg-slate-800 text-white shadow-sm">Super Admin</span>
                         @elseif($role->name === 'admin')
-                            <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-[#A89070] text-white shadow-sm">Admin</span>
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-sm font-medium bg-[#A89070] text-white shadow-sm">Admin</span>
                         @else
-                            <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-blue-100 text-blue-700 shadow-sm capitalize">{{ $role->name }}</span>
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-sm font-medium bg-blue-100 text-blue-700 shadow-sm capitalize">{{ $role->name }}</span>
                         @endif
                     @endforeach
                 </div>
@@ -41,7 +41,7 @@
                 </div>
                 <div class="flex justify-between items-center">
                     <span class="text-sm font-medium text-slate-500">Direct Permissions</span>
-                    <span class="bg-slate-200 border border-slate-300 px-2 py-1 rounded-md text-xs font-medium text-slate-700">
+                    <span class="bg-slate-200 border border-slate-300 px-2 py-1 rounded-md text-sm font-medium text-slate-700">
                         {{ auth()->user()->permissions->count() }} Overrides
                     </span>
                 </div>
@@ -71,7 +71,7 @@
                         <label for="name" class="block text-sm font-medium text-slate-700 mb-2">Full Name</label>
                         <input type="text" name="name" id="name" value="{{ old('name', auth()->user()->name) }}" required class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-[#A89070] focus:border-[#A89070] transition-colors @error('name') border-red-500 focus:border-red-500 focus:ring-red-500 @enderror">
                         @error('name')
-                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                         @enderror
                     </div>
                     
@@ -79,7 +79,7 @@
                         <label for="email" class="block text-sm font-medium text-slate-700 mb-2">Email Address</label>
                         <input type="email" name="email" id="email" value="{{ old('email', auth()->user()->email) }}" required class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-[#A89070] focus:border-[#A89070] transition-colors @error('email') border-red-500 focus:border-red-500 focus:ring-red-500 @enderror">
                         @error('email')
-                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                         @enderror
                     </div>
                 </div>
@@ -112,7 +112,7 @@
                         <label for="current_password" class="block text-sm font-medium text-slate-700 mb-2">Current Password</label>
                         <input type="password" name="current_password" id="current_password" required class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-[#A89070] focus:border-[#A89070] transition-colors @error('current_password', 'updatePassword') border-red-500 focus:border-red-500 focus:ring-red-500 @enderror">
                         @error('current_password', 'updatePassword')
-                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                         @enderror
                     </div>
                     
@@ -120,7 +120,7 @@
                         <label for="password" class="block text-sm font-medium text-slate-700 mb-2">New Password</label>
                         <input type="password" name="password" id="password" required class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-[#A89070] focus:border-[#A89070] transition-colors @error('password', 'updatePassword') border-red-500 focus:border-red-500 focus:ring-red-500 @enderror">
                         @error('password', 'updatePassword')
-                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                         @enderror
                     </div>
 
@@ -128,7 +128,7 @@
                         <label for="password_confirmation" class="block text-sm font-medium text-slate-700 mb-2">Confirm New Password</label>
                         <input type="password" name="password_confirmation" id="password_confirmation" required class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-[#A89070] focus:border-[#A89070] transition-colors @error('password_confirmation', 'updatePassword') border-red-500 focus:border-red-500 focus:ring-red-500 @enderror">
                         @error('password_confirmation', 'updatePassword')
-                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                         @enderror
                     </div>
                 </div>

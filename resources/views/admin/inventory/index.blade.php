@@ -32,11 +32,11 @@
             <div class="w-10 h-10 rounded-xl bg-[#A89070]/10 flex items-center justify-center text-[#A89070]">
                 <i class="bi bi-archive text-lg"></i>
             </div>
-            <span class="text-xs font-medium px-2 py-1 rounded-md bg-slate-100 text-slate-500">Supplies</span>
+            <span class="text-sm font-medium px-2 py-1 rounded-md bg-slate-100 text-slate-500">Supplies</span>
         </div>
-        <p class="text-slate-500 text-xs font-medium mb-1">Total Supply Items</p>
+        <p class="text-slate-500 text-sm font-medium mb-1">Total Supply Items</p>
         <p class="text-3xl font-bold text-slate-900">{{ $totalSupplies }}</p>
-        <p class="text-xs text-slate-400 mt-1">Tracked supply types</p>
+        <p class="text-sm text-slate-400 mt-1">Tracked supply types</p>
     </div>
 
     <!-- Low Stock -->
@@ -46,14 +46,14 @@
                 <i class="bi bi-exclamation-triangle text-lg"></i>
             </div>
             @if($lowStockCount > 0)
-            <span class="text-xs font-bold px-2 py-1 rounded-md bg-amber-50 text-amber-600">Attention</span>
+            <span class="text-sm font-bold px-2 py-1 rounded-md bg-amber-50 text-amber-600">Attention</span>
             @else
-            <span class="text-xs font-medium px-2 py-1 rounded-md bg-green-50 text-green-600">All good</span>
+            <span class="text-sm font-medium px-2 py-1 rounded-md bg-green-50 text-green-600">All good</span>
             @endif
         </div>
-        <p class="text-slate-500 text-xs font-medium mb-1">Low Stock</p>
+        <p class="text-slate-500 text-sm font-medium mb-1">Low Stock</p>
         <p class="text-3xl font-bold {{ $lowStockCount > 0 ? 'text-amber-600' : 'text-slate-900' }}">{{ $lowStockCount }}</p>
-        <p class="text-xs text-slate-400 mt-1">At or below minimum level</p>
+        <p class="text-sm text-slate-400 mt-1">At or below minimum level</p>
     </div>
 
     <!-- Out of Stock -->
@@ -63,14 +63,14 @@
                 <i class="bi bi-x-circle text-lg"></i>
             </div>
             @if($outOfStockCount > 0)
-            <span class="text-xs font-bold px-2 py-1 rounded-md bg-rose-50 text-rose-600">Action needed</span>
+            <span class="text-sm font-bold px-2 py-1 rounded-md bg-rose-50 text-rose-600">Action needed</span>
             @else
-            <span class="text-xs font-medium px-2 py-1 rounded-md bg-green-50 text-green-600">All clear</span>
+            <span class="text-sm font-medium px-2 py-1 rounded-md bg-green-50 text-green-600">All clear</span>
             @endif
         </div>
-        <p class="text-slate-500 text-xs font-medium mb-1">Out of Stock</p>
+        <p class="text-slate-500 text-sm font-medium mb-1">Out of Stock</p>
         <p class="text-3xl font-bold {{ $outOfStockCount > 0 ? 'text-rose-600' : 'text-slate-900' }}">{{ $outOfStockCount }}</p>
-        <p class="text-xs text-slate-400 mt-1">Zero quantity on hand</p>
+        <p class="text-sm text-slate-400 mt-1">Zero quantity on hand</p>
     </div>
 
     <!-- Total Equipment Units -->
@@ -79,11 +79,11 @@
             <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-500">
                 <i class="bi bi-tv text-lg"></i>
             </div>
-            <span class="text-xs font-medium px-2 py-1 rounded-md bg-blue-50 text-blue-600">Equipment</span>
+            <span class="text-sm font-medium px-2 py-1 rounded-md bg-blue-50 text-blue-600">Equipment</span>
         </div>
-        <p class="text-slate-500 text-xs font-medium mb-1">Total Equipment Units</p>
+        <p class="text-slate-500 text-sm font-medium mb-1">Total Equipment Units</p>
         <p class="text-3xl font-bold text-slate-900">{{ $totalEquipment }}</p>
-        <p class="text-xs text-slate-400 mt-1">Individual tracked units</p>
+        <p class="text-sm text-slate-400 mt-1">Individual tracked units</p>
     </div>
 
     <!-- Assigned Units -->
@@ -92,11 +92,11 @@
             <div class="w-10 h-10 rounded-xl bg-teal-50 flex items-center justify-center text-teal-500">
                 <i class="bi bi-door-open text-lg"></i>
             </div>
-            <span class="text-xs font-medium px-2 py-1 rounded-md bg-teal-50 text-teal-600">In rooms</span>
+            <span class="text-sm font-medium px-2 py-1 rounded-md bg-teal-50 text-teal-600">In rooms</span>
         </div>
-        <p class="text-slate-500 text-xs font-medium mb-1">Assigned Units</p>
+        <p class="text-slate-500 text-sm font-medium mb-1">Assigned Units</p>
         <p class="text-3xl font-bold text-slate-900">{{ $assignedCount }}</p>
-        <p class="text-xs text-slate-400 mt-1">Currently in a room</p>
+        <p class="text-sm text-slate-400 mt-1">Currently in a room</p>
     </div>
 
     <!-- Damaged / Under Repair -->
@@ -106,14 +106,14 @@
                 <i class="bi bi-tools text-lg"></i>
             </div>
             @if($damagedCount > 0)
-            <span class="text-xs font-bold px-2 py-1 rounded-md bg-orange-50 text-orange-600">Needs attention</span>
+            <span class="text-sm font-bold px-2 py-1 rounded-md bg-orange-50 text-orange-600">Needs attention</span>
             @else
-            <span class="text-xs font-medium px-2 py-1 rounded-md bg-green-50 text-green-600">All good</span>
+            <span class="text-sm font-medium px-2 py-1 rounded-md bg-green-50 text-green-600">All good</span>
             @endif
         </div>
-        <p class="text-slate-500 text-xs font-medium mb-1">Damaged / Under Repair</p>
+        <p class="text-slate-500 text-sm font-medium mb-1">Damaged / Under Repair</p>
         <p class="text-3xl font-bold {{ $damagedCount > 0 ? 'text-orange-500' : 'text-slate-900' }}">{{ $damagedCount }}</p>
-        <p class="text-xs text-slate-400 mt-1">Damaged or being repaired</p>
+        <p class="text-sm text-slate-400 mt-1">Damaged or being repaired</p>
     </div>
 
 </div>
@@ -130,7 +130,7 @@
         <div class="overflow-x-auto">
             <table class="w-full min-w-[480px] text-left border-collapse">
                 <thead>
-                    <tr class="bg-slate-50/50 text-slate-500 text-xs border-b border-slate-100">
+                    <tr class="bg-slate-50/50 text-slate-500 text-sm border-b border-slate-100">
                         <th class="px-5 py-3 font-medium">Name</th>
                         <th class="px-5 py-3 font-medium">On Hand</th>
                         <th class="px-5 py-3 font-medium">Status</th>
@@ -141,20 +141,20 @@
                     <tr class="hover:bg-slate-50/30 transition-colors">
                         <td class="px-5 py-3.5">
                             <p class="font-medium text-slate-900">{{ $item->name }}</p>
-                            <p class="text-xs text-slate-400">{{ $item->category->name ?? '—' }}</p>
+                            <p class="text-sm text-slate-400">{{ $item->category->name ?? '—' }}</p>
                         </td>
                         <td class="px-5 py-3.5 text-slate-700">
                             {{ $item->stock ? number_format($item->stock->quantity_on_hand, 2) : '0.00' }}
-                            @if($item->unit) <span class="text-slate-400 text-xs">{{ $item->unit }}</span> @endif
+                            @if($item->unit) <span class="text-slate-400 text-sm">{{ $item->unit }}</span> @endif
                         </td>
                         <td class="px-5 py-3.5">
                             @php $status = $item->stock->status ?? 'out_of_stock'; @endphp
                             @if($status === 'available')
-                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-green-50 text-green-700 border border-green-200">Available</span>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-sm font-medium bg-green-50 text-green-700 border border-green-200">Available</span>
                             @elseif($status === 'low_stock')
-                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200">Low Stock</span>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-sm font-medium bg-amber-50 text-amber-700 border border-amber-200">Low Stock</span>
                             @else
-                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-rose-50 text-rose-700 border border-rose-200">Out of Stock</span>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-sm font-medium bg-rose-50 text-rose-700 border border-rose-200">Out of Stock</span>
                             @endif
                         </td>
                     </tr>
@@ -180,7 +180,7 @@
         <div class="overflow-x-auto">
             <table class="w-full min-w-[480px] text-left border-collapse">
                 <thead>
-                    <tr class="bg-slate-50/50 text-slate-500 text-xs border-b border-slate-100">
+                    <tr class="bg-slate-50/50 text-slate-500 text-sm border-b border-slate-100">
                         <th class="px-5 py-3 font-medium">Item</th>
                         <th class="px-5 py-3 font-medium">Room</th>
                         <th class="px-5 py-3 font-medium">Condition</th>
@@ -193,7 +193,7 @@
                         <td class="px-5 py-3.5">
                             <p class="font-medium text-slate-900">{{ $unit->item->name ?? '—' }}</p>
                             @if($unit->serial_number)
-                            <p class="text-xs text-slate-400">{{ $unit->serial_number }}</p>
+                            <p class="text-sm text-slate-400">{{ $unit->serial_number }}</p>
                             @endif
                         </td>
                         <td class="px-5 py-3.5 text-slate-600 text-sm">
@@ -201,22 +201,22 @@
                         </td>
                         <td class="px-5 py-3.5">
                             @if(in_array($unit->condition, ['new', 'good']))
-                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-green-50 text-green-700 border border-green-200">{{ ucfirst($unit->condition) }}</span>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-sm font-medium bg-green-50 text-green-700 border border-green-200">{{ ucfirst($unit->condition) }}</span>
                             @elseif($unit->condition === 'fair')
-                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200">Fair</span>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-sm font-medium bg-amber-50 text-amber-700 border border-amber-200">Fair</span>
                             @else
-                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-rose-50 text-rose-700 border border-rose-200">{{ ucfirst(str_replace('_', ' ', $unit->condition)) }}</span>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-sm font-medium bg-rose-50 text-rose-700 border border-rose-200">{{ ucfirst(str_replace('_', ' ', $unit->condition)) }}</span>
                             @endif
                         </td>
                         <td class="px-5 py-3.5">
                             @if($unit->status === 'available')
-                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-green-50 text-green-700 border border-green-200">Available</span>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-sm font-medium bg-green-50 text-green-700 border border-green-200">Available</span>
                             @elseif($unit->status === 'assigned')
-                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">Assigned</span>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-sm font-medium bg-blue-50 text-blue-700 border border-blue-200">Assigned</span>
                             @elseif($unit->status === 'maintenance')
-                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200">Maintenance</span>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-sm font-medium bg-amber-50 text-amber-700 border border-amber-200">Maintenance</span>
                             @else
-                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-slate-100 text-slate-600 border border-slate-200">Retired</span>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-sm font-medium bg-slate-100 text-slate-600 border border-slate-200">Retired</span>
                             @endif
                         </td>
                     </tr>
@@ -243,7 +243,7 @@
     <div class="overflow-x-auto">
         <table class="w-full min-w-[640px] text-left border-collapse">
             <thead>
-                <tr class="bg-slate-50/50 text-slate-500 text-xs border-b border-slate-100">
+                <tr class="bg-slate-50/50 text-slate-500 text-sm border-b border-slate-100">
                     <th class="px-5 py-3 font-medium">Action</th>
                     <th class="px-5 py-3 font-medium">Item</th>
                     <th class="px-5 py-3 font-medium">Performed By</th>
@@ -266,12 +266,17 @@
                             ];
                             [$cls, $label] = $actionMap[$log->action] ?? ['bg-slate-100 text-slate-600 border-slate-200', ucfirst($log->action)];
                         @endphp
-                        <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium border {{ $cls }}">{{ $label }}</span>
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-md text-sm font-medium border {{ $cls }}">{{ $label }}</span>
                     </td>
                     <td class="px-5 py-3.5 text-slate-700 font-medium">{{ $log->item->name ?? '—' }}</td>
                     <td class="px-5 py-3.5 text-slate-600">{{ $log->performedBy->name ?? '—' }}</td>
-                    <td class="px-5 py-3.5 text-slate-500 text-xs max-w-[180px] truncate">{{ $log->notes ?? '—' }}</td>
-                    <td class="px-5 py-3.5 text-slate-400 text-xs text-right whitespace-nowrap">{{ $log->created_at->diffForHumans() }}</td>
+                    <td class="px-5 py-3.5 text-slate-500 text-sm max-w-[180px] truncate">{{ $log->notes ?? '—' }}</td>
+                    <td class="px-5 py-3.5 text-slate-400 text-sm text-right whitespace-nowrap">
+                        <span title="{{ $log->created_at->format('d M Y, H:i:s') }}"
+                              class="cursor-help border-b border-dashed border-slate-300">
+                            {{ $log->created_at->diffForHumans() }}
+                        </span>
+                    </td>
                 </tr>
                 @empty
                 <tr>

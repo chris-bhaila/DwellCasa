@@ -16,12 +16,12 @@
         @if($filter)   <input type="hidden" name="filter"    value="{{ $filter }}">@endif
         @if($roomType) <input type="hidden" name="room_type" value="{{ $roomType }}">@endif
         <div class="flex items-center gap-2 bg-white border border-slate-200 rounded-xl px-4 py-2.5 shadow-sm">
-            <label class="text-xs font-medium text-slate-500 whitespace-nowrap">From</label>
+            <label class="text-sm font-medium text-slate-500 whitespace-nowrap">From</label>
             <input type="date" name="from" value="{{ $from }}"
                 class="text-sm font-medium text-slate-800 bg-transparent border-none outline-none focus:ring-0 cursor-pointer">
         </div>
         <div class="flex items-center gap-2 bg-white border border-slate-200 rounded-xl px-4 py-2.5 shadow-sm">
-            <label class="text-xs font-medium text-slate-500 whitespace-nowrap">To</label>
+            <label class="text-sm font-medium text-slate-500 whitespace-nowrap">To</label>
             <input type="date" name="to" value="{{ $to }}"
                 class="text-sm font-medium text-slate-800 bg-transparent border-none outline-none focus:ring-0 cursor-pointer">
         </div>
@@ -56,9 +56,9 @@
         <div class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-500 mb-3">
             <i class="bi bi-receipt text-lg"></i>
         </div>
-        <p class="text-slate-500 text-xs font-medium mb-1">Total Billed</p>
+        <p class="text-slate-500 text-sm font-medium mb-1">Total Billed</p>
         <p class="text-2xl font-bold text-slate-900">Rs. {{ number_format($billed, 0) }}</p>
-        <p class="text-xs text-slate-400 mt-1">{{ $totalBookingCount }} booking{{ $totalBookingCount !== 1 ? 's' : '' }}</p>
+        <p class="text-sm text-slate-400 mt-1">{{ $totalBookingCount }} booking{{ $totalBookingCount !== 1 ? 's' : '' }}</p>
     </a>
 
     <!-- Collected -->
@@ -68,12 +68,12 @@
         <div class="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center text-green-600 mb-3">
             <i class="bi bi-check-circle text-lg"></i>
         </div>
-        <p class="text-slate-500 text-xs font-medium mb-1">
+        <p class="text-slate-500 text-sm font-medium mb-1">
             Collected
-            @if($filter === 'collected')<span class="ml-1 text-green-400 text-xs">&times; clear</span>@endif
+            @if($filter === 'collected')<span class="ml-1 text-green-400 text-sm">&times; clear</span>@endif
         </p>
         <p class="text-2xl font-bold text-green-700">Rs. {{ number_format($collected, 0) }}</p>
-        <p class="text-xs text-slate-400 mt-1">{{ $collectPct }}% collection rate</p>
+        <p class="text-sm text-slate-400 mt-1">{{ $collectPct }}% collection rate</p>
     </a>
 
     <!-- Outstanding -->
@@ -83,12 +83,12 @@
         <div class="w-10 h-10 rounded-xl bg-rose-50 flex items-center justify-center text-rose-500 mb-3">
             <i class="bi bi-hourglass-split text-lg"></i>
         </div>
-        <p class="text-slate-500 text-xs font-medium mb-1">
+        <p class="text-slate-500 text-sm font-medium mb-1">
             Outstanding
-            @if($filter === 'outstanding')<span class="ml-1 text-rose-400 text-xs">&times; clear</span>@endif
+            @if($filter === 'outstanding')<span class="ml-1 text-rose-400 text-sm">&times; clear</span>@endif
         </p>
         <p class="text-2xl font-bold {{ $outstanding > 0 ? 'text-rose-600' : 'text-slate-400' }}">Rs. {{ number_format($outstanding, 0) }}</p>
-        <p class="text-xs text-slate-400 mt-1">Unpaid balance</p>
+        <p class="text-sm text-slate-400 mt-1">Unpaid balance</p>
     </a>
 
     <!-- Discounts -->
@@ -98,12 +98,12 @@
         <div class="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center text-amber-500 mb-3">
             <i class="bi bi-tag text-lg"></i>
         </div>
-        <p class="text-slate-500 text-xs font-medium mb-1">
+        <p class="text-slate-500 text-sm font-medium mb-1">
             Discounts
-            @if($filter === 'discounted')<span class="ml-1 text-amber-400 text-xs">&times; clear</span>@endif
+            @if($filter === 'discounted')<span class="ml-1 text-amber-400 text-sm">&times; clear</span>@endif
         </p>
         <p class="text-2xl font-bold {{ $totalDiscount > 0 ? 'text-amber-600' : 'text-slate-400' }}">Rs. {{ number_format($totalDiscount, 0) }}</p>
-        <p class="text-xs text-slate-400 mt-1">Total given</p>
+        <p class="text-sm text-slate-400 mt-1">Total given</p>
     </a>
 
     <!-- Collection Rate (static) -->
@@ -111,7 +111,7 @@
         <div class="w-10 h-10 rounded-xl bg-[#A89070]/10 flex items-center justify-center text-[#A89070] mb-3">
             <i class="bi bi-graph-up text-lg"></i>
         </div>
-        <p class="text-slate-500 text-xs font-medium mb-1">Collection Rate</p>
+        <p class="text-slate-500 text-sm font-medium mb-1">Collection Rate</p>
         <p class="text-2xl font-bold text-slate-900">{{ $collectPct }}%</p>
         <div class="mt-2 w-full bg-slate-100 rounded-full h-1.5">
             <div class="h-1.5 rounded-full transition-all {{ $collectPct >= 80 ? 'bg-green-500' : ($collectPct >= 50 ? 'bg-amber-400' : 'bg-rose-400') }}"
@@ -171,18 +171,18 @@
                 <div class="flex justify-between items-start mb-1.5">
                     <span class="text-sm font-medium {{ $rtActive ? 'text-[#A89070]' : 'text-slate-800' }}">
                         {{ $rtName }}
-                        @if($rtActive)<i class="bi bi-funnel-fill text-xs ml-1"></i>@endif
+                        @if($rtActive)<i class="bi bi-funnel-fill text-sm ml-1"></i>@endif
                     </span>
-                    <span class="text-xs text-slate-400">{{ $data['count'] }} booking{{ $data['count'] !== 1 ? 's' : '' }}</span>
+                    <span class="text-sm text-slate-400">{{ $data['count'] }} booking{{ $data['count'] !== 1 ? 's' : '' }}</span>
                 </div>
-                <div class="flex justify-between text-xs mb-1">
+                <div class="flex justify-between text-sm mb-1">
                     <span class="text-slate-500">Billed: <span class="font-semibold text-slate-700">Rs. {{ number_format($data['billed'], 0) }}</span></span>
                     <span class="{{ $data['outstanding'] > 0 ? 'text-rose-500' : 'text-slate-400' }}">
                         Outstanding: Rs. {{ number_format($data['outstanding'], 0) }}
                     </span>
                 </div>
                 @if($data['discount'] > 0)
-                <div class="text-xs text-amber-600 mb-1.5">
+                <div class="text-sm text-amber-600 mb-1.5">
                     Discount: Rs. {{ number_format($data['discount'], 0) }}
                 </div>
                 @endif
@@ -205,33 +205,33 @@
                 @if($filter || $roomType)
                 <div class="flex items-center gap-1.5 mt-1 flex-wrap">
                     @if($roomType)
-                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-[#A89070]/10 text-[#A89070]">
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-sm font-medium bg-[#A89070]/10 text-[#A89070]">
                         <i class="bi bi-building"></i> {{ $roomType }}
                     </span>
                     @endif
                     @if($filter === 'outstanding')
-                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-rose-50 text-rose-600">
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-sm font-medium bg-rose-50 text-rose-600">
                         <i class="bi bi-hourglass-split"></i> Outstanding
                     </span>
                     @elseif($filter === 'collected')
-                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-green-50 text-green-700">
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-sm font-medium bg-green-50 text-green-700">
                         <i class="bi bi-check-circle"></i> Fully Collected
                     </span>
                     @elseif($filter === 'discounted')
-                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-amber-50 text-amber-600">
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-sm font-medium bg-amber-50 text-amber-600">
                         <i class="bi bi-tag"></i> Discounted
                     </span>
                     @endif
                 </div>
                 @endif
             </div>
-            <span class="text-xs text-slate-400 shrink-0">{{ $bookings->count() }} record{{ $bookings->count() !== 1 ? 's' : '' }}</span>
+            <span class="text-sm text-slate-400 shrink-0">{{ $bookings->count() }} record{{ $bookings->count() !== 1 ? 's' : '' }}</span>
         </div>
 
         <div class="overflow-x-auto">
             <table class="w-full min-w-[620px] text-left border-collapse">
                 <thead>
-                    <tr class="bg-slate-50/50 text-slate-500 text-xs border-b border-slate-100">
+                    <tr class="bg-slate-50/50 text-slate-500 text-sm border-b border-slate-100">
                         <th class="px-5 py-3 font-medium">Guest</th>
                         <th class="px-5 py-3 font-medium">Room Type</th>
                         <th class="px-5 py-3 font-medium">Check In</th>
@@ -247,7 +247,7 @@
                     <tr class="hover:bg-slate-50/30 transition-colors">
                         <td class="px-5 py-3.5">
                             <p class="font-medium text-slate-900">{{ $booking->guest->full_name ?? 'N/A' }}</p>
-                            <p class="text-slate-400 text-xs">{{ $booking->guest->email ?? '' }}</p>
+                            <p class="text-slate-400 text-sm">{{ $booking->guest->email ?? '' }}</p>
                         </td>
                         <td class="px-5 py-3.5 text-slate-600">{{ $booking->roomType->name ?? '—' }}</td>
                         <td class="px-5 py-3.5 text-slate-600">{{ $booking->check_in_date->format('M d, Y') }}</td>
@@ -261,7 +261,7 @@
                                 ];
                                 [$cls, $label] = $statusMap[$booking->status] ?? ['bg-slate-50 text-slate-500 border-slate-200', ucfirst($booking->status)];
                             @endphp
-                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium border {{ $cls }}">{{ $label }}</span>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-sm font-medium border {{ $cls }}">{{ $label }}</span>
                         </td>
                         <td class="px-5 py-3.5 text-right font-semibold text-slate-900">
                             Rs. {{ number_format($booking->total_amount, 0) }}
@@ -278,7 +278,7 @@
                             <span class="font-semibold text-green-700">Rs. {{ number_format($booking->amount_paid, 0) }}</span>
                             <span class="text-slate-400 font-normal">/ {{ number_format($booking->total_amount, 0) }}</span>
                             @else
-                            <span class="text-slate-400 text-xs italic">Not paid</span>
+                            <span class="text-slate-400 text-sm italic">Not paid</span>
                             @endif
                         </td>
                         <td class="px-5 py-3.5 text-right">

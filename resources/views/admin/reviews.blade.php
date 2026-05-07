@@ -37,8 +37,21 @@
                         {{ $review->created_at ? \Carbon\Carbon::parse($review->created_at)->format('M d, Y') : 'N/A' }}
                     </td>
                     <td class="p-4">
-                        <div class="font-bold text-slate-900">{{ $review->name }}</div>
-                        <div class="text-slate-500 text-xs">{{ $review->email }}</div>
+                        <div class="flex items-center gap-3">
+                            @if($review->avatar)
+                            <img src="{{ $review->avatar }}" alt="{{ $review->name }}"
+                                 class="w-8 h-8 rounded-full object-cover border border-slate-100 flex-shrink-0">
+                            @else
+                            <div class="w-8 h-8 rounded-full bg-[#A89070]/20 flex items-center justify-center
+                                        flex-shrink-0 text-[#A89070] text-xs font-bold">
+                                {{ strtoupper(substr($review->name ?? '?', 0, 1)) }}
+                            </div>
+                            @endif
+                            <div>
+                                <div class="font-bold text-slate-900">{{ $review->name }}</div>
+                                <div class="text-slate-500 text-sm">{{ $review->email }}</div>
+                            </div>
+                        </div>
                     </td>
                     <td class="p-4">
                         <div class="flex items-center text-yellow-400 text-sm">
@@ -55,17 +68,17 @@
                         {{ \Illuminate\Support\Str::limit($review->body, 50) }}
                     </td>
                     <td class="p-4">
-                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200 capitalize">
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-sm font-medium bg-slate-100 text-slate-700 border border-slate-200 capitalize">
                             {{ $targetName }}
                         </span>
                     </td>
                     <td class="p-4">
                         @if($review->status === 'approved')
-                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-green-50 text-green-700 border border-green-200">Approved</span>
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-sm font-medium bg-green-50 text-green-700 border border-green-200">Approved</span>
                         @elseif($review->status === 'rejected')
-                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-red-50 text-red-700 border border-red-200">Rejected</span>
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-sm font-medium bg-red-50 text-red-700 border border-red-200">Rejected</span>
                         @else
-                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-yellow-50 text-yellow-700 border border-yellow-200">Pending</span>
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-sm font-medium bg-yellow-50 text-yellow-700 border border-yellow-200">Pending</span>
                         @endif
                     </td>
                     <td class="p-4 text-right">
@@ -105,12 +118,12 @@
         <div class="p-6 space-y-6 max-h-[70vh] overflow-y-auto">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Reviewer</label>
+                    <label class="block text-sm font-bold text-slate-400 uppercase tracking-wider mb-1">Reviewer</label>
                     <p class="font-medium text-slate-900" id="modal-name"></p>
                     <p class="text-slate-600 text-sm" id="modal-email"></p>
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Details</label>
+                    <label class="block text-sm font-bold text-slate-400 uppercase tracking-wider mb-1">Details</label>
                     <p class="font-medium text-primary capitalize" id="modal-type"></p>
                     <div id="modal-rating" class="flex items-center text-yellow-400 text-sm mt-1"></div>
                     <p class="text-slate-600 text-sm mt-1" id="modal-date"></p>
@@ -118,7 +131,7 @@
             </div>
 
             <div class="pt-4 border-t border-slate-100">
-                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Review Content</label>
+                <label class="block text-sm font-bold text-slate-400 uppercase tracking-wider mb-3">Review Content</label>
                 <div class="bg-slate-50 rounded-xl p-4">
                     <p class="text-slate-700 text-sm whitespace-pre-wrap leading-relaxed" id="modal-body"></p>
                 </div>

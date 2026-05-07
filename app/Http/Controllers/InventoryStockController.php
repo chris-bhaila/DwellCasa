@@ -49,7 +49,7 @@ class InventoryStockController extends Controller
         ], 200);
     }
 
-    public function use(UseSupplyRequest $request, int $itemId): JsonResponse
+    public function logUsage(UseSupplyRequest $request, int $itemId): JsonResponse
     {
         $user = auth()->user();
         $locationId = $user->hasRole('super_admin')
@@ -93,6 +93,47 @@ class InventoryStockController extends Controller
             'success' => true,
             'message' => 'Stock logs fetched successfully',
             'data'    => $logs,
+        ], 200);
+    }
+
+    public function adjust(\Illuminate\Http\Request $request, int $itemId): JsonResponse
+    {
+        $request->validate([
+            'original_log_id' => 'required|integer|exists:inventory_logs,id',
+            'adjustment'      => 'required|numeric|not_in:0',
+            'reason'          => 'required|string|max:500',
+        ]);
+
+        try {
+            $stock = $this->repository->adjust(
+                $itemId,
+                $request->integer('original_log_id'),
+                (float) $request->input('adjustment'),
+                auth()->id(),
+                $request->input('reason')
+            );
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+                'errors'  => ['adjustment' => [$e->getMessage()]],
+            ], 422);
+        }
+
+        $user = auth()->user();
+        $locationId = $user->hasRole('super_admin')
+            ? session('selected_location_id')
+            : $user->location_id;
+
+        activity()
+            ->causedBy($user)
+            ->performedOn($stock)
+            ->withProperties(['location_id' => $locationId])
+            ->log("Adjusted supply stock for item ID {$itemId} by {$request->input('adjustment')} units");
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Stock adjusted successfully',
+            'data'    => $stock,
         ], 200);
     }
 }

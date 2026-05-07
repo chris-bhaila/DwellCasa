@@ -40,19 +40,19 @@
                     <td class="p-4">
                         @if($log->causer)
                         <div class="font-semibold text-slate-900">{{ $log->causer->name }}</div>
-                        <div class="text-xs text-slate-400">{{ $log->causer->email }}</div>
+                        <div class="text-sm text-slate-400">{{ $log->causer->email }}</div>
                         @else
-                        <span class="text-slate-400 italic text-xs">System</span>
+                        <span class="text-slate-400 italic text-sm">System</span>
                         @endif
                     </td>
                     @if(auth()->user()->hasRole('super_admin'))
                     <td class="p-4">
                         @if($log->location)
-                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-50 text-slate-700 border border-slate-200">
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-sm font-medium bg-slate-50 text-slate-700 border border-slate-200">
                             {{ $log->location->name }}
                         </span>
                         @else
-                        <span class="text-slate-400 italic text-xs">—</span>
+                        <span class="text-slate-400 italic text-sm">—</span>
                         @endif
                     </td>
                     @endif

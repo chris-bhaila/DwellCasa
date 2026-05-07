@@ -43,22 +43,22 @@
                             @endif
                             <div class="min-w-0">
                                 <div class="font-bold text-slate-900 truncate">{{ $location->name }}</div>
-                                <div class="text-xs text-slate-500 mt-0.5 truncate">/{{ $location->slug }}</div>
+                                <div class="text-sm text-slate-500 mt-0.5 truncate">/{{ $location->slug }}</div>
                             </div>
                         </div>
                     </td>
                     <td class="p-4">
                         <div class="font-medium text-slate-700 truncate max-w-xs">{{ $location->address ?: 'No address provided' }}</div>
-                        <div class="text-xs text-slate-500 mt-1 flex flex-col gap-0.5">
+                        <div class="text-sm text-slate-500 mt-1 flex flex-col gap-0.5">
                             @if($location->email) <span class="truncate max-w-xs"><i class="bi bi-envelope mr-1"></i>{{ $location->email }}</span> @endif
                             @if($location->phone) <span><i class="bi bi-telephone mr-1"></i>{{ $location->phone }}</span> @endif
                         </div>
                     </td>
                     <td class="p-4">
                         @if($location->is_active)
-                            <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-green-50 text-green-700 border border-green-200">Active</span>
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-sm font-medium bg-green-50 text-green-700 border border-green-200">Active</span>
                         @else
-                            <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-50 text-slate-700 border border-slate-200">Inactive</span>
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-sm font-medium bg-slate-50 text-slate-700 border border-slate-200">Inactive</span>
                         @endif
                     </td>
                     <td class="p-4 text-right">
@@ -121,7 +121,7 @@
                         <img id="image-preview" src="" alt="Preview" class="h-32 rounded-xl object-cover border border-slate-200">
                     </div>
                     <input type="file" name="hero_image" id="hero_image" accept="image/*" class="w-full rounded-xl border-slate-200 px-4 py-2 border focus:ring-primary focus:border-primary transition-colors bg-white">
-                    <p class="text-xs text-slate-500 mt-1">Recommended size: 1920x1080px. Max size: 5MB.</p>
+                    <p class="text-sm text-slate-500 mt-1">Recommended size: 1920x1080px. Max size: 5MB.</p>
                 </div>
 
                 <div>

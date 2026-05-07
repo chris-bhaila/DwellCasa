@@ -18,4 +18,7 @@ interface InventoryStockRepositoryInterface
 
     /** Get log history for a supply item, ordered by created_at descending. */
     public function logs(int $itemId): Collection;
+
+    /** Adjust stock against an original usage log entry within the correction window. */
+    public function adjust(int $itemId, int $originalLogId, float $adjustment, int $performedBy, string $reason): InventoryStock;
 }

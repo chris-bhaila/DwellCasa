@@ -38,6 +38,8 @@ class UpdateWebsiteInfoRequest extends FormRequest
             'homepage_main_image'       => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
             'homepage_end_image'        => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
             'about_image'               => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
+            'map_lat'                   => 'nullable|numeric|between:-90,90',
+            'map_lng'                   => 'nullable|numeric|between:-180,180',
         ];
     }
 }

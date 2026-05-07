@@ -38,6 +38,8 @@ class WebsiteInfo extends Model
         'homepage_end_image',
         'about_image',
         'location_id',
+        'map_lat',
+        'map_lng',
     ];
 
     protected $casts = [

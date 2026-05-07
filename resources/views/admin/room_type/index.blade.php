@@ -17,7 +17,7 @@
     <div class="flex items-center gap-3">
         <a href="{{ route('admin.room_type.create') }}" class="relative inline-flex items-center justify-center bg-primary text-white w-10 h-10 rounded-xl font-medium hover:bg-[#8E795E] transition-all shadow-sm group">
             <i class="bi bi-plus-lg text-lg transition-transform group-hover:rotate-90"></i>
-            <span class="absolute -bottom-8 left-1/2 -translate-x-1/2 w-max px-2 py-1 bg-slate-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">Add Room Type</span>
+            <span class="absolute -bottom-8 left-1/2 -translate-x-1/2 w-max px-2 py-1 bg-slate-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">Add Room Type</span>
         </a>
     </div>
     @endif
@@ -52,10 +52,10 @@
         <div class="block h-48 bg-slate-200 relative overflow-hidden">
             <img src="{{ $roomType->thumbnail ? asset('storage/' . $roomType->thumbnail) : 'https://images.unsplash.com/photo-1505693314120-0d443867891c?auto=format&fit=crop&q=80&w=800' }}" alt="{{ $roomType->name }}" class="w-full h-full object-cover {{ $filter !== 'trashed' ? 'group-hover:scale-105 transition-transform duration-700' : '' }}">
             <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-lg text-sm font-bold text-slate-900 shadow-sm">
-                Rs. {{ number_format($roomType->price_per_night, 0) }}<span class="text-xs text-slate-500 font-normal">/night</span>
+                Rs. {{ number_format($roomType->price_per_night, 0) }}<span class="text-sm text-slate-500 font-normal">/night</span>
             </div>
             @if($filter === 'trashed')
-            <div class="absolute top-4 left-4 bg-red-500/90 backdrop-blur-sm px-2.5 py-1 rounded-lg text-xs font-medium text-white">
+            <div class="absolute top-4 left-4 bg-red-500/90 backdrop-blur-sm px-2.5 py-1 rounded-lg text-sm font-medium text-white">
                 Deleted {{ $roomType->deleted_at?->format('M d, Y') }}
             </div>
             @endif
@@ -85,18 +85,18 @@
                     onclick="restoreRoomType({{ $roomType->id }}, '{{ addslashes($roomType->name) }}')"
                     class="relative inline-flex items-center justify-center w-10 h-10 bg-green-50 hover:bg-green-100 text-green-600 rounded-xl transition-colors group shadow-sm border border-green-200">
                     <i class="bi bi-arrow-counterclockwise text-lg"></i>
-                    <span class="absolute -bottom-8 left-1/2 -translate-x-1/2 w-max px-2 py-1 bg-slate-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 font-normal">Restore</span>
+                    <span class="absolute -bottom-8 left-1/2 -translate-x-1/2 w-max px-2 py-1 bg-slate-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 font-normal">Restore</span>
                 </button>
                 <button
                     onclick="forceDeleteRoomType({{ $roomType->id }}, '{{ addslashes($roomType->name) }}')"
                     class="relative inline-flex items-center justify-center w-10 h-10 bg-red-50 hover:bg-red-100 text-red-500 rounded-xl transition-colors group shadow-sm border border-red-200">
                     <i class="bi bi-trash3 text-lg"></i>
-                    <span class="absolute -bottom-8 left-1/2 -translate-x-1/2 w-max px-2 py-1 bg-slate-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 font-normal">Delete Forever</span>
+                    <span class="absolute -bottom-8 left-1/2 -translate-x-1/2 w-max px-2 py-1 bg-slate-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 font-normal">Delete Forever</span>
                 </button>
                 @else
                 <a href="{{ route('admin.room_type.edit', $roomType->id) }}" class="relative inline-flex items-center justify-center w-10 h-10 bg-primary hover:bg-[#8E795E] text-white rounded-xl transition-colors group shadow-sm">
                     <i class="bi bi-pencil-square text-lg"></i>
-                    <span class="absolute -bottom-8 left-1/2 -translate-x-1/2 w-max px-2 py-1 bg-slate-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 font-normal">Manage Details</span>
+                    <span class="absolute -bottom-8 left-1/2 -translate-x-1/2 w-max px-2 py-1 bg-slate-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 font-normal">Manage Details</span>
                 </a>
                 @endif
             </div>
@@ -132,7 +132,7 @@
     @if($filter !== 'trashed')
     <a href="{{ route('admin.room_type.room.add-room') }}" class="relative inline-flex items-center justify-center bg-white border border-slate-200 text-slate-700 w-10 h-10 rounded-xl font-medium hover:bg-slate-50 transition-all shadow-sm group">
         <i class="bi bi-plus-circle text-lg text-slate-500 group-hover:text-slate-700 transition-colors"></i>
-        <span class="absolute -bottom-8 left-1/2 -translate-x-1/2 w-max px-2 py-1 bg-slate-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">Add Room</span>
+        <span class="absolute -bottom-8 left-1/2 -translate-x-1/2 w-max px-2 py-1 bg-slate-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">Add Room</span>
     </a>
     @endif
 </div>
@@ -160,21 +160,21 @@
                     <td class="p-4 text-slate-700 font-medium">{{ $room->roomType->name ?? 'N/A' }}</td>
                     <td class="p-4 text-slate-700">{{ $room->floor ?? 'N/A' }}</td>
                     @if($filter === 'trashed')
-                    <td class="p-4 text-slate-500 text-xs">
+                    <td class="p-4 text-slate-500 text-sm">
                         {{ $room->deleted_at ? $room->deleted_at->format('M d, Y') : '—' }}
                     </td>
                     @else
                     <td class="p-4">
                         @if($room->status === 'available')
-                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-green-50 text-green-700 border border-green-200">Available</span>
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-sm font-medium bg-green-50 text-green-700 border border-green-200">Available</span>
                         @elseif($room->status === 'occupied')
-                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">Occupied</span>
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-sm font-medium bg-blue-50 text-blue-700 border border-blue-200">Occupied</span>
                         @elseif($room->status === 'maintenance')
-                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-orange-50 text-orange-700 border border-orange-200">Maintenance</span>
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-sm font-medium bg-orange-50 text-orange-700 border border-orange-200">Maintenance</span>
                         @elseif($room->status === 'out_of_service')
-                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-orange-50 text-orange-700 border border-orange-200">Out of Service</span>
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-sm font-medium bg-orange-50 text-orange-700 border border-orange-200">Out of Service</span>
                         @else
-                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-50 text-slate-700 border border-slate-200">{{ ucfirst($room->status) }}</span>
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-sm font-medium bg-slate-50 text-slate-700 border border-slate-200">{{ ucfirst($room->status) }}</span>
                         @endif
                     </td>
                     @endif
@@ -196,7 +196,7 @@
                             @else
                             <a href="{{ route('admin.room_type.room.edit', $room->id) }}" class="relative text-[#A89070] hover:bg-slate-50 hover:text-[#8E795E] p-2 rounded-lg transition-colors font-medium group">
                                 <i class="bi bi-pencil text-lg"></i>
-                                <span class="absolute -bottom-8 right-0 w-max px-2 py-1 bg-slate-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 font-normal shadow-sm">Edit Room</span>
+                                <span class="absolute -bottom-8 right-0 w-max px-2 py-1 bg-slate-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 font-normal shadow-sm">Edit Room</span>
                             </a>
                             @endif
                         </div>

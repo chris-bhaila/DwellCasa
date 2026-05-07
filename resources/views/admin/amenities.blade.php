@@ -171,7 +171,7 @@ $amenities = collect([
                             </button>
                             @endforeach
                         </div>
-                        <p class="text-xs text-slate-500 flex items-center gap-2">Selected: <span id="selected-icon-preview" class="w-8 h-8 flex items-center justify-center bg-slate-100 rounded border border-slate-200 text-slate-400 text-lg">?</span></p>
+                        <p class="text-sm text-slate-500 flex items-center gap-2">Selected: <span id="selected-icon-preview" class="w-8 h-8 flex items-center justify-center bg-slate-100 rounded border border-slate-200 text-slate-400 text-lg">?</span></p>
                     </div>
 
                     <!-- Description -->
@@ -236,13 +236,13 @@ $amenities = collect([
                                 </div>
                             </td>
                             <td class="p-4 text-slate-600 capitalize">
-                                <span class="bg-slate-100 text-slate-600 px-2.5 py-1 rounded-lg text-xs font-medium">{{ $amenity->category ?: 'General' }}</span>
+                                <span class="bg-slate-100 text-slate-600 px-2.5 py-1 rounded-lg text-sm font-medium">{{ $amenity->category ?: 'General' }}</span>
                             </td>
                             <td class="p-4">
                                 @if($amenity->is_active)
-                                <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-green-50 text-green-700 border border-green-200">Active</span>
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-sm font-medium bg-green-50 text-green-700 border border-green-200">Active</span>
                                 @else
-                                <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-50 text-slate-700 border border-slate-200">Inactive</span>
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-sm font-medium bg-slate-50 text-slate-700 border border-slate-200">Inactive</span>
                                 @endif
                             </td>
                             <td class="p-4 text-right">
@@ -256,12 +256,12 @@ $amenities = collect([
                                         data-sort_order="{{ $amenity->sort_order }}"
                                         data-is_active="{{ $amenity->is_active ? 1 : 0 }}">
                                         <i class="bi bi-pencil text-lg"></i>
-                                        <span class="absolute -bottom-8 right-0 w-max px-2 py-1 bg-slate-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 font-normal shadow-sm">Edit</span>
+                                        <span class="absolute -bottom-8 right-0 w-max px-2 py-1 bg-slate-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 font-normal shadow-sm">Edit</span>
                                     </button>
                                     <button type="button" class="delete-amenity-btn relative inline-flex items-center justify-center p-2 text-red-400 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors group"
                                         data-id="{{ $amenity->id }}">
                                         <i class="bi bi-trash text-lg"></i>
-                                        <span class="absolute -bottom-8 right-0 w-max px-2 py-1 bg-slate-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 font-normal shadow-sm">Delete</span>
+                                        <span class="absolute -bottom-8 right-0 w-max px-2 py-1 bg-slate-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 font-normal shadow-sm">Delete</span>
                                     </button>
                                 </div>
                             </td>

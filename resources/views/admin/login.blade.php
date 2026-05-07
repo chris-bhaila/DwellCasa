@@ -21,7 +21,7 @@
         <!-- Logo / Brand -->
         <div class="text-center mb-8">
             <h1 class="text-4xl font-serif font-bold italic text-white tracking-wide">DwellCasa</h1>
-            <p class="text-slate-300 mt-2 font-medium tracking-widest uppercase text-xs">Admin Portal</p>
+            <p class="text-slate-300 mt-2 font-medium tracking-widest uppercase text-sm">Admin Portal</p>
         </div>
 
         <!-- Login Card -->
@@ -64,7 +64,7 @@
             </form>
         </div>
         
-        <p class="text-center text-slate-400 text-xs mt-8 font-medium tracking-wide">
+        <p class="text-center text-slate-400 text-sm mt-8 font-medium tracking-wide">
             &copy; {{ date('Y') }} DwellCasa. All rights reserved.
         </p>
     </div>

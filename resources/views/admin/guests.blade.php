@@ -83,7 +83,7 @@
                             <span class="text-slate-400 text-sm italic">No completed stays</span>
                         @endif
                     </td>
-                    <td class="p-4 text-slate-600 text-xs">
+                    <td class="p-4 text-slate-600 text-sm">
                         @if($lastBooking)
                             {{ \Carbon\Carbon::parse($lastBooking->created_at)->format('M d, Y') }}
                             <div class="text-slate-400 mt-0.5">{{ $lastBooking->booking_ref }}</div>
@@ -159,27 +159,27 @@
         <div class="px-6 py-4 border-b border-slate-100 flex gap-6 flex-shrink-0" id="modal-stats">
             <div class="text-center">
                 <div class="text-2xl font-bold text-slate-900" id="modal-stat-bookings">—</div>
-                <div class="text-xs text-slate-500 mt-0.5">Total Bookings</div>
+                <div class="text-sm text-slate-500 mt-0.5">Total Bookings</div>
             </div>
             <div class="text-center">
                 <div class="text-2xl font-bold text-slate-900" id="modal-stat-nights">—</div>
-                <div class="text-xs text-slate-500 mt-0.5">Nights Stayed</div>
+                <div class="text-sm text-slate-500 mt-0.5">Nights Stayed</div>
             </div>
             <div class="text-center">
                 <div class="text-2xl font-bold text-slate-900" id="modal-stat-spent">—</div>
-                <div class="text-xs text-slate-500 mt-0.5">Total Spent</div>
+                <div class="text-sm text-slate-500 mt-0.5">Total Spent</div>
             </div>
         </div>
 
         <!-- Bookings Table -->
         <div class="overflow-y-auto flex-1">
             <div class="px-6 pt-5 pb-2">
-                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Booking History</h3>
+                <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider">Booking History</h3>
             </div>
             <div id="modal-bookings-wrapper">
                 <table class="w-full text-left border-collapse text-sm">
                     <thead>
-                        <tr class="text-slate-500 text-xs border-b border-slate-100">
+                        <tr class="text-slate-500 text-sm border-b border-slate-100">
                             <th class="px-6 py-3 font-medium">Reference</th>
                             <th class="px-6 py-3 font-medium">Room Type</th>
                             <th class="px-6 py-3 font-medium">Check In</th>
@@ -209,12 +209,12 @@
 const guestData = @json($guestJson);
 
 const statusBadge = {
-    pending:    '<span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-yellow-50 text-yellow-700 border border-yellow-200">Pending</span>',
-    confirmed:  '<span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-green-50 text-green-700 border border-green-200">Confirmed</span>',
-    checked_in: '<span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">Checked In</span>',
-    checked_out:'<span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200">Completed</span>',
-    cancelled:  '<span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-red-50 text-red-700 border border-red-200">Cancelled</span>',
-    no_show:    '<span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-orange-50 text-orange-700 border border-orange-200">No Show</span>',
+    pending:    '<span class="inline-flex items-center px-2 py-0.5 rounded-md text-sm font-medium bg-yellow-50 text-yellow-700 border border-yellow-200">Pending</span>',
+    confirmed:  '<span class="inline-flex items-center px-2 py-0.5 rounded-md text-sm font-medium bg-green-50 text-green-700 border border-green-200">Confirmed</span>',
+    checked_in: '<span class="inline-flex items-center px-2 py-0.5 rounded-md text-sm font-medium bg-blue-50 text-blue-700 border border-blue-200">Checked In</span>',
+    checked_out:'<span class="inline-flex items-center px-2 py-0.5 rounded-md text-sm font-medium bg-slate-100 text-slate-700 border border-slate-200">Completed</span>',
+    cancelled:  '<span class="inline-flex items-center px-2 py-0.5 rounded-md text-sm font-medium bg-red-50 text-red-700 border border-red-200">Cancelled</span>',
+    no_show:    '<span class="inline-flex items-center px-2 py-0.5 rounded-md text-sm font-medium bg-orange-50 text-orange-700 border border-orange-200">No Show</span>',
 };
 
 window.openGuestModal = function(id) {

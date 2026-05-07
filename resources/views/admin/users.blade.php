@@ -8,7 +8,7 @@
 $permissionGroups = [
 'Bookings' => ['view bookings', 'create bookings', 'edit bookings', 'cancel bookings', 'view revenue'],
 'Operations' => ['check-in guests', 'check-out guests', 'manage guests'],
-'Inventory' => ['view inventory', 'edit inventory'],
+'Inventory' => ['view inventory', 'edit inventory', 'manage inventory items', 'manage inventory categories'],
 'Content' => ['manage room types', 'manage rooms', 'manage amenities', 'manage gallery', 'manage website info'],
 'Communication' => ['manage inquiries', 'manage reviews'],
 'System' => ['manage users', 'manage locations', 'manage logs'],
@@ -67,32 +67,32 @@ $superAdminOnlyPerms = ['manage users', 'manage locations', 'manage logs'];
                         <td class="p-4 font-bold text-slate-900">
                             {{ $user->name }}
                             @if(!$user->is_active)
-                            <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-600">Disabled</span>
+                            <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-sm font-medium bg-red-100 text-red-600">Disabled</span>
                             @endif
                         </td>
                         <td class="p-4 text-slate-600">{{ $user->email }}</td>
                         <td class="p-4">
                             @if($user->location)
-                            <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-emerald-100 text-emerald-700">
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-sm font-medium bg-emerald-100 text-emerald-700">
                                 {{ $user->location->name }}
                             </span>
                             @else
-                            <span class="text-slate-400 text-xs italic">No location</span>
+                            <span class="text-slate-400 text-sm italic">No location</span>
                             @endif
                         </td>
                         <td class="p-4">
                             @foreach($user->roles as $role)
                             @if($role->name === 'super_admin')
-                            <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-800 text-white shadow-sm">Super Admin</span>
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-sm font-medium bg-slate-800 text-white shadow-sm">Super Admin</span>
                             @elseif($role->name === 'admin')
-                            <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-[#A89070] text-white shadow-sm">Admin</span>
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-sm font-medium bg-[#A89070] text-white shadow-sm">Admin</span>
                             @else
-                            <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-blue-100 text-blue-700 shadow-sm capitalize">{{ str_replace('_', ' ', $role->name) }}</span>
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-sm font-medium bg-blue-100 text-blue-700 shadow-sm capitalize">{{ str_replace('_', ' ', $role->name) }}</span>
                             @endif
                             @endforeach
                         </td>
                         <td class="p-4 text-slate-600">
-                            <span class="bg-slate-100 border border-slate-200 px-2 py-1 rounded-lg text-xs font-medium text-slate-700">
+                            <span class="bg-slate-100 border border-slate-200 px-2 py-1 rounded-lg text-sm font-medium text-slate-700">
                                 {{ $user->permissions->count() }} Overrides
                             </span>
                         </td>
@@ -133,9 +133,9 @@ $superAdminOnlyPerms = ['manage users', 'manage locations', 'manage logs'];
                     <div class="flex items-center gap-3">
                         <h3 class="text-xl font-bold text-slate-900 capitalize">{{ str_replace('_', ' ', $role->name) }}</h3>
                         @if($role->name === 'super_admin')
-                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-800 text-white shadow-sm">All Access</span>
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-sm font-medium bg-slate-800 text-white shadow-sm">All Access</span>
                         @elseif($role->name === 'admin')
-                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-200 text-slate-600 shadow-sm">Built-in</span>
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-sm font-medium bg-slate-200 text-slate-600 shadow-sm">Built-in</span>
                         @endif
                     </div>
                     <div class="flex items-center gap-3">
@@ -159,7 +159,7 @@ $superAdminOnlyPerms = ['manage users', 'manage locations', 'manage logs'];
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     @foreach($permissionGroups as $group => $perms)
                     <div>
-                        <h4 class="text-xs font-bold text-slate-500 uppercase mb-3">{{ $group }}</h4>
+                        <h4 class="text-sm font-bold text-slate-500 uppercase mb-3">{{ $group }}</h4>
                         <div class="space-y-2">
                             @foreach($perms as $perm)
                             <label class="flex items-center gap-2 text-sm text-slate-700 cursor-pointer group">
@@ -234,18 +234,18 @@ $superAdminOnlyPerms = ['manage users', 'manage locations', 'manage logs'];
                         <div>
                             <label class="block text-sm font-medium text-slate-700 mb-1">Password <span class="text-red-500" id="password-req-star">*</span></label>
                             <input type="password" id="password" name="password" minlength="8" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors">
-                            <p id="password-hint" class="text-xs text-slate-500 mt-1 hidden">Leave blank to keep current password.</p>
+                            <p id="password-hint" class="text-sm text-slate-500 mt-1 hidden">Leave blank to keep current password.</p>
                         </div>
                     </div>
 
                     <div>
                         <h3 class="text-sm font-bold text-slate-800 mb-4 border-b border-slate-100 pb-2">Direct Permission Overrides</h3>
-                        <p class="text-xs text-slate-500 mb-6">Select any additional permissions this user should have on top of their role defaults.</p>
+                        <p class="text-sm text-slate-500 mb-6">Select any additional permissions this user should have on top of their role defaults.</p>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             @foreach($permissionGroups as $group => $perms)
                             <div>
-                                <h4 class="text-xs font-bold text-slate-500 uppercase mb-3">{{ $group }}</h4>
+                                <h4 class="text-sm font-bold text-slate-500 uppercase mb-3">{{ $group }}</h4>
                                 <div class="space-y-2">
                                     @foreach($perms as $perm)
                                     @if(auth()->user()->hasRole('super_admin') || (auth()->user()->hasPermissionTo($perm) && !in_array($perm, $superAdminOnlyPerms)))
@@ -291,12 +291,12 @@ $superAdminOnlyPerms = ['manage users', 'manage locations', 'manage logs'];
 
                     <div>
                         <h3 class="text-sm font-bold text-slate-800 mb-4 border-b border-slate-100 pb-2">Role Permissions</h3>
-                        <p class="text-xs text-slate-500 mb-6">Select the default permissions for this role.</p>
+                        <p class="text-sm text-slate-500 mb-6">Select the default permissions for this role.</p>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             @foreach($permissionGroups as $group => $perms)
                             <div>
-                                <h4 class="text-xs font-bold text-slate-500 uppercase mb-3">{{ $group }}</h4>
+                                <h4 class="text-sm font-bold text-slate-500 uppercase mb-3">{{ $group }}</h4>
                                 <div class="space-y-2">
                                     @foreach($perms as $perm)
                                     @if(auth()->user()->hasRole('super_admin') || (auth()->user()->hasPermissionTo($perm) && !in_array($perm, $superAdminOnlyPerms)))

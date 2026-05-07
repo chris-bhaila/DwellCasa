@@ -60,7 +60,7 @@ $groups = [
     @php $items = collect($group['items'])->filter()->values(); @endphp
     @if($items->isNotEmpty())
     <div>
-        <h2 class="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4">{{ $group['label'] }}</h2>
+        <h2 class="text-sm font-bold uppercase tracking-widest text-slate-400 mb-4">{{ $group['label'] }}</h2>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             @foreach($items as $item)
             <a href="{{ route($item['route']) }}"
@@ -70,7 +70,7 @@ $groups = [
                 </div>
                 <div class="min-w-0 pt-0.5">
                     <p class="font-semibold text-slate-900 text-sm mb-1">{{ $item['label'] }}</p>
-                    <p class="text-xs text-slate-400 leading-relaxed">{{ $item['desc'] }}</p>
+                    <p class="text-sm text-slate-400 leading-relaxed">{{ $item['desc'] }}</p>
                 </div>
                 <i class="bi bi-chevron-right text-slate-300 group-hover:text-primary transition-colors flex-shrink-0 mt-1 ml-auto"></i>
             </a>

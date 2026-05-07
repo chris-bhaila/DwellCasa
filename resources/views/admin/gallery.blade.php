@@ -51,7 +51,7 @@ $categories = ['interior', 'exterior', 'dining', 'amenities', 'other'];
 
         <!-- Overlay -->
         <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none flex flex-col justify-end p-4">
-            <span class="text-xs font-bold text-primary uppercase tracking-wider mb-1">
+            <span class="text-sm font-bold text-primary uppercase tracking-wider mb-1">
                 @if(strtolower($image->category) === 'rooms' && $image->imageable_type === 'App\\Models\\RoomType')
                     {{ collect($roomTypes)->firstWhere('id', $image->imageable_id)?->name ?? 'Room' }}
                 @else
@@ -191,7 +191,7 @@ $categories = ['interior', 'exterior', 'dining', 'amenities', 'other'];
     <!-- Caption -->
     <div class="absolute bottom-0 left-0 w-full p-6 text-center z-10 bg-gradient-to-t from-black/80 to-transparent">
         <h3 id="lightbox-caption" class="text-white text-lg font-serif italic mb-1"></h3>
-        <p id="lightbox-category" class="text-primary text-xs font-bold uppercase tracking-wider"></p>
+        <p id="lightbox-category" class="text-primary text-sm font-bold uppercase tracking-wider"></p>
     </div>
 </div>
 @endsection

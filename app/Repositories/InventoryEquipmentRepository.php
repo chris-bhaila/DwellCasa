@@ -16,6 +16,7 @@ class InventoryEquipmentRepository implements InventoryEquipmentRepositoryInterf
     {
         return $this->model->newQuery()
             ->where('inventory_item_id', $itemId)
+            ->with('currentRoom')
             ->get();
     }
 
@@ -67,7 +68,7 @@ class InventoryEquipmentRepository implements InventoryEquipmentRepositoryInterf
     public function return(int $equipmentId, int $performedBy, ?string $notes = null): InventoryEquipment
     {
         return DB::transaction(function () use ($equipmentId, $performedBy, $notes) {
-            $equipment = $this->model->newQuery()->findOrFail($equipmentId);
+            $equipment = InventoryEquipment::findOrFail($equipmentId);
 
             if ($equipment->status !== 'assigned') {
                 throw new \Exception('Equipment is not currently assigned.');
@@ -142,7 +143,46 @@ class InventoryEquipmentRepository implements InventoryEquipmentRepositoryInterf
     public function logs(int $equipmentId): Collection
     {
         return InventoryLog::where('inventory_equipment_id', $equipmentId)
+            ->with('performedBy', 'room')
             ->orderByDesc('created_at')
             ->get();
+    }
+
+    public function correct(int $equipmentId, int $originalLogId, int $performedBy, ?string $reason = null): InventoryEquipment
+    {
+        return DB::transaction(function () use ($equipmentId, $originalLogId, $performedBy, $reason) {
+            $equipment   = InventoryEquipment::findOrFail($equipmentId);
+            $originalLog = InventoryLog::findOrFail($originalLogId);
+
+            if ($originalLog->inventory_equipment_id !== $equipmentId) {
+                throw new \Exception('Log entry does not belong to this equipment unit.');
+            }
+
+            if ($originalLog->action !== 'assigned') {
+                throw new \Exception('Only assignment logs can be corrected.');
+            }
+
+            if (!$originalLog->isWithinCorrectionWindow()) {
+                throw new \Exception('Correction window has expired for this log entry.');
+            }
+
+            $previousRoomId = $equipment->current_room_id;
+            $equipment->current_room_id = null;
+            $equipment->status = 'available';
+            $equipment->save();
+
+            InventoryLog::create([
+                'location_id'            => $equipment->location_id,
+                'inventory_item_id'      => $equipment->inventory_item_id,
+                'inventory_equipment_id' => $equipmentId,
+                'action'                 => 'corrected',
+                'room_id'                => $previousRoomId,
+                'performed_by'           => $performedBy,
+                'notes'                  => $reason,
+                'corrected_log_id'       => $originalLogId,
+            ]);
+
+            return $equipment;
+        });
     }
 }

@@ -11,18 +11,22 @@
         <h1 class="text-3xl font-serif font-bold text-slate-900 italic lg:hidden">Equipment</h1>
         <p class="text-slate-500 mt-1">Track individual equipment units, assignments, and condition.</p>
     </div>
-    @can('edit inventory')
+    @canany('manage inventory categories', 'manage inventory items')
     <div class="flex items-center gap-3">
-        <button onclick="openCategoryModal()"
-            class="px-4 py-2 rounded-xl text-sm font-medium bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors">
-            <i class="bi bi-tag mr-1.5"></i>Manage Categories
-        </button>
+        @can('manage inventory items')
         <button onclick="openEquipmentTypeModal()"
-            class="px-4 py-2 rounded-xl text-sm font-medium bg-[#A89070] text-white hover:bg-[#967860] transition-colors">
-            <i class="bi bi-plus-lg mr-1.5"></i>Add Equipment Type
+            class="inline-flex items-center gap-2 px-4 py-2 bg-[#A89070] hover:bg-[#8E795E] text-white text-sm font-medium rounded-xl transition-colors">
+            <i class="bi bi-plus-lg"></i> Add Equipment Type
         </button>
+        @endcan
+        @can('manage inventory categories')
+        <button onclick="openCategoryModal()"
+            class="inline-flex items-center gap-2 px-4 py-2 bg-white hover:bg-slate-50 text-slate-700 text-sm font-medium rounded-xl border border-slate-200 transition-colors">
+            <i class="bi bi-tags"></i> Manage Categories
+        </button>
+        @endcan
     </div>
-    @endcan
+    @endcanany
 </div>
 
 <!-- Table -->
@@ -33,7 +37,7 @@
     <div id="table-content" class="hidden overflow-x-auto">
         <table class="w-full min-w-[800px] text-left border-collapse">
             <thead>
-                <tr class="bg-slate-50/50 text-slate-500 text-xs border-b border-slate-100">
+                <tr class="bg-slate-50/50 text-slate-500 text-sm border-b border-slate-100">
                     <th class="px-5 py-3 font-medium w-8"></th>
                     <th class="px-5 py-3 font-medium">Name</th>
                     <th class="px-5 py-3 font-medium">Category</th>
@@ -260,7 +264,7 @@
         </div>
         <div class="flex flex-col sm:flex-row flex-1 overflow-hidden">
             <div class="flex-1 overflow-y-auto border-b sm:border-b-0 sm:border-r border-slate-100 p-5">
-                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Existing Categories</h3>
+                <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-3">Existing Categories</h3>
                 <div id="category-list" class="space-y-2">
                     <div class="flex items-center justify-center py-8">
                         <div class="w-5 h-5 border-2 border-[#A89070] border-t-transparent rounded-full animate-spin"></div>
@@ -268,7 +272,7 @@
                 </div>
             </div>
             <div class="w-full sm:w-64 flex-shrink-0 p-5">
-                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Add Category</h3>
+                <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-3">Add Category</h3>
                 <div class="space-y-3">
                     <input type="text" id="new-category-name" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#A89070]/40 focus:border-[#A89070]" placeholder="Category name">
                     <button onclick="addCategory()" class="w-full px-4 py-2 rounded-xl text-sm font-medium bg-[#A89070] text-white hover:bg-[#967860] transition-colors">
@@ -283,40 +287,119 @@
     </div>
 </div>
 
-<!-- Unit Log History Slide-Over -->
-<div id="unit-history-panel" class="fixed inset-0 z-[90] hidden">
-    <div class="absolute inset-0 bg-slate-900/30 backdrop-blur-sm" onclick="closeUnitHistoryPanel()"></div>
-    <div class="absolute inset-y-0 right-0 w-full max-w-lg bg-white shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300" id="unit-history-drawer">
-        <div class="p-5 border-b border-slate-100 flex justify-between items-start bg-slate-50/50 flex-shrink-0">
-            <div>
-                <h2 class="text-lg font-serif font-bold text-slate-900 italic">Unit History</h2>
-                <p class="text-sm text-slate-500 mt-0.5" id="unit-history-label"></p>
-            </div>
-            <button onclick="closeUnitHistoryPanel()" class="text-slate-400 hover:text-slate-600 transition-colors">
+<!-- Correct Assignment Modal -->
+<div id="correct-modal" class="fixed inset-0 z-[110] hidden items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm opacity-0 transition-opacity duration-300">
+    <div class="bg-white rounded-3xl shadow-2xl border border-slate-100 w-full max-w-md overflow-hidden transform scale-95 transition-transform duration-300">
+        <div class="p-6 border-b border-slate-100 flex justify-between items-start bg-slate-50/50">
+            <h2 class="text-xl font-serif font-bold text-slate-900 italic">Undo Assignment</h2>
+            <button onclick="closeCorrectModal()" class="text-slate-400 hover:text-slate-600 transition-colors">
                 <i class="bi bi-x-lg text-xl"></i>
             </button>
         </div>
-        <div class="flex-1 overflow-y-auto">
-            <div id="unit-history-loading" class="flex items-center justify-center py-12">
-                <div class="w-6 h-6 border-2 border-[#A89070] border-t-transparent rounded-full animate-spin"></div>
-            </div>
-            <div id="unit-history-content" class="hidden overflow-x-auto">
-                <table class="w-full text-left border-collapse text-sm">
-                    <thead>
-                        <tr class="bg-slate-50/50 text-slate-500 text-xs border-b border-slate-100">
-                            <th class="px-4 py-3 font-medium">Action</th>
-                            <th class="px-4 py-3 font-medium">Room</th>
-                            <th class="px-4 py-3 font-medium">By</th>
-                            <th class="px-4 py-3 font-medium">Condition</th>
-                            <th class="px-4 py-3 font-medium">Notes</th>
-                            <th class="px-4 py-3 font-medium">Date</th>
-                        </tr>
-                    </thead>
-                    <tbody id="unit-history-tbody" class="divide-y divide-slate-100"></tbody>
-                </table>
-                <p id="unit-history-empty" class="hidden text-center text-slate-400 italic py-8 text-sm">No history for this unit.</p>
+        <div class="p-6 space-y-4">
+            <p class="text-sm text-slate-600">This will return the equipment to storage and mark the original assignment as corrected.</p>
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1.5">
+                    Reason <span class="text-slate-400 font-normal">(optional)</span>
+                </label>
+                <textarea id="correct-reason" rows="2"
+                    class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#A89070]/40 focus:border-[#A89070] resize-none"
+                    placeholder="Why is this assignment being undone?"></textarea>
             </div>
         </div>
+        <div class="px-6 pb-6 flex justify-end gap-3">
+            <button onclick="closeCorrectModal()" class="px-5 py-2.5 rounded-xl font-medium text-slate-600 hover:bg-slate-100 transition-colors text-sm">Cancel</button>
+            <button onclick="saveCorrect()" class="px-5 py-2.5 rounded-xl font-medium bg-rose-600 text-white hover:bg-rose-700 transition-colors text-sm">Undo Assignment</button>
+        </div>
+    </div>
+</div>
+
+<!-- Unit Detail Modal -->
+<div id="unit-detail-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm opacity-0 transition-opacity duration-300">
+    <div class="bg-white rounded-3xl shadow-2xl border border-slate-100 w-full max-w-3xl overflow-hidden transform scale-95 transition-transform duration-300 flex flex-col max-h-[92vh]">
+
+        <!-- Header -->
+        <div class="p-6 border-b border-slate-100 flex justify-between items-start bg-slate-50/50 flex-shrink-0">
+            <div>
+                <h2 class="text-xl font-serif font-bold text-slate-900 italic" id="udet-title">Unit Details</h2>
+                <p class="text-slate-500 text-sm mt-0.5" id="udet-serial"></p>
+            </div>
+            <button onclick="closeUnitDetailModal()" class="text-slate-400 hover:text-slate-600 transition-colors mt-1">
+                <i class="bi bi-x-lg text-xl"></i>
+            </button>
+        </div>
+
+        <!-- Stats Row -->
+        <div class="px-6 py-4 border-b border-slate-100 flex gap-8 flex-shrink-0">
+            <div class="text-center">
+                <div class="text-lg font-bold text-slate-900" id="udet-stat-room">—</div>
+                <div class="text-sm text-slate-500 mt-0.5">Current Room</div>
+            </div>
+            <div class="text-center">
+                <div class="mt-0.5" id="udet-stat-condition">—</div>
+                <div class="text-sm text-slate-500 mt-1">Condition</div>
+            </div>
+            <div class="text-center">
+                <div class="mt-0.5" id="udet-stat-status">—</div>
+                <div class="text-sm text-slate-500 mt-1">Status</div>
+            </div>
+        </div>
+
+        <!-- Details Grid -->
+        <div class="px-6 py-4 border-b border-slate-100 flex-shrink-0">
+            <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-3">Details</h3>
+            <div class="grid grid-cols-2 gap-x-8 gap-y-3 text-sm">
+                <div class="flex gap-2">
+                    <span class="text-slate-500 flex-shrink-0">Purchase Date</span>
+                    <span class="text-slate-900 font-medium" id="udet-purchased-at">—</span>
+                </div>
+                <div class="flex gap-2">
+                    <span class="text-slate-500 flex-shrink-0">Purchase Cost</span>
+                    <span class="text-slate-900 font-medium" id="udet-cost">—</span>
+                </div>
+                <div class="flex gap-2">
+                    <span class="text-slate-500 flex-shrink-0">Location</span>
+                    <span class="text-slate-900 font-medium" id="udet-location">—</span>
+                </div>
+                <div class="flex gap-2">
+                    <span class="text-slate-500 flex-shrink-0">Notes</span>
+                    <span class="text-slate-900 font-medium" id="udet-notes">—</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Log History -->
+        <div class="flex-1 overflow-y-auto">
+            <div class="px-6 pt-5 pb-2 flex-shrink-0">
+                <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider">Log History</h3>
+            </div>
+            <div id="udet-log-loading" class="flex items-center justify-center py-10">
+                <div class="w-6 h-6 border-2 border-[#A89070] border-t-transparent rounded-full animate-spin"></div>
+            </div>
+            <div id="udet-log-content" class="hidden overflow-x-auto">
+                <table class="w-full text-left border-collapse text-sm">
+                    <thead>
+                        <tr class="bg-slate-50/50 text-slate-500 text-sm border-b border-slate-100">
+                            <th class="px-6 py-3 font-medium">Action</th>
+                            <th class="px-6 py-3 font-medium">Room</th>
+                            <th class="px-6 py-3 font-medium">By</th>
+                            <th class="px-6 py-3 font-medium">Condition Change</th>
+                            <th class="px-6 py-3 font-medium">Notes</th>
+                            <th class="px-6 py-3 font-medium">Date</th>
+                            <th class="px-6 py-3 font-medium"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="udet-log-tbody" class="divide-y divide-slate-100"></tbody>
+                </table>
+                <p id="udet-log-empty" class="hidden text-center text-slate-400 italic py-8 text-sm">No log history for this unit.</p>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="p-6 border-t border-slate-100 flex justify-end bg-slate-50/50 flex-shrink-0">
+            <button onclick="closeUnitDetailModal()" class="px-6 py-2.5 rounded-xl font-medium text-slate-600 hover:bg-slate-200 transition-colors">Close</button>
+        </div>
+
     </div>
 </div>
 
@@ -325,11 +408,53 @@
 @push('scripts')
 <script>
 const canEditInventory = @json(auth()->user()->can('edit inventory'));
+const canManageItems = @json(auth()->user()->can('manage inventory items'));
+const canManageCategories = @json(auth()->user()->can('manage inventory categories'));
+
+const staffWindowMinutes      = 30;
+const adminWindowMinutes      = 1440;
+const userRoles               = @json(auth()->user()->getRoleNames());
+const isAdminOrSuper          = userRoles.includes('admin') || userRoles.includes('super_admin');
+const correctionWindowMinutes = isAdminOrSuper ? adminWindowMinutes : staffWindowMinutes;
+
+function isWithinWindow(createdAt) {
+    const created = new Date(createdAt);
+    const now     = new Date();
+    const diffMinutes = (now - created) / 1000 / 60;
+    return diffMinutes <= correctionWindowMinutes;
+}
+
+function timeAgo(date) {
+    const seconds = Math.floor((new Date() - date) / 1000);
+    if (seconds < 60) return 'Just now';
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) return `${minutes}m ago`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours}h ago`;
+    const days = Math.floor(hours / 24);
+    return `${days}d ago`;
+}
+
+function formatLogDate(dateStr) {
+    const d = new Date(dateStr);
+    const relative = timeAgo(d);
+    const full = d.toLocaleDateString('en-GB', {
+        day: '2-digit', month: 'short', year: 'numeric'
+    }) + ', ' + d.toLocaleTimeString('en-GB', {
+        hour: '2-digit', minute: '2-digit', second: '2-digit'
+    });
+    return `<span title="${full}" class="cursor-help border-b border-dashed border-slate-300">${relative}</span>`;
+}
+
 const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
 
 let currentPage = 1;
 let lastMeta = {};
 let expandedItems = new Set();
+let cachedItems = [];
+let currentDetailUnitId  = null;
+let currentCorrectUnitId = null;
+let currentCorrectLogId  = null;
 
 // ── Helpers ────────────────────────────────────────────────────────
 
@@ -356,27 +481,27 @@ function escHtml(str) {
 }
 
 const conditionBadge = {
-    new:         '<span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-green-50 text-green-700 border border-green-200">New</span>',
-    good:        '<span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-green-50 text-green-700 border border-green-200">Good</span>',
-    fair:        '<span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200">Fair</span>',
-    damaged:     '<span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-rose-50 text-rose-700 border border-rose-200">Damaged</span>',
-    under_repair:'<span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-rose-50 text-rose-700 border border-rose-200">Under Repair</span>',
+    new:         '<span class="inline-flex items-center px-2 py-0.5 rounded-md text-sm font-medium bg-green-50 text-green-700 border border-green-200">New</span>',
+    good:        '<span class="inline-flex items-center px-2 py-0.5 rounded-md text-sm font-medium bg-green-50 text-green-700 border border-green-200">Good</span>',
+    fair:        '<span class="inline-flex items-center px-2 py-0.5 rounded-md text-sm font-medium bg-amber-50 text-amber-700 border border-amber-200">Fair</span>',
+    damaged:     '<span class="inline-flex items-center px-2 py-0.5 rounded-md text-sm font-medium bg-rose-50 text-rose-700 border border-rose-200">Damaged</span>',
+    under_repair:'<span class="inline-flex items-center px-2 py-0.5 rounded-md text-sm font-medium bg-rose-50 text-rose-700 border border-rose-200">Under Repair</span>',
 };
 
 const statusBadge = {
-    available:   '<span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-green-50 text-green-700 border border-green-200">Available</span>',
-    assigned:    '<span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">Assigned</span>',
-    maintenance: '<span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200">Maintenance</span>',
-    retired:     '<span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-slate-100 text-slate-600 border border-slate-200">Retired</span>',
+    available:   '<span class="inline-flex items-center px-2 py-0.5 rounded-md text-sm font-medium bg-green-50 text-green-700 border border-green-200">Available</span>',
+    assigned:    '<span class="inline-flex items-center px-2 py-0.5 rounded-md text-sm font-medium bg-blue-50 text-blue-700 border border-blue-200">Assigned</span>',
+    maintenance: '<span class="inline-flex items-center px-2 py-0.5 rounded-md text-sm font-medium bg-amber-50 text-amber-700 border border-amber-200">Maintenance</span>',
+    retired:     '<span class="inline-flex items-center px-2 py-0.5 rounded-md text-sm font-medium bg-slate-100 text-slate-600 border border-slate-200">Retired</span>',
 };
 
 const actionBadge = {
-    restocked:         '<span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-green-50 text-green-700 border border-green-200">Restocked</span>',
-    used:              '<span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">Used</span>',
-    assigned:          '<span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-teal-50 text-teal-700 border border-teal-200">Assigned</span>',
-    returned:          '<span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-slate-100 text-slate-600 border border-slate-200">Returned</span>',
-    condition_changed: '<span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200">Condition Changed</span>',
-    written_off:       '<span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-rose-50 text-rose-700 border border-rose-200">Written Off</span>',
+    restocked:         '<span class="inline-flex items-center px-2 py-0.5 rounded-md text-sm font-medium bg-green-50 text-green-700 border border-green-200">Restocked</span>',
+    used:              '<span class="inline-flex items-center px-2 py-0.5 rounded-md text-sm font-medium bg-blue-50 text-blue-700 border border-blue-200">Used</span>',
+    assigned:          '<span class="inline-flex items-center px-2 py-0.5 rounded-md text-sm font-medium bg-teal-50 text-teal-700 border border-teal-200">Assigned</span>',
+    returned:          '<span class="inline-flex items-center px-2 py-0.5 rounded-md text-sm font-medium bg-slate-100 text-slate-600 border border-slate-200">Returned</span>',
+    condition_changed: '<span class="inline-flex items-center px-2 py-0.5 rounded-md text-sm font-medium bg-amber-50 text-amber-700 border border-amber-200">Condition Changed</span>',
+    written_off:       '<span class="inline-flex items-center px-2 py-0.5 rounded-md text-sm font-medium bg-rose-50 text-rose-700 border border-rose-200">Written Off</span>',
 };
 
 // ── Table ──────────────────────────────────────────────────────────
@@ -397,8 +522,10 @@ async function loadEquipment(page = 1) {
                 .catch(() => ({ ...item, units: [] }))
         );
         const enriched = await Promise.all(promises);
+        cachedItems = enriched;
 
         renderTable(enriched);
+        expandedItems.forEach(id => injectSubRows(id));
 
         if (lastMeta.last_page > 1) {
             document.getElementById('pagination').classList.remove('hidden');
@@ -427,17 +554,16 @@ function renderTable(items) {
         const available= units.filter(u => u.status === 'available').length;
         const assigned = units.filter(u => u.status === 'assigned').length;
         const damaged  = units.filter(u => ['damaged','under_repair'].includes(u.condition)).length;
-        const isOpen   = expandedItems.has(item.id);
 
-        const addUnitBtn = canEditInventory
+        const addUnitBtn = canManageItems
             ? `<button onclick="event.stopPropagation(); openUnitModal(${item.id}, '${escHtml(item.name)}')"
                 class="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-[#A89070] rounded-md hover:bg-slate-100 transition-colors" title="Add unit">
-                <i class="bi bi-plus"></i></button>`
+                <i class="bi bi-plus-circle"></i></button>`
             : '';
 
-        const parentRow = `<tr class="hover:bg-slate-50/30 transition-colors cursor-pointer select-none" onclick="toggleItem(${item.id})">
+        return `<tr id="parent-row-${item.id}" class="hover:bg-slate-50/30 transition-colors cursor-pointer select-none" onclick="toggleItem(${item.id})">
             <td class="px-5 py-3.5">
-                <i class="bi bi-chevron-${isOpen ? 'down' : 'right'} text-slate-400 text-xs transition-transform" id="chevron-${item.id}"></i>
+                <i class="bi bi-chevron-right text-slate-400 text-sm transition-transform" id="chevron-${item.id}"></i>
             </td>
             <td class="px-5 py-3.5">
                 <p class="font-medium text-slate-900">${escHtml(item.name)}</p>
@@ -451,43 +577,67 @@ function renderTable(items) {
                 <div class="flex items-center justify-end gap-1">${addUnitBtn}</div>
             </td>
         </tr>`;
-
-        const subRows = isOpen ? units.map(unit => {
-            const assignBtn = unit.status === 'available'
-                ? `<button onclick="openAssignModal(${unit.id})" class="w-7 h-7 flex items-center justify-center text-teal-500 hover:text-teal-700 rounded-md hover:bg-teal-50 transition-colors" title="Assign"><i class="bi bi-box-arrow-in-right text-xs"></i></button>`
-                : '';
-            const returnBtn = unit.status === 'assigned'
-                ? `<button onclick="openReturnModal(${unit.id})" class="w-7 h-7 flex items-center justify-center text-slate-500 hover:text-slate-700 rounded-md hover:bg-slate-100 transition-colors" title="Return"><i class="bi bi-box-arrow-left text-xs"></i></button>`
-                : '';
-            const condBtn = `<button onclick="openConditionModal(${unit.id}, '${escHtml(unit.condition)}')" class="w-7 h-7 flex items-center justify-center text-amber-500 hover:text-amber-700 rounded-md hover:bg-amber-50 transition-colors" title="Update condition"><i class="bi bi-tools text-xs"></i></button>`;
-            const writeOffBtn = (canEditInventory && unit.status !== 'retired')
-                ? `<button onclick="writeOffUnit(${unit.id})" class="w-7 h-7 flex items-center justify-center text-rose-400 hover:text-rose-600 rounded-md hover:bg-rose-50 transition-colors" title="Write off"><i class="bi bi-x-octagon text-xs"></i></button>`
-                : '';
-            const historyBtn = `<button onclick="openUnitHistoryPanel(${unit.id}, '${escHtml(item.name)} #${unit.id}')" class="w-7 h-7 flex items-center justify-center text-slate-400 hover:text-[#A89070] rounded-md hover:bg-slate-100 transition-colors" title="History"><i class="bi bi-clock-history text-xs"></i></button>`;
-
-            return `<tr class="bg-slate-50/40 hover:bg-slate-50 transition-colors border-l-2 border-[#A89070]/30">
-                <td class="px-5 py-2.5"></td>
-                <td class="px-5 py-2.5 text-slate-500 text-xs">${unit.serial_number ? escHtml(unit.serial_number) : '<span class="italic">No serial</span>'}</td>
-                <td class="px-5 py-2.5 text-slate-600 text-sm">${unit.current_room ? `Room ${escHtml(unit.current_room.room_number)}` : 'Storage'}</td>
-                <td class="px-5 py-2.5">${conditionBadge[unit.condition] ?? escHtml(unit.condition)}</td>
-                <td class="px-5 py-2.5">${statusBadge[unit.status] ?? escHtml(unit.status)}</td>
-                <td class="px-5 py-2.5 text-slate-500 text-xs">${unit.purchased_at ? new Date(unit.purchased_at).toLocaleDateString('en-IN', {day:'2-digit',month:'short',year:'numeric'}) : '—'}</td>
-                <td class="px-5 py-2.5" colspan="2">
-                    <div class="flex items-center justify-end gap-1">
-                        ${assignBtn}${returnBtn}${condBtn}${writeOffBtn}${historyBtn}
-                    </div>
-                </td>
-            </tr>`;
-        }).join('') : '';
-
-        return parentRow + subRows;
     }).join('');
 }
 
+function buildSubRows(item) {
+    return (item.units ?? []).map(unit => {
+        const assignBtn = (canEditInventory && unit.status === 'available')
+            ? `<button onclick="openAssignModal(${unit.id})" class="w-7 h-7 flex items-center justify-center text-teal-500 hover:text-teal-700 rounded-md hover:bg-teal-50 transition-colors" title="Assign"><i class="bi bi-box-arrow-in-right text-sm"></i></button>`
+            : '';
+        const returnBtn = (canEditInventory && unit.status === 'assigned')
+            ? `<button onclick="openReturnModal(${unit.id})" class="w-7 h-7 flex items-center justify-center text-slate-500 hover:text-slate-700 rounded-md hover:bg-slate-100 transition-colors" title="Return"><i class="bi bi-box-arrow-left text-sm"></i></button>`
+            : '';
+        const condBtn = canEditInventory
+            ? `<button onclick="openConditionModal(${unit.id}, '${escHtml(unit.condition)}')" class="w-7 h-7 flex items-center justify-center text-amber-500 hover:text-amber-700 rounded-md hover:bg-amber-50 transition-colors" title="Update condition"><i class="bi bi-tools text-sm"></i></button>`
+            : '';
+        const writeOffBtn = (canEditInventory && unit.status !== 'retired')
+            ? `<button onclick="writeOffUnit(${unit.id})" class="w-7 h-7 flex items-center justify-center text-rose-400 hover:text-rose-600 rounded-md hover:bg-rose-50 transition-colors" title="Write off"><i class="bi bi-x-octagon text-sm"></i></button>`
+            : '';
+        const detailBtn  = `<button onclick="openUnitDetailModal(${unit.id})" class="w-8 h-8 inline-flex items-center justify-center text-slate-400 hover:text-[#A89070] transition-colors rounded-md hover:bg-slate-100" title="View details"><i class="bi bi-eye"></i></button>`;
+
+        return `<tr data-parent="${item.id}" class="bg-slate-50/40 hover:bg-slate-50 transition-colors border-l-2 border-[#A89070]/30">
+            <td class="px-5 py-2.5"></td>
+            <td class="px-5 py-2.5 text-slate-500 text-sm">${unit.serial_number ? escHtml(unit.serial_number) : '<span class="italic">No serial</span>'}</td>
+            <td class="px-5 py-2.5 text-slate-600 text-sm">${unit.current_room ? `Room ${escHtml(unit.current_room.room_number)}` : 'Storage'}</td>
+            <td class="px-5 py-2.5">${conditionBadge[unit.condition] ?? escHtml(unit.condition)}</td>
+            <td class="px-5 py-2.5">${statusBadge[unit.status] ?? escHtml(unit.status)}</td>
+            <td class="px-5 py-2.5 text-slate-500 text-sm">${unit.purchased_at ? new Date(unit.purchased_at).toLocaleDateString('en-IN', {day:'2-digit',month:'short',year:'numeric'}) : '—'}</td>
+            <td class="px-5 py-2.5" colspan="2">
+                <div class="flex items-center justify-end gap-1">
+                    ${assignBtn}${returnBtn}${condBtn}${writeOffBtn}${detailBtn}
+                </div>
+            </td>
+        </tr>`;
+    }).join('');
+}
+
+function injectSubRows(id) {
+    const item = cachedItems.find(i => i.id === id);
+    if (!item) return;
+    const parentRow = document.getElementById(`parent-row-${id}`);
+    if (!parentRow) return;
+    const chevron = document.getElementById(`chevron-${id}`);
+    if (chevron) {
+        chevron.classList.remove('bi-chevron-right');
+        chevron.classList.add('bi-chevron-down');
+    }
+    parentRow.insertAdjacentHTML('afterend', buildSubRows(item));
+}
+
 window.toggleItem = function(id) {
-    if (expandedItems.has(id)) expandedItems.delete(id);
-    else expandedItems.add(id);
-    loadEquipment(currentPage);
+    if (expandedItems.has(id)) {
+        expandedItems.delete(id);
+        document.querySelectorAll(`tr[data-parent="${id}"]`).forEach(r => r.remove());
+        const chevron = document.getElementById(`chevron-${id}`);
+        if (chevron) {
+            chevron.classList.remove('bi-chevron-down');
+            chevron.classList.add('bi-chevron-right');
+        }
+    } else {
+        expandedItems.add(id);
+        injectSubRows(id);
+    }
 };
 
 function changePage(dir) {
@@ -688,7 +838,7 @@ async function loadCategories() {
                 <span class="text-sm font-medium text-slate-700">${escHtml(c.name)}</span>
                 <button onclick="deleteCategory(${c.id}, '${escHtml(c.name)}')"
                     class="w-7 h-7 flex items-center justify-center text-slate-400 hover:text-rose-500 rounded-md hover:bg-rose-50 transition-colors">
-                    <i class="bi bi-trash3 text-xs"></i>
+                    <i class="bi bi-trash3 text-sm"></i>
                 </button>
             </div>`).join('');
     } catch {
@@ -720,23 +870,42 @@ window.deleteCategory = async function(id, name) {
     }
 };
 
-// ── Unit History Panel ─────────────────────────────────────────────
+// ── Unit Detail Modal ──────────────────────────────────────────────
 
-window.openUnitHistoryPanel = async function(id, label) {
-    document.getElementById('unit-history-label').textContent = label;
-    document.getElementById('unit-history-loading').classList.remove('hidden');
-    document.getElementById('unit-history-content').classList.add('hidden');
+window.openUnitDetailModal = async function(id) {
+    let foundUnit = null, foundItem = null;
+    for (const item of cachedItems) {
+        const u = (item.units ?? []).find(u => u.id === id);
+        if (u) { foundUnit = u; foundItem = item; break; }
+    }
+    if (!foundUnit) return;
 
-    const panel = document.getElementById('unit-history-panel');
-    const drawer = document.getElementById('unit-history-drawer');
-    panel.classList.remove('hidden');
-    setTimeout(() => drawer.classList.remove('translate-x-full'), 10);
+    document.getElementById('udet-title').textContent = foundItem.name;
+    document.getElementById('udet-serial').textContent = foundUnit.serial_number || 'No serial number';
+    document.getElementById('udet-stat-room').textContent = foundUnit.current_room
+        ? `Room ${foundUnit.current_room.room_number}` : 'Storage';
+    document.getElementById('udet-stat-condition').innerHTML = conditionBadge[foundUnit.condition] ?? escHtml(foundUnit.condition);
+    document.getElementById('udet-stat-status').innerHTML   = statusBadge[foundUnit.status]    ?? escHtml(foundUnit.status);
+
+    document.getElementById('udet-purchased-at').textContent = foundUnit.purchased_at
+        ? new Date(foundUnit.purchased_at).toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric'})
+        : '—';
+    document.getElementById('udet-cost').textContent = foundUnit.purchase_cost
+        ? 'Rs. ' + parseFloat(foundUnit.purchase_cost).toLocaleString('en-IN', {maximumFractionDigits: 2})
+        : '—';
+    document.getElementById('udet-location').textContent = foundItem.location?.name ?? '—';
+    document.getElementById('udet-notes').textContent = foundUnit.notes || '—';
+
+    currentDetailUnitId = id;
+    document.getElementById('udet-log-loading').classList.remove('hidden');
+    document.getElementById('udet-log-content').classList.add('hidden');
+    openModal('unit-detail-modal');
 
     try {
-        const res = await axios.get(`/api/inventory-equipment/${id}/logs`);
+        const res  = await axios.get(`/api/inventory-equipment/${id}/logs`);
         const logs = res.data.data ?? [];
-        const tbody = document.getElementById('unit-history-tbody');
-        const empty = document.getElementById('unit-history-empty');
+        const tbody = document.getElementById('udet-log-tbody');
+        const empty = document.getElementById('udet-log-empty');
 
         if (!logs.length) {
             tbody.innerHTML = '';
@@ -747,32 +916,57 @@ window.openUnitHistoryPanel = async function(id, label) {
                 const condChange = (l.previous_condition && l.new_condition)
                     ? `${escHtml(l.previous_condition)} → ${escHtml(l.new_condition)}`
                     : '—';
-                return `<tr class="hover:bg-slate-50/30">
-                    <td class="px-4 py-3">${actionBadge[l.action] ?? escHtml(l.action)}</td>
-                    <td class="px-4 py-3 text-slate-600">${l.room ? `Room ${escHtml(l.room.room_number)}` : '—'}</td>
-                    <td class="px-4 py-3 text-slate-600">${escHtml(l.performed_by?.name ?? '—')}</td>
-                    <td class="px-4 py-3 text-slate-500 text-xs">${condChange}</td>
-                    <td class="px-4 py-3 text-slate-500 text-xs max-w-[120px] truncate">${escHtml(l.notes ?? '—')}</td>
-                    <td class="px-4 py-3 text-slate-400 text-xs whitespace-nowrap">${l.created_at ? new Date(l.created_at).toLocaleDateString('en-IN', {day:'2-digit',month:'short',year:'numeric'}) : '—'}</td>
+                return `<tr class="${l.action === 'corrected' ? 'text-slate-400' : 'hover:bg-slate-50/30'}">
+                    <td class="px-6 py-3">${actionBadge[l.action] ?? escHtml(l.action)}</td>
+                    <td class="px-6 py-3 text-slate-600">${l.room ? `Room ${escHtml(l.room.room_number)}` : '—'}</td>
+                    <td class="px-6 py-3 text-slate-600">${escHtml(l.performed_by?.name ?? '—')}</td>
+                    <td class="px-6 py-3 text-slate-500 text-sm">${condChange}</td>
+                    <td class="px-6 py-3 text-slate-500 text-sm max-w-[140px] truncate">${escHtml(l.notes ?? '—')}</td>
+                    <td class="px-6 py-3 text-slate-400 text-sm whitespace-nowrap">${l.created_at ? formatLogDate(l.created_at) : '—'}</td>
+                    ${l.action === 'assigned' && isWithinWindow(l.created_at) ? `<td class="px-6 py-3"><button onclick="openCorrectModal(${id}, ${l.id})" class="text-xs px-2 py-1 rounded-lg bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100 transition-colors">Undo</button></td>` : '<td class="px-6 py-3 text-slate-300 text-xs">—</td>'}
                 </tr>`;
             }).join('');
         }
     } catch {
-        adminToast('Failed to load unit history.', 'error');
+        adminToast('Failed to load unit log history.', 'error');
     }
 
-    document.getElementById('unit-history-loading').classList.add('hidden');
-    document.getElementById('unit-history-content').classList.remove('hidden');
+    document.getElementById('udet-log-loading').classList.add('hidden');
+    document.getElementById('udet-log-content').classList.remove('hidden');
 };
 
-window.closeUnitHistoryPanel = function() {
-    document.getElementById('unit-history-drawer').classList.add('translate-x-full');
-    setTimeout(() => document.getElementById('unit-history-panel').classList.add('hidden'), 300);
+window.closeUnitDetailModal = () => closeModal('unit-detail-modal');
+
+// ── Correct Modal ──────────────────────────────────────────────────
+
+window.openCorrectModal = function(unitId, logId) {
+    currentCorrectUnitId = unitId;
+    currentCorrectLogId  = logId;
+    document.getElementById('correct-reason').value = '';
+    openModal('correct-modal');
+};
+
+window.closeCorrectModal = () => closeModal('correct-modal');
+
+window.saveCorrect = async function() {
+    const reason = document.getElementById('correct-reason').value.trim();
+    try {
+        await axios.post(`/api/inventory-equipment/${currentCorrectUnitId}/correct`, {
+            original_log_id: currentCorrectLogId,
+            reason: reason || null,
+        });
+        adminToast('Assignment undone successfully.', 'success');
+        closeCorrectModal();
+        openUnitDetailModal(currentCorrectUnitId);
+        loadEquipment(currentPage);
+    } catch (e) {
+        adminToast(e.response?.data?.message ?? 'Failed to undo assignment.', 'error');
+    }
 };
 
 // ── Init ───────────────────────────────────────────────────────────
 
-['equip-type-modal','unit-modal','assign-modal','return-modal','condition-modal','category-modal'].forEach(id => {
+['equip-type-modal','unit-modal','assign-modal','return-modal','condition-modal','category-modal','unit-detail-modal','correct-modal'].forEach(id => {
     document.getElementById(id).addEventListener('click', function(e) {
         if (e.target === this) closeModal(id);
     });

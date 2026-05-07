@@ -33,4 +33,7 @@ interface InventoryEquipmentRepositoryInterface
 
     /** Get log history for a specific equipment unit, ordered by created_at descending. */
     public function logs(int $equipmentId): Collection;
+
+    /** Correct an assignment log within the correction window, resetting the unit back to available. */
+    public function correct(int $equipmentId, int $originalLogId, int $performedBy, ?string $reason = null): InventoryEquipment;
 }

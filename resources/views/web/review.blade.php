@@ -5,6 +5,20 @@
 @section('content')
 <section class="min-h-screen bg-[#fbfbf9] py-16 px-4">
 
+    @if(session('oauth_error'))
+    <div class="max-w-2xl mx-auto mb-6">
+        <div class="bg-red-50 border border-red-200 rounded-xl px-4 py-3
+                    flex items-center gap-3">
+            <i class="bi bi-exclamation-circle text-red-500"></i>
+            <p class="text-sm text-red-700">{{ session('oauth_error') }}</p>
+            <a href="{{ route('review.form', $token) }}"
+               class="ml-auto text-sm font-medium text-red-700 underline">
+                Try again
+            </a>
+        </div>
+    </div>
+    @endif
+
     <div class="max-w-2xl mx-auto">
 
         {{-- Header --}}
@@ -43,6 +57,16 @@
                     <p class="text-xs font-mono font-bold text-slate-600">{{ $review->booking->booking_ref }}</p>
                 </div>
             </div>
+        </div>
+
+        {{-- Avatar --}}
+        <div class="flex items-center gap-3 mb-8">
+            <img src="{{ asset('storage/' . $googleAvatar) }}"
+                 alt="Your profile"
+                 class="w-10 h-10 rounded-full object-cover border-2 border-slate-100">
+            <p class="text-sm text-slate-500">
+                Reviewing as <span class="font-semibold text-slate-800">{{ $review->name }}</span>
+            </p>
         </div>
 
         {{-- Review Form --}}

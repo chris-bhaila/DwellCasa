@@ -14,6 +14,7 @@ class Review extends Model
     protected $fillable = [
         'name',
         'email',
+        'avatar',
         'booking_id',
         'room_type_id',
         'guest_id',

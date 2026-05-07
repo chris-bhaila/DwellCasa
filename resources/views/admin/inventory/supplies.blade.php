@@ -11,18 +11,22 @@
         <h1 class="text-3xl font-serif font-bold text-slate-900 italic lg:hidden">Supplies</h1>
         <p class="text-slate-500 mt-1">Track supply stock levels, restock, and log usage.</p>
     </div>
-    @can('edit inventory')
+    @canany('manage inventory categories', 'manage inventory items')
     <div class="flex items-center gap-3">
-        <button onclick="openCategoryModal()"
-            class="px-4 py-2 rounded-xl text-sm font-medium bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors">
-            <i class="bi bi-tag mr-1.5"></i>Manage Categories
-        </button>
+        @can('manage inventory items')
         <button onclick="openItemModal()"
-            class="px-4 py-2 rounded-xl text-sm font-medium bg-[#A89070] text-white hover:bg-[#967860] transition-colors">
-            <i class="bi bi-plus-lg mr-1.5"></i>Add Supply Item
+            class="inline-flex items-center gap-2 px-4 py-2 bg-[#A89070] hover:bg-[#8E795E] text-white text-sm font-medium rounded-xl transition-colors">
+            <i class="bi bi-plus-lg"></i> Add Supply
         </button>
+        @endcan
+        @can('manage inventory categories')
+        <button onclick="openCategoryModal()"
+            class="inline-flex items-center gap-2 px-4 py-2 bg-white hover:bg-slate-50 text-slate-700 text-sm font-medium rounded-xl border border-slate-200 transition-colors">
+            <i class="bi bi-tags"></i> Manage Categories
+        </button>
+        @endcan
     </div>
-    @endcan
+    @endcanany
 </div>
 
 <!-- Stats Bar -->
@@ -53,7 +57,7 @@
     <div id="table-content" class="hidden overflow-x-auto">
         <table class="w-full min-w-[700px] text-left border-collapse">
             <thead>
-                <tr class="bg-slate-50/50 text-slate-500 text-xs border-b border-slate-100">
+                <tr class="bg-slate-50/50 text-slate-500 text-sm border-b border-slate-100">
                     <th class="px-5 py-3 font-medium">Name</th>
                     <th class="px-5 py-3 font-medium">Category</th>
                     <th class="px-5 py-3 font-medium">Unit</th>
@@ -147,7 +151,7 @@
                     <input type="number" id="restock-quantity" min="0.01" step="0.01" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#A89070]/40 focus:border-[#A89070]" placeholder="0.00">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1.5">Cost <span class="text-rose-500">*</span></label>
+                    <label class="block text-sm font-medium text-slate-700 mb-1.5">Total Cost <span class="text-rose-500">*</span></label>
                     <input type="number" id="restock-cost" min="0" step="0.01" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#A89070]/40 focus:border-[#A89070]" placeholder="0.00">
                 </div>
             </div>
@@ -215,7 +219,7 @@
         <div class="flex flex-col sm:flex-row flex-1 overflow-hidden">
             <!-- Category List -->
             <div class="flex-1 overflow-y-auto border-b sm:border-b-0 sm:border-r border-slate-100 p-5">
-                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Existing Categories</h3>
+                <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-3">Existing Categories</h3>
                 <div id="category-list" class="space-y-2">
                     <div class="flex items-center justify-center py-8">
                         <div class="w-5 h-5 border-2 border-[#A89070] border-t-transparent rounded-full animate-spin"></div>
@@ -224,7 +228,7 @@
             </div>
             <!-- Add Category Form -->
             <div class="w-full sm:w-64 flex-shrink-0 p-5">
-                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Add Category</h3>
+                <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-3">Add Category</h3>
                 <div class="space-y-3">
                     <input type="text" id="new-category-name" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#A89070]/40 focus:border-[#A89070]" placeholder="Category name">
                     <button onclick="addCategory()" class="w-full px-4 py-2 rounded-xl text-sm font-medium bg-[#A89070] text-white hover:bg-[#967860] transition-colors">
@@ -239,39 +243,102 @@
     </div>
 </div>
 
-<!-- Stock History Slide-Over -->
-<div id="history-panel" class="fixed inset-0 z-[90] hidden">
-    <div class="absolute inset-0 bg-slate-900/30 backdrop-blur-sm" onclick="closeHistoryPanel()"></div>
-    <div class="absolute inset-y-0 right-0 w-full max-w-lg bg-white shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300" id="history-drawer">
-        <div class="p-5 border-b border-slate-100 flex justify-between items-start bg-slate-50/50 flex-shrink-0">
+<!-- Supply Log Modal -->
+<div id="supply-log-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm opacity-0 transition-opacity duration-300">
+    <div class="bg-white rounded-3xl shadow-2xl border border-slate-100 w-full max-w-3xl overflow-hidden transform scale-95 transition-transform duration-300 flex flex-col max-h-[92vh]">
+
+        <!-- Header -->
+        <div class="p-6 border-b border-slate-100 flex justify-between items-start bg-slate-50/50 flex-shrink-0">
             <div>
-                <h2 class="text-lg font-serif font-bold text-slate-900 italic">Stock History</h2>
-                <p class="text-sm text-slate-500 mt-0.5" id="history-item-name"></p>
+                <h2 class="text-xl font-serif font-bold text-slate-900 italic" id="slm-title">— Stock History</h2>
+                <p class="text-slate-500 text-sm mt-0.5" id="slm-subtitle"></p>
             </div>
-            <button onclick="closeHistoryPanel()" class="text-slate-400 hover:text-slate-600 transition-colors">
+            <button onclick="closeSupplyLogModal()" class="text-slate-400 hover:text-slate-600 transition-colors mt-1">
                 <i class="bi bi-x-lg text-xl"></i>
             </button>
         </div>
+
+        <!-- Stats Row -->
+        <div class="px-6 py-4 border-b border-slate-100 flex gap-8 flex-shrink-0">
+            <div class="text-center">
+                <div class="text-lg font-bold text-slate-900" id="slm-stat-qty">—</div>
+                <div class="text-sm text-slate-500 mt-0.5">Current Stock</div>
+            </div>
+            <div class="text-center">
+                <div class="mt-0.5" id="slm-stat-status">—</div>
+                <div class="text-sm text-slate-500 mt-1">Status</div>
+            </div>
+            <div class="text-center">
+                <div class="text-lg font-bold text-slate-900" id="slm-stat-cost">—</div>
+                <div class="text-sm text-slate-500 mt-0.5">Total Cost</div>
+            </div>
+        </div>
+
+        <!-- Log History -->
         <div class="flex-1 overflow-y-auto">
-            <div id="history-loading" class="flex items-center justify-center py-12">
+            <div id="slm-loading" class="flex items-center justify-center py-10">
                 <div class="w-6 h-6 border-2 border-[#A89070] border-t-transparent rounded-full animate-spin"></div>
             </div>
-            <div id="history-content" class="hidden overflow-x-auto">
+            <div id="slm-content" class="hidden overflow-x-auto">
                 <table class="w-full text-left border-collapse text-sm">
                     <thead>
-                        <tr class="bg-slate-50/50 text-slate-500 text-xs border-b border-slate-100">
-                            <th class="px-4 py-3 font-medium">Action</th>
-                            <th class="px-4 py-3 font-medium">Qty</th>
-                            <th class="px-4 py-3 font-medium">Room</th>
-                            <th class="px-4 py-3 font-medium">By</th>
-                            <th class="px-4 py-3 font-medium">Cost</th>
-                            <th class="px-4 py-3 font-medium">Date</th>
+                        <tr class="bg-slate-50/50 text-slate-500 text-sm border-b border-slate-100">
+                            <th class="px-6 py-3 font-medium">Action</th>
+                            <th class="px-6 py-3 font-medium">Qty</th>
+                            <th class="px-6 py-3 font-medium">Room</th>
+                            <th class="px-6 py-3 font-medium">By</th>
+                            <th class="px-6 py-3 font-medium">Cost</th>
+                            <th class="px-6 py-3 font-medium">Notes</th>
+                            <th class="px-6 py-3 font-medium">Date</th>
+                            <th class="px-6 py-3 font-medium"></th>
                         </tr>
                     </thead>
-                    <tbody id="history-tbody" class="divide-y divide-slate-100"></tbody>
+                    <tbody id="slm-tbody" class="divide-y divide-slate-100"></tbody>
                 </table>
-                <p id="history-empty" class="hidden text-center text-slate-400 italic py-8 text-sm">No stock history found.</p>
+                <p id="slm-empty" class="hidden text-center text-slate-400 italic py-8 text-sm">No stock history found.</p>
             </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="p-6 border-t border-slate-100 flex justify-end bg-slate-50/50 flex-shrink-0">
+            <button onclick="closeSupplyLogModal()" class="px-6 py-2.5 rounded-xl font-medium text-slate-600 hover:bg-slate-200 transition-colors">Close</button>
+        </div>
+
+    </div>
+</div>
+
+<!-- Adjust Stock Modal -->
+<div id="adjust-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm opacity-0 transition-opacity duration-300">
+    <div class="bg-white rounded-3xl shadow-2xl border border-slate-100 w-full max-w-md overflow-hidden transform scale-95 transition-transform duration-300">
+        <div class="p-6 border-b border-slate-100 flex justify-between items-start bg-slate-50/50">
+            <h2 class="text-xl font-serif font-bold text-slate-900 italic">Adjust Stock Usage</h2>
+            <button onclick="closeAdjustModal()" class="text-slate-400 hover:text-slate-600 transition-colors">
+                <i class="bi bi-x-lg text-xl"></i>
+            </button>
+        </div>
+        <div class="p-6 space-y-4">
+            <div class="p-3 bg-slate-50 rounded-xl text-sm text-slate-600">
+                Original quantity logged: <span class="font-semibold text-slate-900" id="adjust-original-qty">—</span>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1.5">
+                    Adjustment <span class="text-rose-500">*</span>
+                    <span class="text-slate-400 font-normal">(+ to add back, − to remove more)</span>
+                </label>
+                <input type="number" id="adjust-amount" step="0.01"
+                    class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#A89070]/40 focus:border-[#A89070]"
+                    placeholder="e.g. 2 or -1.5">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1.5">Reason <span class="text-rose-500">*</span></label>
+                <textarea id="adjust-reason" rows="2"
+                    class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#A89070]/40 focus:border-[#A89070] resize-none"
+                    placeholder="Why is this adjustment being made?"></textarea>
+            </div>
+        </div>
+        <div class="px-6 pb-6 flex justify-end gap-3">
+            <button onclick="closeAdjustModal()" class="px-5 py-2.5 rounded-xl font-medium text-slate-600 hover:bg-slate-100 transition-colors text-sm">Cancel</button>
+            <button onclick="saveAdjust()" class="px-5 py-2.5 rounded-xl font-medium bg-amber-600 text-white hover:bg-amber-700 transition-colors text-sm">Save Adjustment</button>
         </div>
     </div>
 </div>
@@ -281,7 +348,44 @@
 @push('scripts')
 <script>
 const canEditInventory = @json(auth()->user()->can('edit inventory'));
+const canManageItems = @json(auth()->user()->can('manage inventory items'));
+const canManageCategories = @json(auth()->user()->can('manage inventory categories'));
 const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+
+const staffWindowMinutes   = 30;
+const adminWindowMinutes   = 1440;
+const userRoles            = @json(auth()->user()->getRoleNames());
+const isAdminOrSuper       = userRoles.includes('admin') || userRoles.includes('super_admin');
+const correctionWindowMinutes = isAdminOrSuper ? adminWindowMinutes : staffWindowMinutes;
+
+function isWithinWindow(createdAt) {
+    const created = new Date(createdAt);
+    const now     = new Date();
+    const diffMinutes = (now - created) / 1000 / 60;
+    return diffMinutes <= correctionWindowMinutes;
+}
+
+function timeAgo(date) {
+    const seconds = Math.floor((new Date() - date) / 1000);
+    if (seconds < 60) return 'Just now';
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) return `${minutes}m ago`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours}h ago`;
+    const days = Math.floor(hours / 24);
+    return `${days}d ago`;
+}
+
+function formatLogDate(dateStr) {
+    const d = new Date(dateStr);
+    const relative = timeAgo(d);
+    const full = d.toLocaleDateString('en-GB', {
+        day: '2-digit', month: 'short', year: 'numeric'
+    }) + ', ' + d.toLocaleTimeString('en-GB', {
+        hour: '2-digit', minute: '2-digit', second: '2-digit'
+    });
+    return `<span title="${full}" class="cursor-help border-b border-dashed border-slate-300">${relative}</span>`;
+}
 
 let currentPage = 1;
 let lastMeta = {};
@@ -307,18 +411,19 @@ function closeModal(id) {
 }
 
 const statusBadge = {
-    available:    '<span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-green-50 text-green-700 border border-green-200">Available</span>',
-    low_stock:    '<span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200">Low Stock</span>',
-    out_of_stock: '<span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-rose-50 text-rose-700 border border-rose-200">Out of Stock</span>',
+    available:    '<span class="inline-flex items-center px-2 py-0.5 rounded-md text-sm font-medium bg-green-50 text-green-700 border border-green-200">Available</span>',
+    low_stock:    '<span class="inline-flex items-center px-2 py-0.5 rounded-md text-sm font-medium bg-amber-50 text-amber-700 border border-amber-200">Low Stock</span>',
+    out_of_stock: '<span class="inline-flex items-center px-2 py-0.5 rounded-md text-sm font-medium bg-rose-50 text-rose-700 border border-rose-200">Out of Stock</span>',
 };
 
 const actionBadge = {
-    restocked:         '<span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-green-50 text-green-700 border border-green-200">Restocked</span>',
-    used:              '<span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">Used</span>',
-    assigned:          '<span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-teal-50 text-teal-700 border border-teal-200">Assigned</span>',
-    returned:          '<span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-slate-100 text-slate-600 border border-slate-200">Returned</span>',
-    condition_changed: '<span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200">Condition Changed</span>',
-    written_off:       '<span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-rose-50 text-rose-700 border border-rose-200">Written Off</span>',
+    restocked:         '<span class="inline-flex items-center px-2 py-0.5 rounded-md text-sm font-medium bg-green-50 text-green-700 border border-green-200">Restocked</span>',
+    used:              '<span class="inline-flex items-center px-2 py-0.5 rounded-md text-sm font-medium bg-blue-50 text-blue-700 border border-blue-200">Used</span>',
+    assigned:          '<span class="inline-flex items-center px-2 py-0.5 rounded-md text-sm font-medium bg-teal-50 text-teal-700 border border-teal-200">Assigned</span>',
+    returned:          '<span class="inline-flex items-center px-2 py-0.5 rounded-md text-sm font-medium bg-slate-100 text-slate-600 border border-slate-200">Returned</span>',
+    condition_changed: '<span class="inline-flex items-center px-2 py-0.5 rounded-md text-sm font-medium bg-amber-50 text-amber-700 border border-amber-200">Condition Changed</span>',
+    written_off:       '<span class="inline-flex items-center px-2 py-0.5 rounded-md text-sm font-medium bg-rose-50 text-rose-700 border border-rose-200">Written Off</span>',
+    adjusted:          '<span class="inline-flex items-center px-2 py-0.5 rounded-md text-sm font-medium bg-amber-50 text-amber-700 border border-amber-200">Adjusted</span>',
 };
 
 // ── Table ──────────────────────────────────────────────────────────
@@ -368,7 +473,7 @@ function renderTable(items) {
         const stock  = item.stock ?? {};
         const qty    = stock.quantity_on_hand != null ? parseFloat(stock.quantity_on_hand).toFixed(2) : '0.00';
         const status = stock.status ?? 'out_of_stock';
-        const editBtn = canEditInventory
+        const editBtn = canManageItems
             ? `<button onclick="openItemModal(${JSON.stringify(item).replace(/"/g, '&quot;')})"
                 class="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-[#A89070] rounded-md hover:bg-slate-100 transition-colors" title="Edit">
                 <i class="bi bi-pencil"></i></button>
@@ -376,24 +481,24 @@ function renderTable(items) {
                 class="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-rose-500 rounded-md hover:bg-rose-50 transition-colors" title="Delete">
                 <i class="bi bi-trash3"></i></button>`
             : '';
-        return `<tr class="hover:bg-slate-50/30 transition-colors cursor-pointer" onclick="openHistoryPanel(${item.id}, '${escHtml(item.name)}')">
+        return `<tr class="hover:bg-slate-50/30 transition-colors cursor-pointer" onclick="openSupplyLogModal(${item.id}, '${escHtml(item.name)}')">
             <td class="px-5 py-3.5">
                 <p class="font-medium text-slate-900">${escHtml(item.name)}</p>
-                ${item.description ? `<p class="text-xs text-slate-400 truncate max-w-[180px]">${escHtml(item.description)}</p>` : ''}
+                ${item.description ? `<p class="text-sm text-slate-400 truncate max-w-[180px]">${escHtml(item.description)}</p>` : ''}
             </td>
             <td class="px-5 py-3.5 text-slate-600">${escHtml(item.category?.name ?? '—')}</td>
             <td class="px-5 py-3.5 text-slate-500">${escHtml(item.unit ?? '—')}</td>
             <td class="px-5 py-3.5 text-slate-600">${item.minimum_stock ?? '0.00'}</td>
-            <td class="px-5 py-3.5 font-medium text-slate-900">${qty} ${item.unit ? `<span class="text-slate-400 text-xs font-normal">${escHtml(item.unit)}</span>` : ''}</td>
+            <td class="px-5 py-3.5 font-medium text-slate-900">${qty} ${item.unit ? `<span class="text-slate-400 text-sm font-normal">${escHtml(item.unit)}</span>` : ''}</td>
             <td class="px-5 py-3.5">${statusBadge[status] ?? status}</td>
             <td class="px-5 py-3.5" onclick="event.stopPropagation()">
                 <div class="flex items-center justify-end gap-1">
-                    <button onclick="openRestockModal(${item.id}, '${escHtml(item.name)}')"
+                    ${canEditInventory ? `<button onclick="openRestockModal(${item.id}, '${escHtml(item.name)}')"
                         class="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-green-600 rounded-md hover:bg-green-50 transition-colors" title="Restock">
                         <i class="bi bi-plus-circle"></i></button>
                     <button onclick="openUseModal(${item.id}, '${escHtml(item.name)}')"
                         class="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-blue-600 rounded-md hover:bg-blue-50 transition-colors" title="Log usage">
-                        <i class="bi bi-dash-circle"></i></button>
+                        <i class="bi bi-dash-circle"></i></button>` : ''}
                     ${editBtn}
                 </div>
             </td>
@@ -515,7 +620,7 @@ window.openUseModal = async function(id, name) {
     document.getElementById('use-room').innerHTML = '<option value="">No specific room</option>';
 
     try {
-        const res = await axios.get('/api/rooms');
+        const res = await axios.get('/api/rooms/for-inventory');
         const rooms = res.data.data ?? [];
         const sel = document.getElementById('use-room');
         rooms.forEach(r => {
@@ -575,7 +680,7 @@ async function loadCategories() {
                 <span class="text-sm font-medium text-slate-700">${escHtml(c.name)}</span>
                 <button onclick="deleteCategory(${c.id}, '${escHtml(c.name)}')"
                     class="w-7 h-7 flex items-center justify-center text-slate-400 hover:text-rose-500 rounded-md hover:bg-rose-50 transition-colors">
-                    <i class="bi bi-trash3 text-xs"></i>
+                    <i class="bi bi-trash3 text-sm"></i>
                 </button>
             </div>`).join('');
     } catch {
@@ -607,56 +712,130 @@ window.deleteCategory = async function(id, name) {
     }
 };
 
-// ── History Panel ──────────────────────────────────────────────────
+// ── Supply Log Modal ──────────────────────────────────────────────
 
-window.openHistoryPanel = async function(id, name) {
-    document.getElementById('history-item-name').textContent = name;
-    document.getElementById('history-loading').classList.remove('hidden');
-    document.getElementById('history-content').classList.add('hidden');
+let currentSupplyLogItemId = null;
 
-    const panel = document.getElementById('history-panel');
-    const drawer = document.getElementById('history-drawer');
-    panel.classList.remove('hidden');
-    setTimeout(() => drawer.classList.remove('translate-x-full'), 10);
+window.openSupplyLogModal = async function(id, name) {
+    currentSupplyLogItemId = id;
+
+    const item   = allItems.find(i => i.id === id);
+    const stock  = item?.stock ?? {};
+    const qty    = stock.quantity_on_hand != null ? parseFloat(stock.quantity_on_hand).toFixed(2) : '0.00';
+    const status = stock.status ?? 'out_of_stock';
+    const unit   = item?.unit ?? '';
+
+    document.getElementById('slm-title').textContent = name + ' — Stock History';
+    document.getElementById('slm-subtitle').innerHTML = escHtml(qty + (unit ? ' ' + unit : '')) + ' &nbsp;·&nbsp; ' + (statusBadge[status] ?? escHtml(status));
+    document.getElementById('slm-stat-qty').textContent = qty + (unit ? ' ' + unit : '');
+    document.getElementById('slm-stat-status').innerHTML = statusBadge[status] ?? escHtml(status);
+    document.getElementById('slm-stat-cost').textContent = '—';
+
+    document.getElementById('slm-loading').classList.remove('hidden');
+    document.getElementById('slm-content').classList.add('hidden');
+    openModal('supply-log-modal');
 
     try {
-        const res = await axios.get(`/api/inventory-items/${id}/stock/logs`);
+        const res  = await axios.get(`/api/inventory-items/${id}/stock/logs`);
         const logs = res.data.data ?? [];
-        const tbody = document.getElementById('history-tbody');
-        const empty = document.getElementById('history-empty');
+
+        const totalCost = logs
+            .filter(l => l.action === 'restocked' && l.cost != null)
+            .reduce((sum, l) => sum + parseFloat(l.cost), 0);
+        document.getElementById('slm-stat-cost').textContent = totalCost > 0
+            ? 'Rs. ' + totalCost.toLocaleString('en-IN', {maximumFractionDigits: 2})
+            : '—';
+
+        const tbody = document.getElementById('slm-tbody');
+        const empty = document.getElementById('slm-empty');
 
         if (!logs.length) {
             tbody.innerHTML = '';
             empty.classList.remove('hidden');
         } else {
             empty.classList.add('hidden');
-            tbody.innerHTML = logs.map(l => `
-                <tr class="hover:bg-slate-50/30">
-                    <td class="px-4 py-3">${actionBadge[l.action] ?? escHtml(l.action)}</td>
-                    <td class="px-4 py-3 text-slate-700">${l.quantity != null ? parseFloat(l.quantity).toFixed(2) : '—'}</td>
-                    <td class="px-4 py-3 text-slate-600">${l.room ? `Room ${escHtml(l.room.room_number)}` : '—'}</td>
-                    <td class="px-4 py-3 text-slate-600">${escHtml(l.performed_by?.name ?? '—')}</td>
-                    <td class="px-4 py-3 text-slate-600">${l.cost != null ? 'Rs. ' + parseFloat(l.cost).toLocaleString('en-IN', {maximumFractionDigits: 2}) : '—'}</td>
-                    <td class="px-4 py-3 text-slate-400 text-xs whitespace-nowrap">${l.created_at ? new Date(l.created_at).toLocaleDateString('en-IN', {day:'2-digit',month:'short',year:'numeric'}) : '—'}</td>
-                </tr>`).join('');
+            tbody.innerHTML = logs.map(l => {
+                let qtyStr = '—';
+                if (l.quantity != null) {
+                    const q = parseFloat(l.quantity);
+                    if (l.action === 'restocked') qtyStr = '+' + q.toFixed(2);
+                    else if (l.action === 'used') qtyStr = '-' + q.toFixed(2);
+                    else if (l.action === 'adjusted') qtyStr = (q >= 0 ? '+' : '') + q.toFixed(2);
+                    else qtyStr = q.toFixed(2);
+                }
+                const notesStr = l.action === 'adjusted' && !l.notes ? 'Corrects a previous entry' : escHtml(l.notes ?? '—');
+                const adjustCell = l.action === 'used' && isWithinWindow(l.created_at)
+                    ? `<button onclick="openAdjustModal(${id}, ${l.id}, ${l.quantity ?? 0})" class="text-xs px-2 py-1 rounded-lg bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100 transition-colors">Adjust</button>`
+                    : '<span class="text-slate-300 text-xs">—</span>';
+                return `<tr class="${l.action === 'adjusted' ? 'text-slate-400' : 'hover:bg-slate-50/30'}">
+                    <td class="px-6 py-3">${actionBadge[l.action] ?? escHtml(l.action)}</td>
+                    <td class="px-6 py-3 text-slate-700">${qtyStr}</td>
+                    <td class="px-6 py-3 text-slate-600">${l.room ? `Room ${escHtml(l.room.room_number)}` : '—'}</td>
+                    <td class="px-6 py-3 text-slate-600">${escHtml(l.performed_by?.name ?? '—')}</td>
+                    <td class="px-6 py-3 text-slate-600">${l.cost != null ? 'Rs. ' + parseFloat(l.cost).toLocaleString('en-IN', {maximumFractionDigits: 2}) : '—'}</td>
+                    <td class="px-6 py-3 text-slate-500 text-sm max-w-[140px] truncate">${notesStr}</td>
+                    <td class="px-6 py-3 text-slate-400 text-sm whitespace-nowrap">${l.created_at ? formatLogDate(l.created_at) : '—'}</td>
+                    <td class="px-6 py-3">${adjustCell}</td>
+                </tr>`;
+            }).join('');
         }
     } catch {
         adminToast('Failed to load stock history.', 'error');
     }
 
-    document.getElementById('history-loading').classList.add('hidden');
-    document.getElementById('history-content').classList.remove('hidden');
+    document.getElementById('slm-loading').classList.add('hidden');
+    document.getElementById('slm-content').classList.remove('hidden');
 };
 
-window.closeHistoryPanel = function() {
-    const drawer = document.getElementById('history-drawer');
-    drawer.classList.add('translate-x-full');
-    setTimeout(() => document.getElementById('history-panel').classList.add('hidden'), 300);
+window.closeSupplyLogModal = () => closeModal('supply-log-modal');
+
+// ── Adjust Modal ───────────────────────────────────────────────────
+
+let currentAdjustItemId = null;
+let currentAdjustLogId  = null;
+
+window.openAdjustModal = function(itemId, logId, quantity) {
+    currentAdjustItemId = itemId;
+    currentAdjustLogId  = logId;
+    document.getElementById('adjust-original-qty').textContent = parseFloat(quantity).toFixed(2);
+    document.getElementById('adjust-amount').value  = '';
+    document.getElementById('adjust-reason').value  = '';
+    openModal('adjust-modal');
+};
+
+window.closeAdjustModal = () => closeModal('adjust-modal');
+
+window.saveAdjust = async function() {
+    const adjustment = parseFloat(document.getElementById('adjust-amount').value);
+    const reason     = document.getElementById('adjust-reason').value.trim();
+
+    if (!adjustment || adjustment === 0) {
+        adminToast('Please enter a non-zero adjustment amount.', 'error');
+        return;
+    }
+    if (!reason) {
+        adminToast('Reason is required.', 'error');
+        return;
+    }
+
+    try {
+        await axios.post(`/api/inventory-items/${currentAdjustItemId}/adjust`, {
+            original_log_id: currentAdjustLogId,
+            adjustment,
+            reason,
+        });
+        adminToast('Stock adjusted successfully.', 'success');
+        closeAdjustModal();
+        const adjItem = allItems.find(i => i.id === currentAdjustItemId);
+        openSupplyLogModal(currentAdjustItemId, adjItem?.name ?? '');
+    } catch (e) {
+        adminToast(e.response?.data?.message ?? 'Failed to adjust stock.', 'error');
+    }
 };
 
 // ── Init ───────────────────────────────────────────────────────────
 
-['item-modal','restock-modal','use-modal','category-modal'].forEach(id => {
+['item-modal','restock-modal','use-modal','category-modal','adjust-modal','supply-log-modal'].forEach(id => {
     document.getElementById(id).addEventListener('click', function(e) {
         if (e.target === this) closeModal(id);
     });

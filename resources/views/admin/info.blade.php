@@ -32,7 +32,7 @@
                 <i class="bi bi-hourglass-split animate-spin"></i>
             </template>
             <span x-text="loading ? 'Importing...' : 'Import Data From'"></span>
-            <i class="bi bi-chevron-down text-xs transition-transform duration-200" :class="open ? 'rotate-180' : ''"></i>
+            <i class="bi bi-chevron-down text-sm transition-transform duration-200" :class="open ? 'rotate-180' : ''"></i>
         </button>
 
         <div
@@ -178,6 +178,22 @@
                         <input type="time" name="check_out" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary">
                     </div>
                 </div>
+                <div class="grid grid-cols-2 gap-5">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">Map Latitude</label>
+                        <input type="number" step="any" name="map_lat" placeholder="e.g. 14.5995"
+                               class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">Map Longitude</label>
+                        <input type="number" step="any" name="map_lng" placeholder="e.g. 120.9842"
+                               class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary">
+                    </div>
+                </div>
+                <p class="text-xs text-slate-400 -mt-2">
+                    Coordinates appear as an interactive map on the contact page.
+                    Find them at <span class="font-mono">maps.google.com</span> → right-click your location.
+                </p>
             </div>
         </div>
 

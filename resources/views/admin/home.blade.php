@@ -19,7 +19,7 @@
             </p>
         </div>
         <button type="button" onclick="switchAndGoToInfo({{ $loc->id }})"
-            class="flex-shrink-0 text-xs font-bold bg-amber-200 hover:bg-amber-300 text-amber-900 px-4 py-2 rounded-lg transition-colors whitespace-nowrap">
+            class="flex-shrink-0 text-sm font-bold bg-amber-200 hover:bg-amber-300 text-amber-900 px-4 py-2 rounded-lg transition-colors whitespace-nowrap">
             Fill Website Info &rarr;
         </button>
     </div>
@@ -44,11 +44,11 @@
             <div class="w-10 h-10 rounded-xl bg-[#A89070]/10 flex items-center justify-center text-[#A89070]">
                 <i class="bi bi-box-arrow-in-right text-lg"></i>
             </div>
-            <span class="text-xs font-medium px-2 py-1 rounded-md bg-slate-100 text-slate-500">Today</span>
+            <span class="text-sm font-medium px-2 py-1 rounded-md bg-slate-100 text-slate-500">Today</span>
         </div>
-        <p class="text-slate-500 text-xs font-medium mb-1">Today's Arrivals</p>
+        <p class="text-slate-500 text-sm font-medium mb-1">Today's Arrivals</p>
         <p class="text-3xl font-bold text-slate-900">{{ $todayArrivals }}</p>
-        <p class="text-xs text-slate-400 mt-1">Confirmed &amp; pending check-ins</p>
+        <p class="text-sm text-slate-400 mt-1">Confirmed &amp; pending check-ins</p>
     </div>
 
     <!-- Guests In-House -->
@@ -57,11 +57,11 @@
             <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-500">
                 <i class="bi bi-people text-lg"></i>
             </div>
-            <span class="text-xs font-medium px-2 py-1 rounded-md bg-blue-50 text-blue-600">Live</span>
+            <span class="text-sm font-medium px-2 py-1 rounded-md bg-blue-50 text-blue-600">Live</span>
         </div>
-        <p class="text-slate-500 text-xs font-medium mb-1">Guests In-House</p>
+        <p class="text-slate-500 text-sm font-medium mb-1">Guests In-House</p>
         <p class="text-3xl font-bold text-slate-900">{{ $inHouseCount }}</p>
-        <p class="text-xs text-slate-400 mt-1">Currently checked in</p>
+        <p class="text-sm text-slate-400 mt-1">Currently checked in</p>
     </div>
 
     <!-- Monthly Revenue -->
@@ -70,11 +70,11 @@
             <div class="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center text-green-600">
                 <i class="bi bi-currency-rupee text-lg"></i>
             </div>
-            <span class="text-xs font-medium px-2 py-1 rounded-md bg-green-50 text-green-600">{{ now()->format('M') }}</span>
+            <span class="text-sm font-medium px-2 py-1 rounded-md bg-green-50 text-green-600">{{ now()->format('M') }}</span>
         </div>
-        <p class="text-slate-500 text-xs font-medium mb-1">Revenue Collected</p>
+        <p class="text-slate-500 text-sm font-medium mb-1">Revenue Collected</p>
         <p class="text-3xl font-bold text-slate-900">Rs. {{ number_format($monthlyRevenue, 0) }}</p>
-        <p class="text-xs text-slate-400 mt-1">From check-ins this month</p>
+        <p class="text-sm text-slate-400 mt-1">From check-ins this month</p>
     </div>
 
     <!-- Unreplied Inquiries -->
@@ -84,14 +84,14 @@
                 <i class="bi bi-chat-left-dots text-lg"></i>
             </div>
             @if($unrepliedInquiries > 0)
-            <span class="text-xs font-bold px-2 py-1 rounded-md bg-rose-50 text-rose-600">Action needed</span>
+            <span class="text-sm font-bold px-2 py-1 rounded-md bg-rose-50 text-rose-600">Action needed</span>
             @else
-            <span class="text-xs font-medium px-2 py-1 rounded-md bg-green-50 text-green-600">All clear</span>
+            <span class="text-sm font-medium px-2 py-1 rounded-md bg-green-50 text-green-600">All clear</span>
             @endif
         </div>
-        <p class="text-slate-500 text-xs font-medium mb-1">Unreplied Inquiries</p>
+        <p class="text-slate-500 text-sm font-medium mb-1">Unreplied Inquiries</p>
         <p class="text-3xl font-bold text-slate-900">{{ $unrepliedInquiries }}</p>
-        <p class="text-xs text-slate-400 mt-1">Waiting for a response</p>
+        <p class="text-sm text-slate-400 mt-1">Waiting for a response</p>
     </div>
 
 </div>
@@ -104,7 +104,7 @@
             <i class="bi bi-box-arrow-right"></i>
         </div>
         <div>
-            <p class="text-xs text-slate-500 font-medium">Today's Departures</p>
+            <p class="text-sm text-slate-500 font-medium">Today's Departures</p>
             <p class="text-xl font-bold text-slate-900">{{ $todayDepartures }}</p>
         </div>
     </div>
@@ -114,7 +114,7 @@
             <i class="bi bi-door-open"></i>
         </div>
         <div>
-            <p class="text-xs text-slate-500 font-medium">Rooms Available</p>
+            <p class="text-sm text-slate-500 font-medium">Rooms Available</p>
             <p class="text-xl font-bold text-slate-900">{{ $availableRooms }} <span class="text-sm font-normal text-slate-400">/ {{ $totalRooms }}</span></p>
         </div>
     </div>
@@ -124,7 +124,7 @@
             <i class="bi bi-star-half"></i>
         </div>
         <div>
-            <p class="text-xs text-slate-500 font-medium">Avg. Review Score</p>
+            <p class="text-sm text-slate-500 font-medium">Avg. Review Score</p>
             <p class="text-xl font-bold text-slate-900">
                 {{ $avgRating ? number_format($avgRating, 1) : '—' }}
                 <span class="text-sm font-normal text-slate-400">/ 5</span>
@@ -137,7 +137,7 @@
             <i class="bi bi-calendar-check"></i>
         </div>
         <div>
-            <p class="text-xs text-slate-500 font-medium">Bookings This Month</p>
+            <p class="text-sm text-slate-500 font-medium">Bookings This Month</p>
             <p class="text-xl font-bold text-slate-900">{{ $monthlyBookings }}</p>
         </div>
     </div>
@@ -156,7 +156,7 @@
         <div class="overflow-x-auto">
             <table class="w-full min-w-[560px] text-left border-collapse">
                 <thead>
-                    <tr class="bg-slate-50/50 text-slate-500 text-xs border-b border-slate-100">
+                    <tr class="bg-slate-50/50 text-slate-500 text-sm border-b border-slate-100">
                         <th class="px-5 py-3 font-medium">Guest</th>
                         <th class="px-5 py-3 font-medium">Room Type</th>
                         <th class="px-5 py-3 font-medium">Check In / Out</th>
@@ -169,24 +169,24 @@
                     <tr class="hover:bg-slate-50/30 transition-colors">
                         <td class="px-5 py-3.5">
                             <p class="font-medium text-slate-900 text-sm">{{ $booking->guest->full_name ?? 'N/A' }}</p>
-                            <p class="text-slate-400 text-xs">{{ $booking->guest->email ?? '' }}</p>
+                            <p class="text-slate-400 text-sm">{{ $booking->guest->email ?? '' }}</p>
                         </td>
                         <td class="px-5 py-3.5 text-slate-600 text-sm">{{ $booking->roomType->name ?? '—' }}</td>
                         <td class="px-5 py-3.5">
                             <p class="text-slate-800 text-sm font-medium">{{ $booking->check_in_date ? $booking->check_in_date->format('M d, Y') : 'N/A' }}</p>
-                            <p class="text-slate-400 text-xs">to {{ $booking->check_out_date ? $booking->check_out_date->format('M d, Y') : 'N/A' }}</p>
+                            <p class="text-slate-400 text-sm">to {{ $booking->check_out_date ? $booking->check_out_date->format('M d, Y') : 'N/A' }}</p>
                         </td>
                         <td class="px-5 py-3.5">
                             @if($booking->status === 'confirmed')
-                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-green-50 text-green-700 border border-green-200">Confirmed</span>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-sm font-medium bg-green-50 text-green-700 border border-green-200">Confirmed</span>
                             @elseif($booking->status === 'pending')
-                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-yellow-50 text-yellow-700 border border-yellow-200">Pending</span>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-sm font-medium bg-yellow-50 text-yellow-700 border border-yellow-200">Pending</span>
                             @elseif($booking->status === 'checked_in')
-                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">Checked In</span>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-sm font-medium bg-blue-50 text-blue-700 border border-blue-200">Checked In</span>
                             @elseif($booking->status === 'checked_out')
-                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-slate-50 text-slate-600 border border-slate-200">Completed</span>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-sm font-medium bg-slate-50 text-slate-600 border border-slate-200">Completed</span>
                             @else
-                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-red-50 text-red-700 border border-red-200">Cancelled</span>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-sm font-medium bg-red-50 text-red-700 border border-red-200">Cancelled</span>
                             @endif
                         </td>
                         <td class="px-5 py-3.5 text-right">
@@ -198,7 +198,7 @@
                             @elseif($booking->total_amount > 0)
                             <p class="font-medium text-slate-900 text-sm">Rs. {{ number_format($booking->total_amount, 0) }}</p>
                             @else
-                            <p class="text-slate-400 text-xs italic">Not set</p>
+                            <p class="text-slate-400 text-sm italic">Not set</p>
                             @endif
                         </td>
                     </tr>
@@ -221,19 +221,19 @@
             <div class="grid grid-cols-2 gap-3">
                 <a href="{{ route('admin.bookings.create') }}" class="flex flex-col items-center justify-center gap-2 p-4 bg-slate-50 rounded-xl hover:bg-[#A89070] hover:text-white transition-colors text-slate-600 text-center">
                     <i class="bi bi-plus-circle text-xl"></i>
-                    <span class="text-xs font-medium leading-tight">New Booking</span>
+                    <span class="text-sm font-medium leading-tight">New Booking</span>
                 </a>
                 <a href="{{ route('admin.bookings') }}" class="flex flex-col items-center justify-center gap-2 p-4 bg-slate-50 rounded-xl hover:bg-[#A89070] hover:text-white transition-colors text-slate-600 text-center">
                     <i class="bi bi-calendar3 text-xl"></i>
-                    <span class="text-xs font-medium leading-tight">All Bookings</span>
+                    <span class="text-sm font-medium leading-tight">All Bookings</span>
                 </a>
                 <a href="{{ route('admin.room_type.index') }}" class="flex flex-col items-center justify-center gap-2 p-4 bg-slate-50 rounded-xl hover:bg-[#A89070] hover:text-white transition-colors text-slate-600 text-center">
                     <i class="bi bi-building text-xl"></i>
-                    <span class="text-xs font-medium leading-tight">Rooms</span>
+                    <span class="text-sm font-medium leading-tight">Rooms</span>
                 </a>
                 <a href="{{ route('admin.settings') }}" class="flex flex-col items-center justify-center gap-2 p-4 bg-slate-50 rounded-xl hover:bg-[#A89070] hover:text-white transition-colors text-slate-600 text-center">
                     <i class="bi bi-gear text-xl"></i>
-                    <span class="text-xs font-medium leading-tight">Settings</span>
+                    <span class="text-sm font-medium leading-tight">Settings</span>
                 </a>
             </div>
         </div>
@@ -299,7 +299,7 @@
                     {{ $inventoryLowStock > 0 ? 'text-amber-700' : 'text-slate-900' }}">
                     {{ $inventoryLowStock }}
                 </p>
-                <p class="text-xs text-slate-500 font-medium">Low Stock Items</p>
+                <p class="text-sm text-slate-500 font-medium">Low Stock Items</p>
             </div>
         </a>
 
@@ -319,7 +319,7 @@
                     {{ $inventoryOutOfStock > 0 ? 'text-rose-700' : 'text-slate-900' }}">
                     {{ $inventoryOutOfStock }}
                 </p>
-                <p class="text-xs text-slate-500 font-medium">Out of Stock</p>
+                <p class="text-sm text-slate-500 font-medium">Out of Stock</p>
             </div>
         </a>
 
@@ -339,7 +339,7 @@
                     {{ $inventoryDamaged > 0 ? 'text-orange-700' : 'text-slate-900' }}">
                     {{ $inventoryDamaged }}
                 </p>
-                <p class="text-xs text-slate-500 font-medium">Damaged / Under Repair</p>
+                <p class="text-sm text-slate-500 font-medium">Damaged / Under Repair</p>
             </div>
         </a>
 
@@ -364,11 +364,11 @@
                 <div class="min-w-0 flex-1">
                     <div class="flex items-center gap-2 mb-0.5 flex-wrap">
                         <span class="font-semibold text-slate-900 text-sm">{{ $inquiry->name }}</span>
-                        <span class="text-xs px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 capitalize">{{ str_replace('_', ' ', $inquiry->inquiry_type) }}</span>
+                        <span class="text-sm px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 capitalize">{{ str_replace('_', ' ', $inquiry->inquiry_type) }}</span>
                     </div>
-                    <p class="text-xs text-slate-500 truncate">{{ $inquiry->message }}</p>
+                    <p class="text-sm text-slate-500 truncate">{{ $inquiry->message }}</p>
                 </div>
-                <span class="text-xs text-slate-400 flex-shrink-0 mt-0.5">{{ $inquiry->created_at->diffForHumans(null, true) }}</span>
+                <span class="text-sm text-slate-400 flex-shrink-0 mt-0.5">{{ $inquiry->created_at->diffForHumans(null, true) }}</span>
             </div>
             @empty
             <div class="px-5 py-8 text-center text-slate-400 text-sm italic">
@@ -410,7 +410,7 @@
             </div>
 
             <div>
-                <div class="flex justify-between text-xs text-slate-500 mb-1.5">
+                <div class="flex justify-between text-sm text-slate-500 mb-1.5">
                     <span>Collection rate</span>
                     <span class="font-semibold text-slate-700">{{ $collectPct }}%</span>
                 </div>
@@ -421,7 +421,7 @@
             </div>
 
             @if($billed == 0)
-            <p class="text-xs text-slate-400 italic text-center pt-2">No bookings with check-ins this month yet.</p>
+            <p class="text-sm text-slate-400 italic text-center pt-2">No bookings with check-ins this month yet.</p>
             @endif
         </div>
     </div>

@@ -34,6 +34,10 @@
         [x-cloak] {
             display: none !important;
         }
+
+        .bi {
+            -webkit-text-stroke: 0.4px currentColor;
+        }
     </style>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 

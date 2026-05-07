@@ -25,10 +25,12 @@ class InventoryLog extends Model
         'previous_condition',
         'new_condition',
         'notes',
+        'corrected_log_id',
     ];
 
     protected $casts = [
-        'action' => 'string',
+        'created_at' => 'datetime',
+        'action' => 'string', // restocked|used|assigned|returned|condition_changed|written_off|adjusted|corrected
         'quantity' => 'decimal:2',
         'cost' => 'decimal:2',
     ];
@@ -60,5 +62,20 @@ class InventoryLog extends Model
     public function performedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'performed_by');
+    }
+
+    public function correctedLog(): BelongsTo
+    {
+        return $this->belongsTo(InventoryLog::class, 'corrected_log_id');
+    }
+
+    public function isWithinCorrectionWindow(): bool
+    {
+        $user = auth()->user();
+        if (!$user) return false;
+
+        $minutes = $user->hasAnyRole(['admin', 'super_admin']) ? 1440 : 30;
+
+        return $this->created_at->diffInMinutes(now()) <= $minutes;
     }
 }

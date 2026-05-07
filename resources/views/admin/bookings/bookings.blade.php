@@ -80,7 +80,7 @@
                             <div class="font-medium text-slate-700">
                                 {{ $booking->guest->full_name ?? 'N/A' }}
                             </div>
-                            <div class="text-slate-500 text-xs">{{ $booking->guest->email ?? '' }}</div>
+                            <div class="text-slate-500 text-sm">{{ $booking->guest->email ?? '' }}</div>
                         </td>
                         <td class="p-4 text-slate-700 font-medium">
                             {{ $booking->roomType->name ?? "Room ID: {$booking->room_type_id}" }}
@@ -95,7 +95,7 @@
                                     {{ $booking->checkIn?->checked_in_at?->format('M d, Y H:i:s') ?? 'N/A' }}
                                 </div>
                                 @if($filter !== 'inhouse')
-                                <div class="text-xs text-slate-500 mt-0.5">
+                                <div class="text-sm text-slate-500 mt-0.5">
                                     @if($filter === 'completed' || $booking->status === 'checked_out')
                                         to {{ $booking->checkOut?->checked_out_at?->format('M d, Y H:i:s') ?? 'N/A' }}
                                     @else
@@ -107,7 +107,7 @@
                                 <div class="font-medium text-slate-900">
                                     {{ $booking->check_in_date ? \Carbon\Carbon::parse($booking->check_in_date)->format('M d, Y') : 'N/A' }}
                                 </div>
-                                <div class="text-xs text-slate-500 mt-0.5">
+                                <div class="text-sm text-slate-500 mt-0.5">
                                     to {{ $booking->check_out_date ? \Carbon\Carbon::parse($booking->check_out_date)->format('M d, Y') : 'N/A' }}
                                 </div>
                             @endif
@@ -126,36 +126,36 @@
                                 <div class="font-medium text-slate-900">Rs. {{ number_format($booking->total_amount, 0) }}</div>
                                 @endif
                             @else
-                            <div class="font-medium text-slate-400 italic text-xs">Not set</div>
+                            <div class="font-medium text-slate-400 italic text-sm">Not set</div>
                             @endif
                             @if($booking->payment_status === 'fully_paid')
-                            <span class="text-xs text-green-600 font-medium flex items-center mt-1"><span class="w-1.5 h-1.5 rounded-full bg-green-500 mr-1.5"></span>Fully Paid{{ ($booking->discount ?? 0) > 0 ? ' + Discount' : '' }}</span>
+                            <span class="text-sm text-green-600 font-medium flex items-center mt-1"><span class="w-1.5 h-1.5 rounded-full bg-green-500 mr-1.5"></span>Fully Paid{{ ($booking->discount ?? 0) > 0 ? ' + Discount' : '' }}</span>
                             @elseif($booking->payment_status === 'deposit_paid')
-                            <span class="text-xs text-blue-600 font-medium flex items-center mt-1"><span class="w-1.5 h-1.5 rounded-full bg-blue-500 mr-1.5"></span>Deposit Paid</span>
+                            <span class="text-sm text-blue-600 font-medium flex items-center mt-1"><span class="w-1.5 h-1.5 rounded-full bg-blue-500 mr-1.5"></span>Deposit Paid</span>
                             @elseif($booking->payment_status === 'partially_paid')
-                            <span class="text-xs text-orange-600 font-medium flex items-center mt-1"><span class="w-1.5 h-1.5 rounded-full bg-orange-500 mr-1.5"></span>Partially Paid</span>
+                            <span class="text-sm text-orange-600 font-medium flex items-center mt-1"><span class="w-1.5 h-1.5 rounded-full bg-orange-500 mr-1.5"></span>Partially Paid</span>
                             @elseif($booking->payment_status === 'refunded')
-                            <span class="text-xs text-slate-500 font-medium flex items-center mt-1"><span class="w-1.5 h-1.5 rounded-full bg-slate-400 mr-1.5"></span>Refunded</span>
+                            <span class="text-sm text-slate-500 font-medium flex items-center mt-1"><span class="w-1.5 h-1.5 rounded-full bg-slate-400 mr-1.5"></span>Refunded</span>
                             @else
-                            <span class="text-xs text-red-600 font-medium flex items-center mt-1"><span class="w-1.5 h-1.5 rounded-full bg-red-500 mr-1.5"></span>Unpaid</span>
+                            <span class="text-sm text-red-600 font-medium flex items-center mt-1"><span class="w-1.5 h-1.5 rounded-full bg-red-500 mr-1.5"></span>Unpaid</span>
                             @endif
                         </td>
                         @if($filter === 'trashed')
-                        <td class="p-4 text-slate-500 text-xs">
+                        <td class="p-4 text-slate-500 text-sm">
                             {{ $booking->deleted_at ? $booking->deleted_at->format('M d, Y') : '—' }}
                         </td>
                         @else
                         <td class="p-4">
                             @if($booking->status === 'confirmed')
-                            <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-green-50 text-green-700 border border-green-200">Confirmed</span>
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-sm font-medium bg-green-50 text-green-700 border border-green-200">Confirmed</span>
                             @elseif($booking->status === 'pending')
-                            <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-yellow-50 text-yellow-700 border border-yellow-200">Pending</span>
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-sm font-medium bg-yellow-50 text-yellow-700 border border-yellow-200">Pending</span>
                             @elseif($booking->status === 'checked_in')
-                            <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">Checked In</span>
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-sm font-medium bg-blue-50 text-blue-700 border border-blue-200">Checked In</span>
                             @elseif($booking->status === 'checked_out')
-                            <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-50 text-slate-700 border border-slate-200">Completed</span>
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-sm font-medium bg-slate-50 text-slate-700 border border-slate-200">Completed</span>
                             @else
-                            <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-red-50 text-red-700 border border-red-200">Cancelled</span>
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-sm font-medium bg-red-50 text-red-700 border border-red-200">Cancelled</span>
                             @endif
                         </td>
                         @endif

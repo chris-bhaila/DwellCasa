@@ -31,17 +31,17 @@
                 <tr class="hover:bg-slate-50/50 transition-colors">
                     <td class="p-4 text-slate-700 whitespace-nowrap">
                         {{ $inquiry->created_at ? \Carbon\Carbon::parse($inquiry->created_at)->format('M d, Y') : 'N/A' }}
-                        <div class="text-xs text-slate-400 mt-0.5">{{ $inquiry->created_at ? \Carbon\Carbon::parse($inquiry->created_at)->format('h:i A') : '' }}</div>
+                        <div class="text-sm text-slate-400 mt-0.5">{{ $inquiry->created_at ? \Carbon\Carbon::parse($inquiry->created_at)->format('h:i A') : '' }}</div>
                     </td>
                     <td class="p-4">
                         <div class="font-bold text-slate-900 mb-0.5">{{ $inquiry->name }}</div>
-                        <div class="text-slate-500 text-xs">{{ $inquiry->email }}</div>
+                        <div class="text-slate-500 text-sm">{{ $inquiry->email }}</div>
                         @if($inquiry->phone)
-                        <div class="text-slate-500 text-xs mt-0.5"><i class="bi bi-telephone text-slate-400 mr-1"></i>{{ $inquiry->phone }}</div>
+                        <div class="text-slate-500 text-sm mt-0.5"><i class="bi bi-telephone text-slate-400 mr-1"></i>{{ $inquiry->phone }}</div>
                         @endif
                     </td>
                     <td class="p-4">
-                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200 capitalize">
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-sm font-medium bg-blue-50 text-blue-700 border border-blue-200 capitalize">
                             {{ str_replace('_', ' ', $inquiry->inquiry_type) }}
                         </span>
                     </td>
@@ -50,9 +50,9 @@
                     </td>
                     <td class="p-4">
                         @if($inquiry->status === 'replied')
-                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-green-50 text-green-700 border border-green-200">Replied</span>
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-sm font-medium bg-green-50 text-green-700 border border-green-200">Replied</span>
                         @else
-                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-yellow-50 text-yellow-700 border border-yellow-200">Unreplied</span>
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-sm font-medium bg-yellow-50 text-yellow-700 border border-yellow-200">Unreplied</span>
                         @endif
                     </td>
                     <td class="p-4 text-right">
@@ -92,20 +92,20 @@
         <div class="p-6 space-y-6 max-h-[70vh] overflow-y-auto">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">From</label>
+                    <label class="block text-sm font-bold text-slate-400 uppercase tracking-wider mb-1">From</label>
                     <p class="font-medium text-slate-900" id="modal-name"></p>
                     <p class="text-slate-600 text-sm" id="modal-email"></p>
                     <p class="text-slate-600 text-sm" id="modal-phone"></p>
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Type & Date</label>
+                    <label class="block text-sm font-bold text-slate-400 uppercase tracking-wider mb-1">Type & Date</label>
                     <p class="font-medium text-primary capitalize" id="modal-type"></p>
                     <p class="text-slate-600 text-sm" id="modal-date"></p>
                 </div>
             </div>
 
             <div class="pt-4 border-t border-slate-100">
-                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Message</label>
+                <label class="block text-sm font-bold text-slate-400 uppercase tracking-wider mb-3">Message</label>
                 <div class="bg-slate-50 rounded-xl p-4 text-slate-700 text-sm whitespace-pre-wrap leading-relaxed" id="modal-message"></div>
             </div>
 

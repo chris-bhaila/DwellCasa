@@ -78,6 +78,7 @@ Route::middleware(['web', 'auth'])->group(function () {
     });
 
     // ── Inventory ─────────────────────────────────────────────────────
+
     Route::middleware('permission:view inventory')->group(function () {
         // Categories
         Route::get('inventory-categories', [InventoryCategoryController::class, 'index']);
@@ -92,34 +93,39 @@ Route::middleware(['web', 'auth'])->group(function () {
         // Equipment units + logs
         Route::get('inventory-items/{itemId}/equipment', [InventoryEquipmentController::class, 'index']);
         Route::get('inventory-equipment/{id}/logs', [InventoryEquipmentController::class, 'logs']);
+        Route::get('rooms/for-inventory', [RoomController::class, 'index']);
     });
 
-    Route::middleware('permission:edit inventory')->group(function () {
-        // Categories — admin only actions
+    Route::middleware('permission:manage inventory categories')->group(function () {
         Route::post('inventory-categories', [InventoryCategoryController::class, 'store']);
         Route::put('inventory-categories/{id}', [InventoryCategoryController::class, 'update']);
         Route::delete('inventory-categories/{id}', [InventoryCategoryController::class, 'destroy']);
+    });
 
-        // Items — admin only actions
+    Route::middleware('permission:manage inventory items')->group(function () {
         Route::post('inventory-items', [InventoryItemController::class, 'store']);
         Route::put('inventory-items/{id}', [InventoryItemController::class, 'update']);
         Route::delete('inventory-items/{id}', [InventoryItemController::class, 'destroy']);
 
-        // Equipment units — admin only actions
+        // Equipment types and units — managing items includes managing their units
         Route::post('inventory-equipment', [InventoryEquipmentController::class, 'store']);
         Route::put('inventory-equipment/{id}', [InventoryEquipmentController::class, 'update']);
-        Route::delete('inventory-equipment/{id}/write-off', [InventoryEquipmentController::class, 'writeOff']);
     });
 
-    Route::middleware('permission:view inventory')->group(function () {
-        // Stock operations — staff can perform these
+    Route::middleware('permission:edit inventory')->group(function () {
+        // Stock operations
         Route::post('inventory-items/{itemId}/restock', [InventoryStockController::class, 'restock']);
-        Route::post('inventory-items/{itemId}/use', [InventoryStockController::class, 'use']);
+        Route::post('inventory-items/{itemId}/use', [InventoryStockController::class, 'logUsage']);
 
-        // Equipment movement — staff can perform these
+        // Equipment movement and condition
         Route::post('inventory-equipment/{id}/assign', [InventoryEquipmentController::class, 'assign']);
-        Route::post('inventory-equipment/{id}/return', [InventoryEquipmentController::class, 'return']);
+        Route::post('inventory-equipment/{id}/return', [InventoryEquipmentController::class, 'returnEquipment']);
         Route::patch('inventory-equipment/{id}/condition', [InventoryEquipmentController::class, 'updateCondition']);
+        Route::delete('inventory-equipment/{id}/write-off', [InventoryEquipmentController::class, 'writeOff']);
+
+        // Corrections
+        Route::post('inventory-items/{itemId}/adjust', [InventoryStockController::class, 'adjust']);
+        Route::post('inventory-equipment/{id}/correct', [InventoryEquipmentController::class, 'correct']);
     });
 
     // ── Room Types ────────────────────────────────────────────────────

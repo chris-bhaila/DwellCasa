@@ -110,7 +110,7 @@ class InventoryEquipmentController extends Controller
         ], 200);
     }
 
-    public function return(Request $request, int $id): JsonResponse
+    public function returnEquipment(Request $request, int $id): JsonResponse
     {
         $user = auth()->user();
         $locationId = $user->hasRole('super_admin')
@@ -208,6 +208,45 @@ class InventoryEquipmentController extends Controller
             'success' => true,
             'message' => 'Equipment logs fetched successfully',
             'data'    => $logs,
+        ], 200);
+    }
+
+    public function correct(\Illuminate\Http\Request $request, int $id): JsonResponse
+    {
+        $request->validate([
+            'original_log_id' => 'required|integer|exists:inventory_logs,id',
+            'reason'          => 'nullable|string|max:500',
+        ]);
+
+        try {
+            $equipment = $this->repository->correct(
+                $id,
+                $request->integer('original_log_id'),
+                auth()->id(),
+                $request->input('reason')
+            );
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+                'errors'  => ['original_log_id' => [$e->getMessage()]],
+            ], 422);
+        }
+
+        $user = auth()->user();
+        $locationId = $user->hasRole('super_admin')
+            ? session('selected_location_id')
+            : $user->location_id;
+
+        activity()
+            ->causedBy($user)
+            ->performedOn($equipment)
+            ->withProperties(['location_id' => $locationId])
+            ->log("Corrected assignment for equipment unit ID {$id}");
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Assignment corrected successfully',
+            'data'    => $equipment,
         ], 200);
     }
 }

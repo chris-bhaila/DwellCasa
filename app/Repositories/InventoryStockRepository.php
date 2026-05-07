@@ -80,8 +80,56 @@ class InventoryStockRepository implements InventoryStockRepositoryInterface
     {
         return InventoryLog::where('inventory_item_id', $itemId)
             ->whereIn('action', ['restocked', 'used'])
+            ->with(['performedBy', 'room'])
             ->orderByDesc('created_at')
             ->get();
+    }
+
+    public function adjust(int $itemId, int $originalLogId, float $adjustment, int $performedBy, string $reason): InventoryStock
+    {
+        return DB::transaction(function () use ($itemId, $originalLogId, $adjustment, $performedBy, $reason) {
+            $stock = InventoryStock::where('inventory_item_id', $itemId)->lockForUpdate()->firstOrFail();
+            $originalLog = InventoryLog::findOrFail($originalLogId);
+
+            if ($originalLog->inventory_item_id !== $itemId) {
+                throw new \Exception('Log entry does not belong to this item.');
+            }
+
+            if ($originalLog->action !== 'used') {
+                throw new \Exception('Only usage logs can be adjusted.');
+            }
+
+            if (!$originalLog->isWithinCorrectionWindow()) {
+                throw new \Exception('Correction window has expired for this log entry.');
+            }
+
+            $newQuantity = $stock->quantity_on_hand + $adjustment;
+            if ($newQuantity < 0) {
+                throw new \Exception('Adjustment would result in negative stock.');
+            }
+
+            $stock->quantity_on_hand = $newQuantity;
+
+            $minimum = $stock->item->minimum_stock ?? 0;
+            $stock->status = match(true) {
+                $newQuantity <= 0        => 'out_of_stock',
+                $newQuantity <= $minimum => 'low_stock',
+                default                  => 'available',
+            };
+            $stock->save();
+
+            InventoryLog::create([
+                'location_id'       => $stock->location_id,
+                'inventory_item_id' => $itemId,
+                'action'            => 'adjusted',
+                'quantity'          => $adjustment,
+                'performed_by'      => $performedBy,
+                'notes'             => $reason,
+                'corrected_log_id'  => $originalLogId,
+            ]);
+
+            return $stock;
+        });
     }
 
     private function resolveStatus(float $quantity, float $minimumStock): string

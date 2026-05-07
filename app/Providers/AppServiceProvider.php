@@ -30,6 +30,7 @@ use App\Repositories\RoomRepository;
 use App\Repositories\RoomTypeRepository;
 use App\Repositories\ServiceRepository;
 use App\Repositories\UserRepository;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use App\Contracts\WebsiteInfoRepositoryInterface;
 use App\Repositories\WebsiteInfoRepository;
@@ -84,6 +85,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Gate::before(function (\App\Models\User $user, string $ability) {
+            return $user->hasRole('super_admin') ? true : null;
+        });
+
         view()->composer('layouts.app', function ($view) {
             $view->with('webInfo', \App\Models\WebsiteInfo::first() ?? new \App\Models\WebsiteInfo());
         });
