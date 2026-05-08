@@ -119,7 +119,7 @@ class AdminController extends Controller
 
         // Summary stats are always computed from all bookings — filters only affect the table
         $billed            = $allBookings->sum('total_amount');
-        $collected         = $allBookings->sum('amount_paid');
+        $collected         = $allBookings->sum(fn($b) => ($b->amount_paid ?? 0) + ($b->deposit_amount ?? 0));
         $totalDiscount     = $allBookings->sum('discount');
         $totalRefunds      = $allBookings->sum('refund_amount');
         $totalExtra        = $allBookings->sum(fn($b) => $b->checkOut->extra_charges ?? 0);
@@ -138,8 +138,8 @@ class AdminController extends Controller
         }
 
         $bookings = match ($filter) {
-            'outstanding' => $bookings->filter(fn($b) => ($b->total_amount - ($b->discount ?? 0) + ($b->checkOut->extra_charges ?? 0) - ($b->amount_paid ?? 0)) > 0)->values(),
-            'collected'   => $bookings->filter(fn($b) => ($b->amount_paid ?? 0) >= ($b->total_amount - ($b->discount ?? 0)))->values(),
+            'outstanding' => $bookings->filter(fn($b) => ($b->total_amount - ($b->discount ?? 0) + ($b->checkOut->extra_charges ?? 0) - ($b->amount_paid ?? 0) - ($b->deposit_amount ?? 0)) > 0)->values(),
+            'collected'   => $bookings->filter(fn($b) => (($b->amount_paid ?? 0) + ($b->deposit_amount ?? 0)) >= ($b->total_amount - ($b->discount ?? 0)))->values(),
             'discounted'  => $bookings->filter(fn($b) => ($b->discount ?? 0) > 0)->values(),
             'extra'       => $bookings->filter(fn($b) => ($b->checkOut->extra_charges ?? 0) > 0)->values(),
             'refunded'    => $bookings->filter(fn($b) => ($b->refund_amount ?? 0) > 0)->values(),
@@ -150,7 +150,7 @@ class AdminController extends Controller
             ->map(fn($group) => [
                 'count'       => $group->count(),
                 'billed'      => $group->sum('total_amount'),
-                'collected'   => $group->sum('amount_paid'),
+                'collected'   => $group->sum(fn($b) => ($b->amount_paid ?? 0) + ($b->deposit_amount ?? 0)),
                 'discount'    => $group->sum('discount'),
                 'extra'       => $group->sum(fn($b) => $b->checkOut->extra_charges ?? 0),
                 'refunds'     => $group->sum('refund_amount'),
@@ -158,7 +158,7 @@ class AdminController extends Controller
                     $group->sum('total_amount')
                     - $group->sum(fn($b) => $b->discount ?? 0)
                     + $group->sum(fn($b) => $b->checkOut->extra_charges ?? 0)
-                    - $group->sum('amount_paid')
+                    - $group->sum(fn($b) => ($b->amount_paid ?? 0) + ($b->deposit_amount ?? 0))
                 ),
             ]);
 

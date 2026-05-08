@@ -360,7 +360,7 @@
                         <td class="px-5 py-3.5">
                             <p class="font-bold text-slate-900 mb-0.5">{{ $booking->booking_ref }}</p>
                             <p class="font-medium text-slate-700">{{ $booking->guest->full_name ?? 'N/A' }}</p>
-                            <p class="text-slate-400 text-sm">{{ $booking->guest->email ?? '' }}</p>
+                            <!-- <p class="text-slate-400 text-sm">{{ $booking->guest->email ?? '' }}</p> -->
                         </td>
                         <td class="px-5 py-3.5 text-slate-600">{{ $booking->roomType->name ?? '—' }}</td>
                         <td class="px-5 py-3.5 text-slate-600">{{ $booking->check_in_date->format('M d, Y') }}</td>
@@ -400,8 +400,9 @@
                         </td>
                         @php $netWithExtra = $net + $extra; @endphp
                         <td class="px-5 py-3.5 text-right">
-                            @if($booking->amount_paid !== null)
-                            <span class="font-semibold text-green-700">Rs. {{ number_format($booking->amount_paid, 0) }}</span>
+                            @php $totalPaid = ($booking->amount_paid ?? 0) + ($booking->deposit_amount ?? 0); @endphp
+                            @if($totalPaid > 0)
+                            <span class="font-semibold text-green-700">Rs. {{ number_format($totalPaid, 0) }}</span>
                             @else
                             <span class="text-slate-400 text-sm italic">Not paid</span>
                             @endif
