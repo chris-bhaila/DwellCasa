@@ -308,17 +308,21 @@ class RoomTypeController extends Controller
 
     public function page(Request $request)
     {
-        $filter = $request->query('filter', 'all');
+        $filter   = $request->query('filter', 'all');
+        $rtFilter = $request->query('rt');
 
         if ($filter === 'trashed') {
             $roomTypes = RoomType::onlyTrashed()->latest('deleted_at')->get();
             $rooms     = Room::onlyTrashed()->with('roomType')->latest('deleted_at')->get();
         } else {
             $roomTypes = $this->roomTypeRepository->all();
-            $rooms     = Room::with('roomType')->orderBy('room_number')->get();
+            $rooms     = Room::with('roomType')
+                ->when($rtFilter, fn($q) => $q->where('room_type_id', $rtFilter))
+                ->orderBy('room_number')
+                ->get();
         }
 
-        return view('admin.room_type.index', compact('roomTypes', 'rooms', 'filter'));
+        return view('admin.room_type.index', compact('roomTypes', 'rooms', 'filter', 'rtFilter'));
     }
 
     public function createPage()

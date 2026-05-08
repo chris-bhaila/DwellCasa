@@ -42,83 +42,180 @@
     $collectedUrl   = route('admin.revenue', array_filter(array_merge($baseRt, ['filter' => $filter === 'collected'   ? null : 'collected'])));
     $outstandingUrl = route('admin.revenue', array_filter(array_merge($baseRt, ['filter' => $filter === 'outstanding' ? null : 'outstanding'])));
     $discountedUrl  = route('admin.revenue', array_filter(array_merge($baseRt, ['filter' => $filter === 'discounted'  ? null : 'discounted'])));
+    $extraUrl       = route('admin.revenue', array_filter(array_merge($baseRt, ['filter' => $filter === 'extra'       ? null : 'extra'])));
+    $refundsUrl     = route('admin.revenue', array_filter(array_merge($baseRt, ['filter' => $filter === 'refunded'    ? null : 'refunded'])));
 
     $hasFilter = $filter || $roomType;
     $clearUrl  = route('admin.revenue', ['from' => $from, 'to' => $to]);
 @endphp
 
-<div class="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+<div class="mb-8 space-y-3">
 
-    <!-- Total Billed — clears dashboard filter, shows all -->
+    {{-- Top banner card: Total Billed + Collected + Outstanding + progress --}}
     <a href="{{ $billedUrl }}"
-        class="rounded-2xl border shadow-sm p-5 transition-all block
-            {{ !$filter ? 'bg-slate-50 border-slate-300 ring-2 ring-slate-200' : 'bg-white border-slate-100 hover:border-slate-300 hover:shadow-md' }}">
-        <div class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-500 mb-3">
-            <i class="bi bi-receipt text-lg"></i>
+        class="block bg-white rounded-2xl border border-slate-100 px-6 py-5
+               transition-all hover:border-slate-300 hover:shadow-sm
+               {{ !$filter ? 'ring-2 ring-slate-200 bg-slate-50 border-slate-300' : '' }}">
+        <div class="flex flex-wrap items-center gap-6">
+            <div class="flex items-center gap-3 min-w-0">
+                <div class="w-9 h-9 rounded-xl bg-slate-100 flex items-center
+                            justify-center text-slate-500 flex-shrink-0">
+                    <i class="bi bi-receipt text-lg"></i>
+                </div>
+                <div>
+                    <p class="text-sm font-medium text-slate-500">Total billed</p>
+                    <p class="text-2xl font-bold text-slate-900 leading-tight">
+                        Rs. {{ number_format($billed, 0) }}
+                    </p>
+                    <p class="text-xs text-slate-400">
+                        {{ $totalBookingCount }} booking{{ $totalBookingCount !== 1 ? 's' : '' }}
+                    </p>
+                </div>
+            </div>
+
+            <div class="flex-1 max-w-xs hidden sm:block">
+                <div class="flex justify-between text-xs text-slate-500 mb-1.5">
+                    <span>Collection rate</span>
+                    <span class="font-semibold text-slate-700">{{ $collectPct }}%</span>
+                </div>
+                <div class="w-full bg-slate-100 rounded-full h-2">
+                    <div class="h-2 rounded-full transition-all
+                        {{ $collectPct >= 80 ? 'bg-green-500' : ($collectPct >= 50 ? 'bg-amber-400' : 'bg-rose-400') }}"
+                        style="width: {{ $collectPct }}%"></div>
+                </div>
+            </div>
+
+            <div class="ml-auto flex items-center gap-8 flex-shrink-0">
+                <div class="text-right">
+                    <p class="text-xs text-slate-500 mb-0.5">Collected</p>
+                    <p class="text-xl font-bold text-green-700">
+                        Rs. {{ number_format($collected, 0) }}
+                    </p>
+                </div>
+                <div class="text-right">
+                    <p class="text-xs text-slate-500 mb-0.5">Outstanding</p>
+                    <p class="text-xl font-bold {{ $outstanding > 0 ? 'text-rose-600' : 'text-slate-400' }}">
+                        Rs. {{ number_format($outstanding, 0) }}
+                    </p>
+                </div>
+            </div>
         </div>
-        <p class="text-slate-500 text-sm font-medium mb-1">Total Billed</p>
-        <p class="text-2xl font-bold text-slate-900">Rs. {{ number_format($billed, 0) }}</p>
-        <p class="text-sm text-slate-400 mt-1">{{ $totalBookingCount }} booking{{ $totalBookingCount !== 1 ? 's' : '' }}</p>
     </a>
 
-    <!-- Collected -->
-    <a href="{{ $collectedUrl }}"
-        class="rounded-2xl border shadow-sm p-5 transition-all block
-            {{ $filter === 'collected' ? 'bg-green-50 border-green-300 ring-2 ring-green-200' : 'bg-white border-slate-100 hover:border-green-200 hover:shadow-md' }}">
-        <div class="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center text-green-600 mb-3">
-            <i class="bi bi-check-circle text-lg"></i>
-        </div>
-        <p class="text-slate-500 text-sm font-medium mb-1">
-            Collected
-            @if($filter === 'collected')<span class="ml-1 text-green-400 text-sm">&times; clear</span>@endif
-        </p>
-        <p class="text-2xl font-bold text-green-700">Rs. {{ number_format($collected, 0) }}</p>
-        <p class="text-sm text-slate-400 mt-1">{{ $collectPct }}% collection rate</p>
-    </a>
+    {{-- Bottom row: 5 equal cards --}}
+    <div class="grid grid-cols-2 lg:grid-cols-5 gap-3">
 
-    <!-- Outstanding -->
-    <a href="{{ $outstandingUrl }}"
-        class="rounded-2xl border shadow-sm p-5 transition-all block
-            {{ $filter === 'outstanding' ? 'bg-rose-50 border-rose-300 ring-2 ring-rose-200' : 'bg-white border-slate-100 hover:border-rose-200 hover:shadow-md' }}">
-        <div class="w-10 h-10 rounded-xl bg-rose-50 flex items-center justify-center text-rose-500 mb-3">
-            <i class="bi bi-hourglass-split text-lg"></i>
-        </div>
-        <p class="text-slate-500 text-sm font-medium mb-1">
-            Outstanding
-            @if($filter === 'outstanding')<span class="ml-1 text-rose-400 text-sm">&times; clear</span>@endif
-        </p>
-        <p class="text-2xl font-bold {{ $outstanding > 0 ? 'text-rose-600' : 'text-slate-400' }}">Rs. {{ number_format($outstanding, 0) }}</p>
-        <p class="text-sm text-slate-400 mt-1">Unpaid balance</p>
-    </a>
+        {{-- Collected (filterable) --}}
+        <a href="{{ $collectedUrl }}"
+            class="rounded-2xl border shadow-sm p-5 transition-all block
+                {{ $filter === 'collected'
+                    ? 'bg-green-50 border-green-300 ring-2 ring-green-200'
+                    : 'bg-white border-slate-100 hover:border-green-200 hover:shadow-md' }}">
+            <div class="w-9 h-9 rounded-xl bg-green-50 flex items-center
+                        justify-center text-green-600 mb-3">
+                <i class="bi bi-check-circle text-lg"></i>
+            </div>
+            <p class="text-slate-500 text-sm font-medium mb-1">
+                Collected
+                @if($filter === 'collected')
+                <span class="ml-1 text-green-400 text-xs">&times; clear</span>
+                @endif
+            </p>
+            <p class="text-2xl font-bold text-green-700">
+                Rs. {{ number_format($collected, 0) }}
+            </p>
+            <p class="text-xs text-slate-400 mt-1">Fully collected bookings</p>
+        </a>
 
-    <!-- Discounts -->
-    <a href="{{ $discountedUrl }}"
-        class="rounded-2xl border shadow-sm p-5 transition-all block
-            {{ $filter === 'discounted' ? 'bg-amber-50 border-amber-300 ring-2 ring-amber-200' : 'bg-white border-slate-100 hover:border-amber-200 hover:shadow-md' }}">
-        <div class="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center text-amber-500 mb-3">
-            <i class="bi bi-tag text-lg"></i>
-        </div>
-        <p class="text-slate-500 text-sm font-medium mb-1">
-            Discounts
-            @if($filter === 'discounted')<span class="ml-1 text-amber-400 text-sm">&times; clear</span>@endif
-        </p>
-        <p class="text-2xl font-bold {{ $totalDiscount > 0 ? 'text-amber-600' : 'text-slate-400' }}">Rs. {{ number_format($totalDiscount, 0) }}</p>
-        <p class="text-sm text-slate-400 mt-1">Total given</p>
-    </a>
+        {{-- Outstanding (filterable) --}}
+        <a href="{{ $outstandingUrl }}"
+            class="rounded-2xl border shadow-sm p-5 transition-all block
+                {{ $filter === 'outstanding'
+                    ? 'bg-rose-50 border-rose-300 ring-2 ring-rose-200'
+                    : 'bg-white border-slate-100 hover:border-rose-200 hover:shadow-md' }}">
+            <div class="w-9 h-9 rounded-xl bg-rose-50 flex items-center
+                        justify-center text-rose-500 mb-3">
+                <i class="bi bi-hourglass-split text-lg"></i>
+            </div>
+            <p class="text-slate-500 text-sm font-medium mb-1">
+                Outstanding
+                @if($filter === 'outstanding')
+                <span class="ml-1 text-rose-400 text-xs">&times; clear</span>
+                @endif
+            </p>
+            <p class="text-2xl font-bold {{ $outstanding > 0 ? 'text-rose-600' : 'text-slate-400' }}">
+                Rs. {{ number_format($outstanding, 0) }}
+            </p>
+            <p class="text-xs text-slate-400 mt-1">Unpaid balance</p>
+        </a>
 
-    <!-- Collection Rate (static) -->
-    <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
-        <div class="w-10 h-10 rounded-xl bg-[#A89070]/10 flex items-center justify-center text-[#A89070] mb-3">
-            <i class="bi bi-graph-up text-lg"></i>
-        </div>
-        <p class="text-slate-500 text-sm font-medium mb-1">Collection Rate</p>
-        <p class="text-2xl font-bold text-slate-900">{{ $collectPct }}%</p>
-        <div class="mt-2 w-full bg-slate-100 rounded-full h-1.5">
-            <div class="h-1.5 rounded-full transition-all {{ $collectPct >= 80 ? 'bg-green-500' : ($collectPct >= 50 ? 'bg-amber-400' : 'bg-rose-400') }}"
-                style="width: {{ $collectPct }}%"></div>
-        </div>
+        {{-- Discounts (filterable) --}}
+        <a href="{{ $discountedUrl }}"
+            class="rounded-2xl border shadow-sm p-5 transition-all block
+                {{ $filter === 'discounted'
+                    ? 'bg-amber-50 border-amber-300 ring-2 ring-amber-200'
+                    : 'bg-white border-slate-100 hover:border-amber-200 hover:shadow-md' }}">
+            <div class="w-9 h-9 rounded-xl bg-amber-50 flex items-center
+                        justify-center text-amber-500 mb-3">
+                <i class="bi bi-tag text-lg"></i>
+            </div>
+            <p class="text-slate-500 text-sm font-medium mb-1">
+                Discounts
+                @if($filter === 'discounted')
+                <span class="ml-1 text-amber-400 text-xs">&times; clear</span>
+                @endif
+            </p>
+            <p class="text-2xl font-bold {{ $totalDiscount > 0 ? 'text-amber-600' : 'text-slate-400' }}">
+                Rs. {{ number_format($totalDiscount, 0) }}
+            </p>
+            <p class="text-xs text-slate-400 mt-1">Total given</p>
+        </a>
+
+        {{-- Extra Charges (filterable) --}}
+        <a href="{{ $extraUrl }}"
+            class="rounded-2xl border shadow-sm p-5 transition-all block
+                {{ $filter === 'extra'
+                    ? 'bg-purple-50 border-purple-300 ring-2 ring-purple-200'
+                    : 'bg-white border-slate-100 hover:border-purple-200 hover:shadow-md' }}">
+            <div class="w-9 h-9 rounded-xl bg-purple-50 flex items-center
+                        justify-center text-purple-500 mb-3">
+                <i class="bi bi-plus-circle text-lg"></i>
+            </div>
+            <p class="text-slate-500 text-sm font-medium mb-1">
+                Extra Charges
+                @if($filter === 'extra')
+                <span class="ml-1 text-purple-400 text-xs">&times; clear</span>
+                @endif
+            </p>
+            <p class="text-2xl font-bold {{ $totalExtra > 0 ? 'text-purple-600' : 'text-slate-400' }}">
+                Rs. {{ number_format($totalExtra, 0) }}
+            </p>
+            <p class="text-xs text-slate-400 mt-1">Post-checkout charges</p>
+        </a>
+
+        {{-- Refunds (filterable) --}}
+        <a href="{{ $refundsUrl }}"
+            class="rounded-2xl border shadow-sm p-5 transition-all block
+                {{ $filter === 'refunded'
+                    ? 'bg-slate-100 border-slate-400 ring-2 ring-slate-300'
+                    : 'bg-white border-slate-100 hover:border-slate-300 hover:shadow-md' }}">
+            <div class="w-9 h-9 rounded-xl bg-slate-100 flex items-center
+                        justify-center text-slate-500 mb-3">
+                <i class="bi bi-arrow-return-left text-lg"></i>
+            </div>
+            <p class="text-slate-500 text-sm font-medium mb-1">
+                Refunds
+                @if($filter === 'refunded')
+                <span class="ml-1 text-slate-400 text-xs">&times; clear</span>
+                @endif
+            </p>
+            <p class="text-2xl font-bold {{ ($totalRefunds ?? 0) > 0 ? 'text-slate-700' : 'text-slate-400' }}">
+                Rs. {{ number_format($totalRefunds ?? 0, 0) }}
+            </p>
+            <p class="text-xs text-slate-400 mt-1">Total refunded</p>
+        </a>
+
     </div>
-
 </div>
 
 <!-- Room Type Filter Bar -->
@@ -148,7 +245,7 @@
 </div>
 @endif
 
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+<div class="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6">
 
     <!-- By Room Type -->
     <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
@@ -178,12 +275,17 @@
                 <div class="flex justify-between text-sm mb-1">
                     <span class="text-slate-500">Billed: <span class="font-semibold text-slate-700">Rs. {{ number_format($data['billed'], 0) }}</span></span>
                     <span class="{{ $data['outstanding'] > 0 ? 'text-rose-500' : 'text-slate-400' }}">
-                        Outstanding: Rs. {{ number_format($data['outstanding'], 0) }}
+                        Outst.: Rs. {{ number_format($data['outstanding'], 0) }}
                     </span>
                 </div>
                 @if($data['discount'] > 0)
                 <div class="text-sm text-amber-600 mb-1.5">
                     Discount: Rs. {{ number_format($data['discount'], 0) }}
+                </div>
+                @endif
+                @if($data['extra'] > 0)
+                <div class="text-sm text-rose-500 mb-1.5">
+                    Extra Charges: Rs. {{ number_format($data['extra'], 0) }}
                 </div>
                 @endif
                 @php $pct = $data['billed'] > 0 ? min(100, round(($data['collected'] / $data['billed']) * 100)) : 0; @endphp
@@ -198,7 +300,7 @@
     </div>
 
     <!-- Bookings Table -->
-    <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+    <div class="lg:col-span-3 bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
         <div class="p-5 border-b border-slate-100 flex items-center justify-between gap-2 flex-wrap">
             <div>
                 <h2 class="text-lg font-serif font-bold text-slate-900 italic">Bookings</h2>
@@ -221,6 +323,14 @@
                     <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-sm font-medium bg-amber-50 text-amber-600">
                         <i class="bi bi-tag"></i> Discounted
                     </span>
+                    @elseif($filter === 'extra')
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-sm font-medium bg-rose-50 text-rose-600">
+                        <i class="bi bi-exclamation-circle"></i> Extra Charges
+                    </span>
+                    @elseif($filter === 'refunded')
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-sm font-medium bg-slate-100 text-slate-600">
+                        <i class="bi bi-arrow-counterclockwise"></i> Refunded
+                    </span>
                     @endif
                 </div>
                 @endif
@@ -232,12 +342,14 @@
             <table class="w-full min-w-[620px] text-left border-collapse">
                 <thead>
                     <tr class="bg-slate-50/50 text-slate-500 text-sm border-b border-slate-100">
-                        <th class="px-5 py-3 font-medium">Guest</th>
+                        <th class="px-5 py-3 font-medium">Ref / Guest</th>
                         <th class="px-5 py-3 font-medium">Room Type</th>
                         <th class="px-5 py-3 font-medium">Check In</th>
                         <th class="px-5 py-3 font-medium">Status</th>
                         <th class="px-5 py-3 font-medium text-right">Billed</th>
                         <th class="px-5 py-3 font-medium text-right">Discount</th>
+                        <th class="px-5 py-3 font-medium text-right">Net</th>
+                        <th class="px-5 py-3 font-medium text-right">Extra</th>
                         <th class="px-5 py-3 font-medium text-right">Paid</th>
                         <th class="px-5 py-3 font-medium"></th>
                     </tr>
@@ -246,7 +358,8 @@
                     @forelse($bookings as $booking)
                     <tr class="hover:bg-slate-50/30 transition-colors">
                         <td class="px-5 py-3.5">
-                            <p class="font-medium text-slate-900">{{ $booking->guest->full_name ?? 'N/A' }}</p>
+                            <p class="font-bold text-slate-900 mb-0.5">{{ $booking->booking_ref }}</p>
+                            <p class="font-medium text-slate-700">{{ $booking->guest->full_name ?? 'N/A' }}</p>
                             <p class="text-slate-400 text-sm">{{ $booking->guest->email ?? '' }}</p>
                         </td>
                         <td class="px-5 py-3.5 text-slate-600">{{ $booking->roomType->name ?? '—' }}</td>
@@ -273,20 +386,41 @@
                             <span class="text-slate-300">—</span>
                             @endif
                         </td>
+                        @php $net = ($booking->total_amount ?? 0) - ($booking->discount ?? 0); @endphp
+                        <td class="px-5 py-3.5 text-right font-semibold text-slate-700">
+                            Rs. {{ number_format($net, 0) }}
+                        </td>
+                        @php $extra = $booking->checkOut->extra_charges ?? 0; @endphp
+                        <td class="px-5 py-3.5 text-right">
+                            @if($extra > 0)
+                            <span class="font-semibold text-rose-600">Rs. {{ number_format($extra, 0) }}</span>
+                            @else
+                            <span class="text-slate-300">—</span>
+                            @endif
+                        </td>
+                        @php $netWithExtra = $net + $extra; @endphp
                         <td class="px-5 py-3.5 text-right">
                             @if($booking->amount_paid !== null)
                             <span class="font-semibold text-green-700">Rs. {{ number_format($booking->amount_paid, 0) }}</span>
-                            <span class="text-slate-400 font-normal">/ {{ number_format($booking->total_amount, 0) }}</span>
                             @else
                             <span class="text-slate-400 text-sm italic">Not paid</span>
                             @endif
                         </td>
                         <td class="px-5 py-3.5 text-right">
+                            @php $isEditable = $booking->isEditableBy(auth()->user()); @endphp
+                            @if($isEditable && !in_array($booking->status, ['checked_out', 'cancelled']))
                             <a href="{{ route('admin.bookings.edit', $booking->id) }}"
                                 class="w-8 h-8 inline-flex items-center justify-center text-slate-400 hover:text-[#A89070] transition-colors rounded-md hover:bg-slate-100"
                                 title="Edit booking">
                                 <i class="bi bi-pencil-square"></i>
                             </a>
+                            @else
+                            <a href="{{ route('admin.bookings.view', $booking->id) }}"
+                                class="w-8 h-8 inline-flex items-center justify-center text-slate-400 hover:text-slate-900 transition-colors rounded-md hover:bg-slate-100"
+                                title="View booking">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            @endif
                         </td>
                     </tr>
                     @empty

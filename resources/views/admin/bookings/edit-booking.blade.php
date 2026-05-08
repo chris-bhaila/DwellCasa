@@ -5,6 +5,13 @@
 
 @section('content')
 
+@if(session('info'))
+<div class="mb-6 flex items-center gap-3 bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 text-sm text-blue-700">
+    <i class="bi bi-info-circle flex-shrink-0"></i>
+    {{ session('info') }}
+</div>
+@endif
+
 <!-- Header -->
 <div class="flex items-center justify-between mb-8">
     <div class="flex items-center gap-4">
@@ -149,14 +156,19 @@
                         </select>
                     </div> -->
                     <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-2">Payment Status</label>
-                        <select name="payment_status" form="edit-booking-form" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors">
-                            <option value="unpaid" {{ old('payment_status', $booking->payment_status) == 'unpaid' ? 'selected' : '' }}>Unpaid</option>
-                            <option value="deposit_paid" {{ old('payment_status', $booking->payment_status) == 'deposit_paid' ? 'selected' : '' }}>Deposit Paid</option>
-                            <option value="partially_paid" {{ old('payment_status', $booking->payment_status) == 'partially_paid' ? 'selected' : '' }}>Partially Paid</option>
-                            <option value="fully_paid" {{ old('payment_status', $booking->payment_status) == 'fully_paid' ? 'selected' : '' }}>Fully Paid</option>
-                            <option value="refunded" {{ old('payment_status', $booking->payment_status) == 'refunded' ? 'selected' : '' }}>Refunded</option>
-                        </select>
+                        <p class="text-xs font-medium text-slate-400 uppercase tracking-wide mb-2">Payment Status</p>
+                        @if($booking->payment_status === 'fully_paid')
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-sm font-medium bg-green-50 text-green-700 border border-green-200">Fully Paid</span>
+                        @elseif($booking->payment_status === 'deposit_paid')
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-sm font-medium bg-blue-50 text-blue-700 border border-blue-200">Deposit Paid</span>
+                        @elseif($booking->payment_status === 'partially_paid')
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-sm font-medium bg-orange-50 text-orange-700 border border-orange-200">Partially Paid</span>
+                        @elseif($booking->payment_status === 'refunded')
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-sm font-medium bg-slate-50 text-slate-600 border border-slate-200">Refunded</span>
+                        @else
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-sm font-medium bg-red-50 text-red-700 border border-red-200">Unpaid</span>
+                        @endif
+                        <p class="text-xs text-slate-400 mt-1">Updated automatically based on payments.</p>
                     </div>
                     <div class="pt-6 border-t border-slate-100">
                         <label class="block text-sm font-medium text-slate-700 mb-2">Admin Notes (Internal)</label>
@@ -172,14 +184,6 @@
                 </button>
             </div>
             @endif
-            @if(!in_array($booking->status, ['cancelled', 'checked_out']))
-            <div class="mt-4">
-                <button type="button" onclick="cancelBooking()"
-                    class="w-full bg-red-50 text-red-600 border border-red-200 px-4 py-3 rounded-xl font-medium hover:bg-red-100 transition-all">
-                    Cancel Booking
-                </button>
-            </div>
-            @endif
             @if($booking->status === 'confirmed')
             <div class="mt-4">
                 <button type="button" onclick="openCheckInModal()" class="w-full bg-green-700 text-white px-4 py-3 rounded-xl font-medium hover:bg-green-800 transition-all shadow-sm">
@@ -187,11 +191,32 @@
                 </button>
             </div>
             @endif
-
             @if($booking->status === 'checked_in')
             <div class="mt-4">
                 <button type="button" onclick="openCheckOutModal()" class="w-full bg-slate-700 text-white px-4 py-3 rounded-xl font-medium hover:bg-slate-800 transition-all shadow-sm">
                     Check Out Guest
+                </button>
+            </div>
+            @endif
+            @if(
+                $booking->status !== 'checked_in' &&
+                $booking->payment_status !== 'refunded' &&
+                (($booking->amount_paid ?? 0) > 0 || ($booking->deposit_amount ?? 0) > 0)
+            )
+            @can('edit bookings')
+            <div class="mt-4">
+                <button type="button" onclick="openRefundModal()"
+                    class="w-full inline-flex items-center justify-center gap-2 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 px-4 py-3 rounded-xl font-medium transition-colors">
+                    <i class="bi bi-arrow-counterclockwise"></i> Process Refund
+                </button>
+            </div>
+            @endcan
+            @endif
+            @if(!in_array($booking->status, ['cancelled', 'checked_out']))
+            <div class="mt-4">
+                <button type="button" onclick="cancelBooking()"
+                    class="w-full bg-red-50 text-red-600 border border-red-200 px-4 py-3 rounded-xl font-medium hover:bg-red-100 transition-all">
+                    Cancel Booking
                 </button>
             </div>
             @endif
@@ -225,12 +250,8 @@
             </div>
             <div>
                 <label class="block text-sm font-medium text-slate-700 mb-2">Checked In By <span class="text-red-500">*</span></label>
-                <select name="checked_in_by" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors" required>
-                    <option value="">Select staff...</option>
-                    @foreach($users ?? [] as $user)
-                    <option value="{{ $user->id }}" {{ auth()->check() && auth()->id() == $user->id ? 'selected' : '' }}>{{ $user->name }}</option>
-                    @endforeach
-                </select>
+                <input type="text" value="{{ auth()->user()->name ?? '' }}" disabled class="w-full rounded-xl border-slate-200 px-4 py-3 bg-slate-50 text-slate-500 cursor-not-allowed focus:outline-none">
+                <input type="hidden" name="checked_in_by" value="{{ auth()->id() }}">
             </div>
             <div class="flex items-center gap-6 pt-2">
                 <label class="flex items-center gap-2 cursor-pointer">
@@ -271,12 +292,8 @@
             </div>
             <div>
                 <label class="block text-sm font-medium text-slate-700 mb-2">Checked Out By <span class="text-red-500">*</span></label>
-                <select name="checked_out_by" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors" required>
-                    <option value="">Select staff...</option>
-                    @foreach($users ?? [] as $user)
-                    <option value="{{ $user->id }}" {{ auth()->check() && auth()->id() == $user->id ? 'selected' : '' }}>{{ $user->name }}</option>
-                    @endforeach
-                </select>
+                <input type="text" value="{{ auth()->user()->name ?? '' }}" disabled class="w-full rounded-xl border-slate-200 px-4 py-3 bg-slate-50 text-slate-500 cursor-not-allowed focus:outline-none">
+                <input type="hidden" name="checked_out_by" value="{{ auth()->id() }}">
             </div>
             <div>
                 <label class="block text-sm font-medium text-slate-700 mb-2">Room Condition <span class="text-red-500">*</span></label>
@@ -309,6 +326,51 @@
         </form>
     </div>
 </div>
+<!-- Refund Modal -->
+<div id="refund-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm opacity-0 transition-opacity duration-300">
+    <div class="bg-white rounded-2xl shadow-2xl border border-slate-100 w-full max-w-md transform scale-95 transition-transform duration-300">
+        <div class="p-6 border-b border-slate-100 flex justify-between items-center">
+            <h2 class="text-xl font-serif font-bold text-slate-900 italic">Process Refund</h2>
+            <button onclick="closeRefundModal()" class="text-slate-400 hover:text-slate-600 transition-colors">
+                <i class="bi bi-x-lg text-xl"></i>
+            </button>
+        </div>
+        <div class="p-6 space-y-4">
+            <div class="bg-slate-50 rounded-xl p-4 text-sm text-slate-600 space-y-1">
+                <div class="flex justify-between">
+                    <span>Amount Paid</span>
+                    <span class="font-medium">Rs. {{ number_format($booking->amount_paid ?? 0, 0) }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span>Deposit</span>
+                    <span class="font-medium">Rs. {{ number_format($booking->deposit_amount ?? 0, 0) }}</span>
+                </div>
+                <div class="flex justify-between font-semibold text-slate-800 pt-1 border-t border-slate-200 mt-1">
+                    <span>Max Refundable</span>
+                    <span>Rs. {{ number_format(($booking->amount_paid ?? 0) + ($booking->deposit_amount ?? 0), 0) }}</span>
+                </div>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-2">Refund Amount (Rs.) <span class="text-red-500">*</span></label>
+                <input type="number" id="refund-amount"
+                       max="{{ ($booking->amount_paid ?? 0) + ($booking->deposit_amount ?? 0) }}" min="1" step="1"
+                       class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors"
+                       placeholder="Enter refund amount">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-2">Notes (optional)</label>
+                <textarea id="refund-notes" rows="3"
+                    class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors resize-none"
+                    placeholder="Reason for refund..."></textarea>
+            </div>
+        </div>
+        <div class="p-6 border-t border-slate-100 flex justify-end gap-3">
+            <button onclick="closeRefundModal()" class="px-5 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 transition-colors">Cancel</button>
+            <button onclick="submitRefund()" class="px-5 py-2.5 rounded-xl text-sm font-medium bg-rose-600 hover:bg-rose-700 text-white transition-colors shadow-sm">Confirm Refund</button>
+        </div>
+    </div>
+</div>
+
 @endsection
 
 @push('scripts')
@@ -377,21 +439,30 @@
 
         data.early_check_in = formData.get('early_check_in') ? 1 : 0;
         data.id_verified = formData.get('id_verified') ? 1 : 0;
-        data.checked_in_at = new Date().toISOString().slice(0, 19).replace('T', ' '); // YYYY-MM-DD HH:mm:ss format
+        data.checked_in_at = new Date().toISOString().slice(0, 19).replace('T', ' ');
+
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
         try {
+            const saveResponse = await fetch(`/api/bookings/{{ $booking->id }}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': csrfToken },
+                body: JSON.stringify(getMainFormData())
+            });
+
+            if (!saveResponse.ok) {
+                adminToast('Error saving booking details before check-in.');
+                return;
+            }
+
             const response = await fetch('/api/check-ins', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                },
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': csrfToken },
                 body: JSON.stringify(data)
             });
 
             if (response.ok) {
-                window.location.reload(); // Reload immediately to see updated status
+                window.location.reload();
             } else {
                 const error = await response.json();
                 let errorMessage = 'Error during check-in: ' + (error.message || 'Unknown error');
@@ -449,14 +520,23 @@
         data.late_check_out = formData.get('late_check_out') ? 1 : 0;
         data.checked_out_at = new Date().toISOString().slice(0, 19).replace('T', ' ');
 
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
         try {
+            const saveResponse = await fetch(`/api/bookings/{{ $booking->id }}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': csrfToken },
+                body: JSON.stringify(getMainFormData())
+            });
+
+            if (!saveResponse.ok) {
+                adminToast('Error saving booking details before check-out.');
+                return;
+            }
+
             const response = await fetch('/api/check-outs', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                },
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': csrfToken },
                 body: JSON.stringify(data)
             });
 
@@ -476,6 +556,13 @@
         }
     });
 
+    function getMainFormData() {
+        const formData = new FormData(document.getElementById('edit-booking-form'));
+        const data = Object.fromEntries(formData.entries());
+        delete data.payment_status;
+        return data;
+    }
+
     // Confirm booking (pending → confirmed)
     async function confirmBooking() {
         if (!await adminConfirm('Are you sure you want to confirm this booking?', { confirmLabel: 'Confirm Booking', type: 'primary' })) return;
@@ -488,9 +575,7 @@
                     'Accept': 'application/json',
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                 },
-                body: JSON.stringify({
-                    status: 'confirmed'
-                })
+                body: JSON.stringify({ ...getMainFormData(), status: 'confirmed' })
             });
 
             if (response.ok) {
@@ -514,9 +599,7 @@
                     'Accept': 'application/json',
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                 },
-                body: JSON.stringify({
-                    status: 'cancelled'
-                })
+                body: JSON.stringify({ ...getMainFormData(), status: 'cancelled' })
             });
 
             if (response.ok) {
@@ -565,6 +648,68 @@
             checkOutInput.addEventListener('change', calculateTotal);
             stayTypeSelect.addEventListener('change', calculateTotal);
         }
+    });
+</script>
+<script>
+    function openRefundModal() {
+        const modal = document.getElementById('refund-modal');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        setTimeout(() => {
+            modal.classList.remove('opacity-0');
+            modal.querySelector('div').classList.remove('scale-95');
+        }, 10);
+    }
+
+    function closeRefundModal() {
+        const modal = document.getElementById('refund-modal');
+        modal.classList.add('opacity-0');
+        modal.querySelector('div').classList.add('scale-95');
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }, 300);
+    }
+
+    async function submitRefund() {
+        const amount = document.getElementById('refund-amount').value;
+        const notes  = document.getElementById('refund-notes').value;
+
+        if (!amount || parseFloat(amount) <= 0) {
+            adminToast('Please enter a valid refund amount.', 'error');
+            return;
+        }
+
+        if (!await adminConfirm(
+            `Process a refund of Rs. ${parseFloat(amount).toLocaleString('en-IN')}? This cannot be undone.`,
+            { confirmLabel: 'Confirm Refund', type: 'danger' }
+        )) return;
+
+        try {
+            const response = await fetch(`/api/bookings/{{ $booking->id }}/refund`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                },
+                body: JSON.stringify({ refund_amount: amount, notes }),
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                adminToast('Refund processed successfully.', 'success');
+                setTimeout(() => window.location.reload(), 1000);
+            } else {
+                adminToast(data.message ?? 'Refund failed.', 'error');
+            }
+        } catch (e) {
+            adminToast('An error occurred.', 'error');
+        }
+    }
+
+    document.getElementById('refund-modal').addEventListener('click', function(e) {
+        if (e.target === this) closeRefundModal();
     });
 </script>
 @endpush

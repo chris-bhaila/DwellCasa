@@ -7,6 +7,7 @@ use App\Contracts\RoomRepositoryInterface;
 use App\Contracts\RoomTypeRepositoryInterface;
 use App\Models\Activity;
 use App\Models\Booking;
+use App\Models\CheckOut;
 use App\Models\Inquiry;
 use App\Models\InventoryEquipment;
 use App\Models\InventoryStock;
@@ -110,7 +111,7 @@ class AdminController extends Controller
         $filter   = $request->query('filter');    // 'outstanding' | 'collected' | 'discounted' | null
         $roomType = $request->query('room_type'); // room type name or null
 
-        $allBookings = Booking::with(['guest', 'roomType'])
+        $allBookings = Booking::with(['guest', 'roomType', 'checkOut'])
             ->whereBetween('check_in_date', [$from, $to])
             ->whereNotIn('status', ['cancelled'])
             ->orderBy('check_in_date')
@@ -120,9 +121,13 @@ class AdminController extends Controller
         $billed            = $allBookings->sum('total_amount');
         $collected         = $allBookings->sum('amount_paid');
         $totalDiscount     = $allBookings->sum('discount');
-        $netBilled         = max(0, $billed - $totalDiscount);
+        $totalRefunds      = $allBookings->sum('refund_amount');
+        $totalExtra        = $allBookings->sum(fn($b) => $b->checkOut->extra_charges ?? 0);
+        $netBilled         = max(0, $billed - $totalDiscount + $totalExtra);
         $outstanding       = max(0, $netBilled - $collected);
-        $collectPct        = $netBilled > 0 ? min(100, round(($collected / $netBilled) * 100)) : 0;
+        $collectPct        = $netBilled > 0
+            ? min(100, round(($collected / $netBilled) * 100))
+            : 0;
         $totalBookingCount = $allBookings->count();
 
         // Apply room type filter first, then dashboard filter
@@ -133,9 +138,11 @@ class AdminController extends Controller
         }
 
         $bookings = match ($filter) {
-            'outstanding' => $bookings->filter(fn($b) => ($b->total_amount - ($b->discount ?? 0) - ($b->amount_paid ?? 0)) > 0)->values(),
-            'collected'   => $bookings->filter(fn($b) => ($b->amount_paid ?? 0) > 0 && ($b->amount_paid ?? 0) >= ($b->total_amount - ($b->discount ?? 0)))->values(),
+            'outstanding' => $bookings->filter(fn($b) => ($b->total_amount - ($b->discount ?? 0) + ($b->checkOut->extra_charges ?? 0) - ($b->amount_paid ?? 0)) > 0)->values(),
+            'collected'   => $bookings->filter(fn($b) => ($b->amount_paid ?? 0) >= ($b->total_amount - ($b->discount ?? 0)))->values(),
             'discounted'  => $bookings->filter(fn($b) => ($b->discount ?? 0) > 0)->values(),
+            'extra'       => $bookings->filter(fn($b) => ($b->checkOut->extra_charges ?? 0) > 0)->values(),
+            'refunded'    => $bookings->filter(fn($b) => ($b->refund_amount ?? 0) > 0)->values(),
             default       => $bookings,
         };
 
@@ -145,13 +152,20 @@ class AdminController extends Controller
                 'billed'      => $group->sum('total_amount'),
                 'collected'   => $group->sum('amount_paid'),
                 'discount'    => $group->sum('discount'),
-                'outstanding' => max(0, $group->sum('total_amount') - $group->sum('discount') - $group->sum('amount_paid')),
+                'extra'       => $group->sum(fn($b) => $b->checkOut->extra_charges ?? 0),
+                'refunds'     => $group->sum('refund_amount'),
+                'outstanding' => max(0,
+                    $group->sum('total_amount')
+                    - $group->sum(fn($b) => $b->discount ?? 0)
+                    + $group->sum(fn($b) => $b->checkOut->extra_charges ?? 0)
+                    - $group->sum('amount_paid')
+                ),
             ]);
 
         return view('admin.revenue', compact(
             'from', 'to', 'bookings', 'filter', 'roomType',
             'billed', 'collected', 'outstanding', 'collectPct', 'byRoomType',
-            'totalDiscount', 'totalBookingCount'
+            'totalDiscount', 'totalExtra', 'totalRefunds', 'totalBookingCount'
         ));
     }
 

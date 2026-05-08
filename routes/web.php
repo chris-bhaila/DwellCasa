@@ -92,6 +92,10 @@ Route::middleware('auth')->prefix('admin')->group(function () {
         Route::get('/bookings/{id}/edit', [BookingController::class, 'editPage'])->name('admin.bookings.edit');
     });
 
+    Route::middleware('permission:view bookings')->group(function () {
+        Route::get('/bookings/{id}/view', [BookingController::class, 'viewPage'])->name('admin.bookings.view');
+    });
+
     Route::middleware('permission:view inventory')->group(function () {
         Route::get('/inventory', [InventoryItemController::class, 'inventoryDashboard'])
             ->name('admin.inventory');

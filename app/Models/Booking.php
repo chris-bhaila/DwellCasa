@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\MassPrunable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\Scopes\LocationScope;
+use App\Models\User;
 
 class Booking extends Model
 {
@@ -36,6 +37,8 @@ class Booking extends Model
         'discount',
         'deposit_amount',
         'amount_paid',
+        'refund_amount',
+        'refunded_at',
         'status',
         'payment_status',
         'checked_in_at',
@@ -56,6 +59,8 @@ class Booking extends Model
         'amount_paid' => 'decimal:2',
         'checked_in_at' => 'datetime',
         'checked_out_at' => 'datetime',
+        'refund_amount' => 'decimal:2',
+        'refunded_at'   => 'datetime',
     ];
 
     public function guest(): BelongsTo
@@ -90,6 +95,15 @@ class Booking extends Model
     public function location(): BelongsTo
     {
         return $this->belongsTo(Location::class);
+    }
+
+    public function isEditableBy(User $user): bool
+    {
+        if ($this->status !== 'checked_out') return true;
+        if (!$this->checked_out_at) return true;
+
+        $hours = $user->hasAnyRole(['admin', 'super_admin']) ? 72 : 24;
+        return $this->checked_out_at->diffInHours(now()) <= $hours;
     }
 
     protected static function booted(): void

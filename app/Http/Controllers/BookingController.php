@@ -13,6 +13,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use App\Mail\BookingConfirmationMail;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -102,6 +103,13 @@ class BookingController extends Controller
         unset($data['location_id']);
 
         $booking = Booking::findOrFail($id);
+
+        if (!$booking->isEditableBy(auth()->user())) {
+            return response()->json([
+                'message' => 'This booking can no longer be edited. The edit window has expired.',
+            ], 403);
+        }
+
         $oldStatus  = $booking->status;
         $roomTypeId = $request->input('room_type_id', $booking->room_type_id);
         $checkIn    = $request->input('check_in_date', $booking->check_in_date);
@@ -210,6 +218,54 @@ class BookingController extends Controller
         ], 200);
     }
 
+    public function refund(\Illuminate\Http\Request $request, int $id): JsonResponse
+    {
+        $request->validate([
+            'refund_amount' => 'required|numeric|min:0.01',
+            'notes'         => 'nullable|string|max:500',
+        ]);
+
+        $booking = Booking::findOrFail($id);
+
+        if (($booking->amount_paid ?? 0) == 0 && ($booking->deposit_amount ?? 0) == 0) {
+            return response()->json([
+                'message' => 'Cannot process a refund — no payment has been recorded for this booking.',
+            ], 422);
+        }
+
+        $maxRefundable = ($booking->amount_paid ?? 0) + ($booking->deposit_amount ?? 0);
+        if ($request->input('refund_amount') > $maxRefundable) {
+            return response()->json([
+                'message' => "Refund amount cannot exceed total payments received (Rs. " . number_format($maxRefundable, 0) . ").",
+            ], 422);
+        }
+
+        $booking->refund_amount   = $request->input('refund_amount');
+        $booking->refunded_at     = now();
+        $booking->payment_status  = 'refunded';
+        if ($request->input('notes')) {
+            $booking->admin_notes = trim(($booking->admin_notes ?? '') . "\n[Refund] " . $request->input('notes'));
+        }
+        $booking->save();
+
+        $user = auth()->user();
+        $locationId = $user->hasRole('super_admin')
+            ? session('selected_location_id')
+            : $user->location_id;
+
+        activity()
+            ->causedBy($user)
+            ->performedOn($booking)
+            ->withProperties(['location_id' => $locationId])
+            ->log("Processed refund of Rs. {$request->input('refund_amount')} for booking {$booking->booking_ref}");
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Refund processed successfully',
+            'data'    => $booking,
+        ], 200);
+    }
+
     private function checkAvailability($roomTypeId, $checkIn, $checkOut, $excludeBookingId = null)
     {
         $roomType = RoomType::withCount(['rooms' => function ($query) {
@@ -285,9 +341,28 @@ class BookingController extends Controller
         return view('admin.bookings.add-booking', compact('roomTypes'));
     }
 
+    public function viewPage(int $id)
+    {
+        $booking = Booking::with([
+            'guest',
+            'roomType',
+            'room',
+            'checkIn.checkedInBy',
+            'checkOut.checkedOutBy',
+            'payments',
+        ])->findOrFail($id);
+
+        return view('admin.bookings.view-booking', compact('booking'));
+    }
+
     public function editPage(int $id, RoomTypeRepositoryInterface $roomTypeRepository)
     {
         $booking   = Booking::with('guest')->findOrFail($id);
+
+        if (!$booking->isEditableBy(auth()->user())) {
+            return redirect()->route('admin.bookings.view', $booking->id)
+                ->with('info', 'This booking is no longer editable — the edit window has expired.');
+        }
         $roomTypes = $roomTypeRepository->all();
         $rooms     = Room::where('room_type_id', $booking->room_type_id)
             ->where('status', 'available')

@@ -119,30 +119,20 @@
     window.__mapAddress = @json($webInfo->contact_address ?? '');
     window.__mapPhone   = @json($webInfo->contact_phone ?? '');
 
-    window.initPropertyMap = function() {
+    window.initPropertyMap = async function() {
+        const { Map, InfoWindow } = await google.maps.importLibrary("maps");
+        const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
+
         const center = { lat: window.__mapLat, lng: window.__mapLng };
 
-        const mapStyles = [
-            { elementType: 'geometry',            stylers: [{ color: '#f5f4f0' }] },
-            { elementType: 'labels.text.fill',    stylers: [{ color: '#6b7280' }] },
-            { elementType: 'labels.text.stroke',  stylers: [{ color: '#f5f4f0' }] },
-            { featureType: 'road',              elementType: 'geometry',         stylers: [{ color: '#ffffff' }] },
-            { featureType: 'road',              elementType: 'labels.text.fill', stylers: [{ color: '#9ca3af' }] },
-            { featureType: 'road.highway',      elementType: 'geometry',         stylers: [{ color: '#e5e1db' }] },
-            { featureType: 'water',             elementType: 'geometry',         stylers: [{ color: '#c8d9e8' }] },
-            { featureType: 'water',             elementType: 'labels.text.fill', stylers: [{ color: '#9ca3af' }] },
-            { featureType: 'poi',               elementType: 'geometry',         stylers: [{ color: '#ede8e0' }] },
-            { featureType: 'poi.park',          elementType: 'geometry',         stylers: [{ color: '#dce8d6' }] },
-            { featureType: 'poi',               elementType: 'labels',           stylers: [{ visibility: 'off' }] },
-            { featureType: 'transit',           elementType: 'geometry',         stylers: [{ color: '#e8e4de' }] },
-            { featureType: 'administrative',    elementType: 'geometry.stroke',  stylers: [{ color: '#d1c9be' }] },
-            { featureType: 'administrative',    elementType: 'labels.text.fill', stylers: [{ color: '#A89070' }] },
-        ];
-
-        const map = new google.maps.Map(document.getElementById('property-map'), {
+        // TODO: Replace "MAP_ID_PLACEHOLDER" with your real Map ID from
+        // https://console.cloud.google.com/google/maps-apis/credentials
+        // Note: custom `styles` are ignored when mapId is set — configure
+        // map styling via the Cloud Console for your Map ID instead.
+        const map = new Map(document.getElementById('property-map'), {
             center,
             zoom: 15,
-            styles: mapStyles,
+            mapId: "MAP_ID_PLACEHOLDER",
             disableDefaultUI: true,
             zoomControl: true,
             zoomControlOptions: { position: google.maps.ControlPosition.RIGHT_BOTTOM },
@@ -155,14 +145,13 @@
                 <circle cx="18" cy="18" r="7" fill="#ffffff"/>
             </svg>`;
 
-        const marker = new google.maps.Marker({
+        const markerEl = document.createElement('div');
+        markerEl.innerHTML = markerSvg;
+
+        const marker = new AdvancedMarkerElement({
             position: center,
             map,
-            icon: {
-                url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(markerSvg),
-                scaledSize: new google.maps.Size(36, 44),
-                anchor: new google.maps.Point(18, 44),
-            },
+            content: markerEl,
             title: window.__mapName,
         });
 
@@ -173,14 +162,14 @@
                 ${window.__mapPhone   ? `<p style="color:#475569;font-size:13px;margin:0;">${window.__mapPhone}</p>` : ''}
             </div>`;
 
-        const infoWindow = new google.maps.InfoWindow({ content: infoContent });
+        const infoWindow = new InfoWindow({ content: infoContent });
 
         marker.addListener('click', () => infoWindow.open({ anchor: marker, map }));
         infoWindow.open({ anchor: marker, map });
     };
 </script>
 <script
-    src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google_maps.key') }}&callback=initPropertyMap"
+    src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google_maps.key') }}&callback=initPropertyMap&loading=async"
     async defer></script>
 @endif
 @endpush

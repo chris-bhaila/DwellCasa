@@ -48,6 +48,7 @@ Route::middleware(['web', 'auth'])->group(function () {
 
     Route::middleware('permission:edit bookings')->group(function () {
         Route::apiResource('bookings', BookingController::class)->only(['update']);
+        Route::post('bookings/{id}/refund', [BookingController::class, 'refund']);
         Route::apiResource('guests', GuestController::class)->only(['update', 'destroy']);
         Route::post('guests/{id}/restore', [GuestController::class, 'restore']);
         Route::delete('guests/{id}/force', [GuestController::class, 'forceDelete']);

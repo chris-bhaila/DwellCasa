@@ -10,70 +10,147 @@ $categories = ['interior', 'exterior', 'dining', 'amenities', 'other'];
 @endphp
 
 <!-- Header -->
-<div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+<div class="flex flex-col sm:flex-row justify-between items-start
+            sm:items-center mb-6 gap-4">
     <div>
-        <h1 class="text-3xl font-serif font-bold text-slate-900 italic lg:hidden">Gallery Management</h1>
-        <p class="text-slate-500 mt-1">Manage images across different categories for your property.</p>
+        <h1 class="text-3xl font-serif font-bold text-slate-900
+                   italic lg:hidden">Gallery</h1>
+        <p class="text-slate-500 mt-1">
+            Manage images across different categories for your property.
+        </p>
     </div>
-    <div class="flex items-center gap-3">
-        <button onclick="
-            document.getElementById('upload-modal').classList.remove('hidden');
-            document.getElementById('upload-modal').classList.add('flex');
-        " class="relative inline-flex items-center justify-center bg-primary text-white px-5 py-2.5 rounded-xl font-medium hover:bg-[#8E795E] transition-all shadow-sm group">
-            <i class="bi bi-cloud-arrow-up mr-2 text-lg"></i>
-            Upload Image
-        </button>
-    </div>
+    <button onclick="
+        document.getElementById('upload-modal').classList.remove('hidden');
+        document.getElementById('upload-modal').classList.add('flex');
+    " class="inline-flex items-center gap-2 bg-[#A89070] text-white
+              px-5 py-2.5 rounded-xl font-medium hover:bg-[#8E795E]
+              transition-all shadow-sm text-sm flex-shrink-0">
+        <i class="bi bi-cloud-arrow-up text-lg"></i>
+        Upload Image
+    </button>
 </div>
 
-<!-- Filters -->
-<div class="flex flex-wrap gap-2 mb-8">
-    <button class="filter-btn active px-4 py-2 rounded-full text-sm font-medium transition-colors bg-slate-800 text-white border border-slate-800 hover:bg-slate-700 cursor-pointer" data-filter="all">All</button>
+<div class="flex flex-wrap items-center gap-2 mb-6" id="filter-bar">
+
+    {{-- Category pills --}}
+    <button class="filter-pill active" data-filter="all">
+        All <span class="filter-count" id="count-all">{{ $images->count() }}</span>
+    </button>
     @foreach($categories as $category)
-    <button class="filter-btn px-4 py-2 rounded-full text-sm font-medium transition-colors bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 cursor-pointer" data-filter="{{ $category }}">{{ ucfirst($category) }}</button>
+    @php $catCount = $images->filter(fn($i) => strtolower($i->category) === $category && $i->imageable_type !== 'App\\Models\\RoomType')->count(); @endphp
+    <button class="filter-pill" data-filter="{{ $category }}">
+        {{ ucfirst($category) }}
+        <span class="filter-count" id="count-{{ $category }}">{{ $catCount }}</span>
+    </button>
     @endforeach
-    @foreach($roomTypes as $roomType)
-    <button class="filter-btn px-4 py-2 rounded-full text-sm font-medium transition-colors bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 cursor-pointer" data-filter="room_type_{{ $roomType->id }}">{{ $roomType->name }}</button>
-    @endforeach
+
+    {{-- Room type dropdown --}}
+    <div class="relative" id="rt-dropdown-wrap">
+        <button id="rt-btn" onclick="toggleRtDropdown()"
+            class="filter-pill">
+            Room type <i class="bi bi-chevron-down text-xs ml-0.5"></i>
+        </button>
+        <div id="rt-dropdown-menu"
+            class="hidden absolute top-[calc(100%+6px)] left-0 bg-white
+                   border border-slate-200 rounded-xl shadow-lg z-20
+                   min-w-[160px] overflow-hidden py-1">
+            @foreach($roomTypes as $rt)
+            @php $rtCount = $images->filter(fn($i) => $i->imageable_type === 'App\\Models\\RoomType' && $i->imageable_id === $rt->id)->count(); @endphp
+            <button onclick="selectRoomType('room_type_{{ $rt->id }}', '{{ addslashes($rt->name) }}')"
+                data-rt="room_type_{{ $rt->id }}"
+                class="rt-item w-full flex items-center justify-between
+                       px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50
+                       transition-colors text-left">
+                <span>{{ $rt->name }}</span>
+                <span class="text-xs text-slate-400 ml-3">{{ $rtCount }}</span>
+            </button>
+            @endforeach
+        </div>
+    </div>
+
+    {{-- Clear button — hidden by default --}}
+    <button id="filter-clear-btn" onclick="clearAllFilters()"
+        class="hidden items-center gap-1 text-xs text-[#A89070]
+               border border-[#A89070] px-3 py-1.5 rounded-full
+               hover:bg-[#A89070]/5 transition-colors">
+        <i class="bi bi-x text-sm"></i> Clear
+    </button>
+
+    {{-- Image count summary --}}
+    <span id="filter-result-line"
+          class="ml-auto text-xs text-slate-400">
+        {{ $images->count() }} images
+    </span>
+
 </div>
 
-<!-- Gallery Grid -->
-<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6" id="gallery-grid">
+<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3"
+     id="gallery-grid">
     @forelse($images as $index => $image)
     @php
         $itemCategory = strtolower($image->category);
-        if ($itemCategory === 'rooms' && $image->imageable_type === 'App\\Models\\RoomType') {
+        if ($itemCategory === 'rooms' &&
+            $image->imageable_type === 'App\\Models\\RoomType') {
             $itemCategory = 'room_type_' . $image->imageable_id;
         }
+        $isFeatured = $index === 0;
     @endphp
-    <div class="gallery-item group relative rounded-2xl overflow-hidden shadow-sm border border-slate-100 bg-slate-100 aspect-[4/3]" data-category="{{ $itemCategory }}" data-index="{{ $index }}">
-        <img src="{{ asset('storage/' . $image->filename) }}" alt="{{ $image->alt_text }}" class="w-full h-full object-cover cursor-pointer transition-transform duration-500 group-hover:scale-105" onclick="openLightbox({{ $index }})">
+    <div class="gallery-item group relative rounded-xl overflow-hidden
+                bg-slate-100 border border-slate-100
+                {{ $isFeatured ? 'md:col-span-2 md:row-span-2' : '' }}"
+         style="aspect-ratio: 4/3;"
+         data-category="{{ $itemCategory }}"
+         data-index="{{ $index }}">
 
-        <!-- Overlay -->
-        <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none flex flex-col justify-end p-4">
-            <span class="text-sm font-bold text-primary uppercase tracking-wider mb-1">
-                @if(strtolower($image->category) === 'rooms' && $image->imageable_type === 'App\\Models\\RoomType')
+        <img src="{{ asset('storage/' . $image->filename) }}"
+             alt="{{ $image->alt_text }}"
+             class="w-full h-full object-cover cursor-pointer
+                    transition-transform duration-500 group-hover:scale-105"
+             onclick="openLightbox({{ $index }})">
+
+        {{-- Overlay with category + caption --}}
+        <div class="absolute inset-0 bg-gradient-to-t from-black/65
+                    via-transparent to-transparent opacity-0
+                    group-hover:opacity-100 transition-opacity
+                    pointer-events-none flex flex-col justify-end p-3">
+            <span class="inline-flex w-fit text-[10px] font-bold uppercase
+                         tracking-wider text-white bg-[#A89070]/80
+                         px-2 py-0.5 rounded-full mb-1">
+                @if(strtolower($image->category) === 'rooms' &&
+                    $image->imageable_type === 'App\\Models\\RoomType')
                     {{ collect($roomTypes)->firstWhere('id', $image->imageable_id)?->name ?? 'Room' }}
                 @else
                     {{ ucfirst($image->category) }}
                 @endif
             </span>
-            <p class="text-white text-sm font-medium line-clamp-1">{{ $image->caption ?? $image->alt_text }}</p>
+            @if($image->caption ?? $image->alt_text)
+            <p class="text-white text-xs font-medium line-clamp-1">
+                {{ $image->caption ?? $image->alt_text }}
+            </p>
+            @endif
         </div>
 
-        <!-- Actions -->
-        <div class="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-            <button type="button" class="w-8 h-8 bg-white/90 backdrop-blur text-slate-700 rounded-lg flex items-center justify-center hover:text-red-500 hover:bg-white transition-colors shadow-sm" onclick="deleteImage({{ $image->id }})">
-                <i class="bi bi-trash"></i>
-            </button>
-        </div>
+        {{-- Delete button --}}
+        <button type="button"
+            class="absolute top-2 right-2 w-7 h-7 bg-white/90
+                   text-slate-600 rounded-lg flex items-center
+                   justify-center opacity-0 group-hover:opacity-100
+                   transition-opacity hover:text-red-500
+                   hover:bg-white shadow-sm"
+            onclick="deleteImage({{ $image->id }})">
+            <i class="bi bi-trash text-xs"></i>
+        </button>
     </div>
     @empty
-    <div class="col-span-full py-16 text-center bg-white rounded-2xl border border-slate-200 border-dashed">
-        <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-400">
+    <div class="col-span-full py-16 text-center bg-white rounded-2xl
+                border border-slate-200 border-dashed">
+        <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center
+                    justify-center mx-auto mb-4 text-slate-400">
             <i class="bi bi-images text-3xl"></i>
         </div>
-        <h3 class="text-lg font-serif font-bold text-slate-900 mb-1">No Images Found</h3>
+        <h3 class="text-lg font-serif font-bold text-slate-900 mb-1">
+            No Images Found
+        </h3>
         <p class="text-slate-500">Upload some images to populate your gallery.</p>
     </div>
     @endforelse
@@ -175,18 +252,27 @@ $categories = ['interior', 'exterior', 'dining', 'amenities', 'other'];
         </button>
     </div>
 
-    <!-- Image Container -->
-    <div id="lightbox-img-container" class="relative w-full h-full flex items-center justify-center p-4 md:p-12 overflow-hidden touch-pan-y gap-4 md:gap-8">
-        <button onclick="prevImage(event)" class="shrink-0 text-black bg-white/80 hover:bg-white transition-colors w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full z-10 focus:outline-none shadow-sm">
-            <i class="bi bi-chevron-left text-xl md:text-2xl"></i>
-        </button>
+    <!-- Prev / Next buttons — fixed at horizontal edges, vertically centred -->
+    <button onclick="prevImage(event)"
+        class="absolute left-4 top-1/2 -translate-y-1/2 z-20
+               text-black bg-white/80 hover:bg-white transition-colors
+               w-10 h-10 md:w-12 md:h-12 flex items-center justify-center
+               rounded-full focus:outline-none shadow-sm">
+        <i class="bi bi-chevron-left text-xl md:text-2xl"></i>
+    </button>
 
+    <!-- Image Container -->
+    <div id="lightbox-img-container" class="relative w-full h-full flex items-center justify-center px-16 md:px-20 py-4 overflow-hidden touch-pan-y">
         <img id="lightbox-img" src="" alt="" class="max-h-full min-w-0 object-contain select-none transition-transform duration-300 shadow-2xl">
-        
-        <button onclick="nextImage(event)" class="shrink-0 text-black bg-white/80 hover:bg-white transition-colors w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full z-10 focus:outline-none shadow-sm">
-            <i class="bi bi-chevron-right text-xl md:text-2xl"></i>
-        </button>
     </div>
+
+    <button onclick="nextImage(event)"
+        class="absolute right-4 top-1/2 -translate-y-1/2 z-20
+               text-black bg-white/80 hover:bg-white transition-colors
+               w-10 h-10 md:w-12 md:h-12 flex items-center justify-center
+               rounded-full focus:outline-none shadow-sm">
+        <i class="bi bi-chevron-right text-xl md:text-2xl"></i>
+    </button>
 
     <!-- Caption -->
     <div class="absolute bottom-0 left-0 w-full p-6 text-center z-10 bg-gradient-to-t from-black/80 to-transparent">
@@ -195,6 +281,50 @@ $categories = ['interior', 'exterior', 'dining', 'amenities', 'other'];
     </div>
 </div>
 @endsection
+
+@push('styles')
+<style>
+.filter-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid #e2e8f0;
+    background: white;
+    color: #64748b;
+    transition: all 0.15s;
+    line-height: 1;
+}
+.filter-pill.active {
+    background: #1e293b;
+    color: white;
+    border-color: #1e293b;
+}
+.filter-pill:hover:not(.active) {
+    border-color: #94a3b8;
+    color: #1e293b;
+}
+.filter-pill.zero-count {
+    opacity: 0.4;
+    pointer-events: none;
+}
+.filter-count {
+    font-size: 10px;
+    padding: 1px 5px;
+    border-radius: 10px;
+    font-weight: 600;
+    background: rgba(255,255,255,0.2);
+}
+.filter-pill:not(.active) .filter-count {
+    background: #f1f5f9;
+    color: #94a3b8;
+}
+</style>
+@endpush
 
 @push('scripts')
 <script>
@@ -233,44 +363,142 @@ $categories = ['interior', 'exterior', 'dining', 'amenities', 'other'];
     const imgContainer = document.getElementById('lightbox-img-container');
 
     // Filtering Logic
-    const filterBtns = document.querySelectorAll('.filter-btn');
     const galleryItems = document.querySelectorAll('.gallery-item');
+    const filterPills  = document.querySelectorAll('.filter-pill');
+    const rtItems      = document.querySelectorAll('.rt-item');
 
-    filterBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            // Update active state classes
-            filterBtns.forEach(b => {
-                b.classList.remove('bg-slate-800', 'text-white', 'border-slate-800', 'hover:bg-slate-700');
-                b.classList.add('bg-white', 'text-slate-600', 'border-slate-200', 'hover:bg-slate-50');
-            });
-            btn.classList.remove('bg-white', 'text-slate-600', 'border-slate-200', 'hover:bg-slate-50');
-            btn.classList.add('bg-slate-800', 'text-white', 'border-slate-800', 'hover:bg-slate-700');
+    let activeCategory = 'all';
+    let activeRoomType = null;
 
-            const filter = btn.dataset.filter;
+    const categoryCounts = {};
+    galleryItems.forEach(item => {
+        const cat = item.dataset.category;
+        categoryCounts[cat] = (categoryCounts[cat] || 0) + 1;
+    });
 
-            // Filter DOM items
-            galleryItems.forEach(item => {
-                if (filter === 'all' || item.dataset.category === filter) {
-                    item.style.display = 'block';
-                    item.style.animation = 'fadeIn 0.5s ease-in-out';
-                } else {
-                    item.style.display = 'none';
-                }
-            });
+    function applyFilters() {
+        let visibleCount = 0;
 
-            // Update array for lightbox navigation to only cycle through filtered items
-            if (filter === 'all') {
-                currentFilteredImages = [...images];
-            } else {
-                currentFilteredImages = images.filter(img => {
-                    let imgCat = (img.category || '').toLowerCase();
-                    if (imgCat === 'rooms' && img.imageable_type === 'App\\Models\\RoomType') {
-                        imgCat = 'room_type_' + img.imageable_id;
-                    }
-                    return imgCat === filter.toLowerCase();
-                });
-            }
+        galleryItems.forEach(item => {
+            const cat = item.dataset.category;
+            const catMatch = activeCategory === 'all' || cat === activeCategory;
+            const rtMatch  = !activeRoomType || cat === activeRoomType;
+            const visible  = catMatch && rtMatch;
+
+            item.style.display  = visible ? '' : 'none';
+            item.style.opacity  = visible ? '1' : '0';
+            if (visible) visibleCount++;
         });
+
+        filterPills.forEach(p => {
+            p.classList.toggle('active', p.dataset.filter === activeCategory);
+        });
+
+        // Update category pill counts based on room type filter
+        @foreach($categories as $category)
+        (function() {
+            const el = document.getElementById('count-{{ $category }}');
+            if (!el) return;
+            const n = [...galleryItems].filter(i =>
+                i.dataset.category === '{{ $category }}' &&
+                (!activeRoomType || i.dataset.category === activeRoomType)
+            ).length;
+            el.textContent = n;
+            const pill = document.querySelector('.filter-pill[data-filter="{{ $category }}"]');
+            if (pill) pill.classList.toggle('zero-count', n === 0);
+        })();
+        @endforeach
+
+        // All count
+        const allEl = document.getElementById('count-all');
+        if (allEl) {
+            allEl.textContent = [...galleryItems].filter(i =>
+                !activeRoomType || i.dataset.category === activeRoomType
+            ).length;
+        }
+
+        // Room type dropdown item active state
+        rtItems.forEach(i => {
+            i.classList.toggle('font-medium', i.dataset.rt === activeRoomType);
+            i.style.color = i.dataset.rt === activeRoomType ? '#A89070' : '';
+        });
+
+        // Room type button label
+        const rtBtn = document.getElementById('rt-btn');
+        if (activeRoomType) {
+            const rtName = document.querySelector(`.rt-item[data-rt="${activeRoomType}"]`)
+                ?.querySelector('span')?.textContent?.trim() ?? 'Room type';
+            rtBtn.innerHTML = `${rtName} <i class="bi bi-x text-xs ml-1" onclick="event.stopPropagation(); clearRoomType()"></i>`;
+            rtBtn.classList.add('active');
+        } else {
+            rtBtn.innerHTML = `Room type <i class="bi bi-chevron-down text-xs ml-0.5"></i>`;
+            rtBtn.classList.remove('active');
+        }
+
+        // Clear button
+        const clearBtn = document.getElementById('filter-clear-btn');
+        const hasFilter = activeCategory !== 'all' || activeRoomType;
+        clearBtn.classList.toggle('hidden', !hasFilter);
+        clearBtn.classList.toggle('inline-flex', hasFilter);
+
+        // Result line
+        const resultLine = document.getElementById('filter-result-line');
+        if (resultLine) {
+            resultLine.textContent = visibleCount === {{ $images->count() }}
+                ? '{{ $images->count() }} images'
+                : `${visibleCount} of {{ $images->count() }} images`;
+        }
+
+        // Update lightbox filtered images
+        if (activeCategory === 'all' && !activeRoomType) {
+            currentFilteredImages = [...images];
+        } else {
+            currentFilteredImages = images.filter(img => {
+                let imgCat = (img.category || '').toLowerCase();
+                if (imgCat === 'rooms' && img.imageable_type === 'App\\Models\\RoomType') {
+                    imgCat = 'room_type_' + img.imageable_id;
+                }
+                const catMatch = activeCategory === 'all' || imgCat === activeCategory;
+                const rtMatch  = !activeRoomType || imgCat === activeRoomType;
+                return catMatch && rtMatch;
+            });
+        }
+    }
+
+    filterPills.forEach(pill => {
+        pill.addEventListener('click', () => {
+            activeCategory = pill.dataset.filter;
+            applyFilters();
+        });
+    });
+
+    window.toggleRtDropdown = function() {
+        document.getElementById('rt-dropdown-menu').classList.toggle('hidden');
+    };
+
+    window.selectRoomType = function(rt, name) {
+        activeRoomType = activeRoomType === rt ? null : rt;
+        activeCategory = 'all';
+        document.getElementById('rt-dropdown-menu').classList.add('hidden');
+        applyFilters();
+    };
+
+    window.clearRoomType = function() {
+        activeRoomType = null;
+        applyFilters();
+    };
+
+    window.clearAllFilters = function() {
+        activeCategory = 'all';
+        activeRoomType = null;
+        applyFilters();
+    };
+
+    document.addEventListener('click', function(e) {
+        const wrap = document.getElementById('rt-dropdown-wrap');
+        if (wrap && !wrap.contains(e.target)) {
+            document.getElementById('rt-dropdown-menu').classList.add('hidden');
+        }
     });
 
     // Lightbox Logic

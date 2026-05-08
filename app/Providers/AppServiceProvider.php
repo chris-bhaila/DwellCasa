@@ -85,6 +85,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        \App\Models\Booking::observe(\App\Observers\BookingObserver::class);
+
         Gate::before(function (\App\Models\User $user, string $ability) {
             return $user->hasRole('super_admin') ? true : null;
         });

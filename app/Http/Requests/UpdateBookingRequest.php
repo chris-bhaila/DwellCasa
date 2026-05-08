@@ -38,13 +38,36 @@ class UpdateBookingRequest extends FormRequest
             'discount' => 'nullable|numeric|min:0',
             'deposit_amount' => 'nullable|numeric|min:0',
             'amount_paid' => 'nullable|numeric|min:0',
-            'payment_status' => 'nullable|in:unpaid,deposit_paid,partially_paid,fully_paid,refunded',
             'rate_per_night' => 'sometimes|required_if:stay_type,short_term|nullable|numeric|min:0',
             'rate_per_month' => 'sometimes|required_if:stay_type,long_term|nullable|numeric|min:0',
             'status' => 'nullable|in:pending,confirmed,checked_in,checked_out,cancelled,no_show',
             'special_requests' => 'nullable|string',
             'admin_notes' => 'nullable|string',
         ];
+    }
+
+    public function withValidator(\Illuminate\Validation\Validator $validator): void
+    {
+        $validator->after(function ($validator) {
+            $totalAmount = floatval($this->input('total_amount') ?? 0);
+            $discount    = floatval($this->input('discount') ?? 0);
+            $amountPaid  = floatval($this->input('amount_paid') ?? 0);
+            $netAmount   = $totalAmount - $discount;
+
+            if ($discount > $totalAmount) {
+                $validator->errors()->add(
+                    'discount',
+                    'Discount cannot exceed the total amount (Rs. ' . number_format($totalAmount, 0) . ').'
+                );
+            }
+
+            if ($amountPaid > $netAmount) {
+                $validator->errors()->add(
+                    'amount_paid',
+                    'Amount paid cannot exceed the net amount (Rs. ' . number_format($netAmount, 0) . ').'
+                );
+            }
+        });
     }
 
     protected function prepareForValidation()
@@ -81,6 +104,8 @@ class UpdateBookingRequest extends FormRequest
             );
             $merge['guest_id'] = $guest->id;
         }
+
+        $this->request->remove('payment_status');
 
         if (!empty($merge)) {
             $this->merge($merge);

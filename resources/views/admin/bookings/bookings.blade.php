@@ -4,6 +4,12 @@
 @section('header_title', 'Bookings')
 
 @section('content')
+@if(session('info'))
+<div class="mb-6 flex items-center gap-3 bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 text-sm text-blue-700">
+    <i class="bi bi-info-circle flex-shrink-0"></i>
+    {{ session('info') }}
+</div>
+@endif
 <!-- Header -->
 <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
     <div>
@@ -117,9 +123,10 @@
                         </td>
                         <td class="p-4">
                             @if($booking->total_amount > 0)
-                                @if($booking->amount_paid !== null)
+                                @php $totalReceived = ($booking->amount_paid ?? 0) + ($booking->deposit_amount ?? 0); @endphp
+                                @if($booking->amount_paid !== null || $booking->deposit_amount !== null)
                                 <div class="font-medium text-slate-900">
-                                    Rs. {{ number_format($booking->amount_paid, 0) }}
+                                    Rs. {{ number_format($totalReceived, 0) }}
                                     <span class="text-slate-400 font-normal">/ {{ number_format($booking->total_amount, 0) }}</span>
                                 </div>
                                 @else
@@ -175,12 +182,15 @@
                                     <i class="bi bi-trash3"></i>
                                 </button>
                                 @else
-                                <a href="{{ route('admin.bookings.edit', $booking->id) }}" class="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-slate-900 transition-colors font-medium rounded-md hover:bg-slate-100">
+                                @php $isEditable = $booking->isEditableBy(auth()->user()); @endphp
+                                <a href="{{ route('admin.bookings.view', $booking->id) }}" class="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-slate-900 transition-colors font-medium rounded-md hover:bg-slate-100">
                                     <i class="bi bi-eye"></i>
                                 </a>
+                                @if($isEditable)
                                 <a href="{{ route('admin.bookings.edit', $booking->id) }}" class="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-[#A89070] transition-colors font-medium rounded-md hover:bg-slate-100">
                                     <i class="bi bi-pencil-square"></i>
                                 </a>
+                                @endif
                                 @endif
                             </div>
                         </td>

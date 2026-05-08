@@ -110,10 +110,10 @@
                 </div>
 
                 <div class="flex items-center space-x-4">
-                    <a href="#booking-form"
+                    <a href="{{ route('home') }}"
                         class="px-6 py-2.5 rounded-full text-sm font-bold tracking-wider uppercase transition-all shadow-lg active:scale-95"
                         :class="scrolled ? 'bg-white text-primary hover:bg-[#A89070] hover:text-white':'bg-primary text-white hover:bg-white hover:text-primary'">
-                        Book Now
+                        View Locations
                     </a>
 
                     <button class="md:hidden p-2" @click="mobileMenu = true">
