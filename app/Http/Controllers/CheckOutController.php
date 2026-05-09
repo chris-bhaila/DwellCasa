@@ -71,6 +71,7 @@ class CheckOutController extends Controller
                         'booking_id'   => $booking->id,
                         'room_type_id' => $booking->room_type_id,
                         'guest_id'     => $booking->guest_id,
+                        'location_id'  => $booking->location_id,
                         'type'         => 'room_type',
                         'status'       => 'pending',
                         'review_token' => $token,

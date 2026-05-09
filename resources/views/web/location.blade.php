@@ -227,9 +227,14 @@
                         <p class="text-slate-600 text-base leading-relaxed mb-8 line-clamp-4">"{{ $review->body }}"</p>
                     </div>
                     <div class="flex items-center gap-4 pt-4 border-t border-slate-200/50">
-                        <div class="w-14 h-14 rounded-full bg-[#A89070] flex items-center justify-center font-bold text-white text-xl shadow-inner">
+                        @if($review->avatar)
+                        <img src="{{ asset('storage/' . $review->avatar) }}" alt="{{ $review->name }}"
+                             class="w-14 h-14 rounded-full object-cover shadow-inner flex-shrink-0">
+                        @else
+                        <div class="w-14 h-14 rounded-full bg-[#A89070] flex items-center justify-center font-bold text-white text-xl shadow-inner flex-shrink-0">
                             {{ substr($review->name, 0, 1) }}
                         </div>
+                        @endif
                         <div>
                             <p class="font-bold text-base text-slate-900">{{ $review->name }}</p>
                             <p class="text-sm text-slate-500 uppercase tracking-wider font-semibold mt-0.5">Verified Guest</p>
@@ -255,9 +260,14 @@
                         <p class="text-slate-600 text-base leading-relaxed mb-8 line-clamp-4">"{{ $review->body }}"</p>
                     </div>
                     <div class="flex items-center gap-4 pt-4 border-t border-slate-200/50">
-                        <div class="w-14 h-14 rounded-full bg-[#A89070] flex items-center justify-center font-bold text-white text-xl shadow-inner">
+                        @if($review->avatar)
+                        <img src="{{ asset('storage/' . $review->avatar) }}" alt="{{ $review->name }}"
+                             class="w-14 h-14 rounded-full object-cover shadow-inner flex-shrink-0">
+                        @else
+                        <div class="w-14 h-14 rounded-full bg-[#A89070] flex items-center justify-center font-bold text-white text-xl shadow-inner flex-shrink-0">
                             {{ substr($review->name, 0, 1) }}
                         </div>
+                        @endif
                         <div>
                             <p class="font-bold text-base text-slate-900">{{ $review->name }}</p>
                             <p class="text-sm text-slate-500 uppercase tracking-wider font-semibold mt-0.5">Verified Guest</p>

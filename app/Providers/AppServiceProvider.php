@@ -31,6 +31,7 @@ use App\Repositories\RoomTypeRepository;
 use App\Repositories\ServiceRepository;
 use App\Repositories\UserRepository;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use App\Contracts\WebsiteInfoRepositoryInterface;
 use App\Repositories\WebsiteInfoRepository;
@@ -48,6 +49,8 @@ use App\Contracts\InventoryStockRepositoryInterface;
 use App\Repositories\InventoryStockRepository;
 use App\Contracts\InventoryEquipmentRepositoryInterface;
 use App\Repositories\InventoryEquipmentRepository;
+use App\Contracts\FaqRepositoryInterface;
+use App\Repositories\FaqRepository;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -78,6 +81,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(InventoryItemRepositoryInterface::class, InventoryItemRepository::class);
         $this->app->bind(InventoryStockRepositoryInterface::class, InventoryStockRepository::class);
         $this->app->bind(InventoryEquipmentRepositoryInterface::class, InventoryEquipmentRepository::class);
+        $this->app->bind(FaqRepositoryInterface::class, FaqRepository::class);
     }
 
     /**
@@ -86,6 +90,15 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         \App\Models\Booking::observe(\App\Observers\BookingObserver::class);
+
+        Route::bind('location', function ($value) {
+            if (request()->is('admin*') || request()->is('api*')) {
+                return \App\Models\Location::findOrFail($value);
+            }
+            return \App\Models\Location::where('slug', $value)
+                ->where('is_active', true)
+                ->firstOrFail();
+        });
 
         Gate::before(function (\App\Models\User $user, string $ability) {
             return $user->hasRole('super_admin') ? true : null;

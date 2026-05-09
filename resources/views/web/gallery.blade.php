@@ -30,10 +30,7 @@
 
         {{-- Header --}}
         <div class="text-center mb-14">
-            <p class="text-[10px] font-bold tracking-[0.4em] uppercase
-                       text-[#A89070] mb-3">Our Gallery</p>
-            <h1 class="text-5xl md:text-6xl font-serif italic font-bold
-                       text-slate-900 leading-tight mb-4">
+            <h1 class="text-5xl md:text-6xl !font-sans font-bold text-slate-900 mb-4">
                 {{ $webInfo->gallery_heading }}
             </h1>
             <div class="w-12 h-px bg-[#A89070] mx-auto mb-4"></div>

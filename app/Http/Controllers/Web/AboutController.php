@@ -17,6 +17,12 @@ class AboutController extends Controller
     public function index(Location $location)
     {
         $webInfo = $this->websiteInfoRepository->getForLocation($location->id);
-        return view('web.about', compact('webInfo', 'location'));
+        $faqs = \App\Models\Faq::withoutGlobalScopes()
+            ->where('location_id', $location->id)
+            ->where('is_active', true)
+            ->orderBy('sort_order')
+            ->orderBy('created_at')
+            ->get();
+        return view('web.about', compact('webInfo', 'location', 'faqs'));
     }
 }

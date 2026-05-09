@@ -28,37 +28,47 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div class="text-center p-8 rounded-2xl bg-white shadow-sm hover:shadow-lg transition-shadow">
-                <div class="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-blue-200">
-                    <span class="text-2xl">🏨</span>
-                </div>
-                <h3 class="text-xl !font-sans font-semibold text-slate-900 mb-3">Luxury Accommodations</h3>
-                <p class="text-gray-600">
-                    Spacious, well-appointed rooms designed for comfort and relaxation.
-                </p>
+        @if(isset($faqs) && $faqs->isNotEmpty())
+        <div class="mt-16">
+            <div class="text-center mb-10">
+                <h2 class="font-serif italic text-3xl md:text-4xl font-bold text-slate-900">Frequently Asked Questions</h2>
             </div>
-
-            <div class="text-center p-8 rounded-2xl bg-white shadow-sm hover:shadow-lg transition-shadow">
-                <div class="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-blue-200">
-                    <span class="text-2xl">👥</span>
+            <div class="max-w-5xl mx-auto divide-y divide-slate-100 bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                @foreach($faqs as $index => $faq)
+                <div class="faq-item">
+                    <button type="button"
+                        class="faq-trigger w-full flex items-center justify-between gap-4 px-6 py-5 text-left hover:bg-slate-50/60 transition-colors cursor-pointer"
+                        aria-expanded="false">
+                        <span class="font-semibold text-slate-900 text-base leading-snug text-md">{{ $faq->question }}</span>
+                        <span class="faq-icon flex-shrink-0 w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 transition-transform duration-300">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                        </span>
+                    </button>
+                    <div class="faq-answer hidden px-6 pb-5">
+                        <p class="text-slate-500 text-md leading-relaxed whitespace-pre-wrap">{{ $faq->answer }}</p>
+                    </div>
                 </div>
-                <h3 class="text-xl !font-sans font-semibold text-slate-900 mb-3">Exceptional Service</h3>
-                <p class="text-gray-600">
-                    Our dedicated staff provides personalized service around the clock.
-                </p>
-            </div>
-
-            <div class="text-center p-8 rounded-2xl bg-white shadow-sm hover:shadow-lg transition-shadow">
-                <div class="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-blue-200">
-                    <span class="text-2xl">📍</span>
-                </div>
-                <h3 class="text-xl !font-sans font-semibold text-slate-900 mb-3">Prime Location</h3>
-                <p class="text-gray-600">
-                    Centrally located with easy access to Lalitpur's attractions.
-                </p>
+                @endforeach
             </div>
         </div>
+        @endif
     </div>
 </section>
 @endsection
+
+@push('scripts')
+<script>
+    document.querySelectorAll('.faq-trigger').forEach(trigger => {
+        trigger.addEventListener('click', function () {
+            const item     = this.closest('.faq-item');
+            const answer   = item.querySelector('.faq-answer');
+            const icon     = item.querySelector('.faq-icon');
+            const isOpen   = this.getAttribute('aria-expanded') === 'true';
+
+            this.setAttribute('aria-expanded', !isOpen);
+            answer.classList.toggle('hidden', isOpen);
+            icon.style.transform = isOpen ? '' : 'rotate(180deg)';
+        });
+    });
+</script>
+@endpush

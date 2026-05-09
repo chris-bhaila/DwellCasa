@@ -9,7 +9,7 @@ class LocationRepository implements LocationRepositoryInterface
 {
     public function all()
     {
-        return Location::where('is_active', true)->orderBy('name')->get();
+        return Location::orderBy('name')->get();
     }
 
     public function find($id)

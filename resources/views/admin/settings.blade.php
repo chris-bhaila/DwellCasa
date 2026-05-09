@@ -27,6 +27,12 @@ $groups = [
                 'label' => 'Website Info',
                 'desc'  => 'Manage headings, contact details, check-in times, and social links per location.',
             ] : null,
+            auth()->user()->can('manage website info') ? [
+                'route' => 'admin.faqs',
+                'icon'  => 'bi-question-circle',
+                'label' => 'FAQs',
+                'desc'  => 'Add and manage frequently asked questions displayed on your website.',
+            ] : null,
         ],
     ],
     [

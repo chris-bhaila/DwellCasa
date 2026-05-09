@@ -4,7 +4,7 @@
 
 @section('content')
 <section class="pt-10 pb-20 bg-[#fbfbf9]">
-    <div class="relative pb-24 px-4 sm:px-6 lg:px-22 text-center overflow-hidden">
+    <div class="relative pb-24 px-6 sm:px-12 lg:px-24 xl:px-36 overflow-hidden">
         <div class="text-center mb-16">
             <h1 class="text-5xl md:text-6xl !font-sans font-bold text-slate-900 mb-4">Our Rooms</h1>
             <p class="text-lg text-slate-700 max-w-2xl mx-auto">
@@ -12,15 +12,16 @@
             </p>
         </div>
 
-        <div class="space-y-16">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-8 lg:mx-40">
             @foreach($roomTypes as $roomType)
-            <div class="flex flex-col md:flex-row {{ $loop->even ? 'md:flex-row-reverse' : '' }} items-stretch bg-white rounded-[2rem] shadow-sm hover:shadow-xl transition-shadow duration-500 overflow-hidden border border-slate-100 group">
-                
-                <!-- Image Section -->
-                <div class="w-full md:w-1/2 relative overflow-hidden min-h-[300px] md:min-h-[400px]">
+            <a href="{{ route('web.rooms.show', [$location->slug, $roomType->id]) }}"
+               class="bg-white rounded-[1.5rem] border border-slate-100 shadow-sm hover:shadow-xl transition-shadow duration-500 overflow-hidden flex flex-col group">
+
+                <!-- Image -->
+                <div class="relative w-full h-56 overflow-hidden flex-shrink-0">
                     @php
                         $roomImage = $roomType->galleryImages->first();
-                        $imageUrl = $roomType->thumbnail 
+                        $imageUrl = $roomType->thumbnail
                         ? asset('storage/' . $roomType->thumbnail)
                         : ($roomImage
                         ? (filter_var($roomImage->filename, FILTER_VALIDATE_URL)
@@ -32,46 +33,46 @@
                         class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                 </div>
 
-                <!-- Info Section -->
-                <div class="w-full md:w-1/2 p-8 md:p-12 lg:p-16 flex flex-col justify-center">
-                    <h3 class="text-3xl md:text-4xl !font-sans font-bold text-slate-900 mb-4 group-hover:text-primary transition-colors">
+                <!-- Body -->
+                <div class="flex-1 flex flex-col p-6">
+                    <h3 class="font-serif italic font-bold text-3xl text-slate-900 mb-3 group-hover:text-primary transition-colors">
                         {{ $roomType->name }}
                     </h3>
-                    
                     @if($roomType->description)
-                    <p class="text-slate-600 mb-8 leading-relaxed line-clamp-3">
+                    <p class="text-slate-500 text-base leading-relaxed line-clamp-3 mb-4 flex-1">
                         {{ $roomType->description }}
                     </p>
+                    @else
+                    <div class="flex-1"></div>
                     @endif
-                    
-                    <div class="flex flex-wrap gap-x-8 gap-y-4 mb-8 text-sm text-slate-700">
-                        <div>
-                            <span class="block text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">Max Occupancy</span>
-                            <span class="font-medium">{{ $roomType->max_occupancy }} guests</span>
-                        </div>
-                        <div>
-                            <span class="block text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">Room Size</span>
-                            <span class="font-medium">{{ $roomType->size_sqft }} sq ft</span>
-                        </div>
+
+                    <hr class="border-slate-100 mb-4">
+
+                    <div class="flex flex-wrap gap-2 mb-5">
+                        <span class="inline-flex items-center gap-1.5 text-sm text-slate-500 bg-slate-50 px-3 py-1.5 rounded-lg">
+                            <i class="bi bi-people text-primary text-xs"></i>
+                            {{ $roomType->max_occupancy }} guests
+                        </span>
+                        <span class="inline-flex items-center gap-1.5 text-sm text-slate-500 bg-slate-50 px-3 py-1.5 rounded-lg">
+                            <i class="bi bi-aspect-ratio text-primary text-xs"></i>
+                            {{ $roomType->size_sqft }} sq ft
+                        </span>
                     </div>
 
-                    <div class="mt-auto pt-8 border-t border-slate-100 flex flex-col sm:flex-row justify-between sm:items-end gap-6">
+                    <div class="flex justify-between items-center gap-3">
                         <div>
-                            <p class="text-[10px] font-bold tracking-widest uppercase text-slate-400 mb-1">Starting from</p>
-                            <div class="flex items-baseline gap-2">
-                                <span class="text-3xl font-serif font-bold text-primary">Rs. {{ number_format($roomType->price_per_night, 0) }}</span>
-                                <span class="text-slate-500 font-medium">/night</span>
-                            </div>
-                            @if($roomType->price_per_month)
-                            <p class="text-sm text-slate-600 mt-1">Rs. {{ number_format($roomType->price_per_month, 0) }}/month</p>
-                            @endif
+                            <span class="text-[9px] font-bold tracking-widest uppercase text-slate-300 block mb-1">FROM</span>
+                            <p class="font-serif italic font-bold text-3xl text-primary leading-none">
+                                Rs. {{ number_format($roomType->price_per_night, 0) }}<span class="font-sans text-slate-400 font-normal text-xs not-italic"> /night</span>
+                            </p>
                         </div>
-                        <a href="{{ route('web.rooms.show', [$location->slug, $roomType->id]) }}" class="inline-flex items-center justify-center bg-slate-900 text-white px-8 py-3.5 rounded-xl font-medium hover:bg-primary transition-colors hover:-translate-y-0.5 transform duration-200">
-                            View Details
-                        </a>
+                        <span class="inline-flex items-center justify-center bg-slate-900 text-white text-xs font-semibold px-5 py-2.5 rounded-xl group-hover:bg-primary transition-colors whitespace-nowrap">
+                            View Details &rarr;
+                        </span>
                     </div>
                 </div>
-            </div>
+
+            </a>
             @endforeach
         </div>
     </div>

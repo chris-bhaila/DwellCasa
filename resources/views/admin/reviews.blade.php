@@ -39,7 +39,7 @@
                     <td class="p-4">
                         <div class="flex items-center gap-3">
                             @if($review->avatar)
-                            <img src="{{ $review->avatar }}" alt="{{ $review->name }}"
+                            <img src="{{ asset('storage/' . $review->avatar) }}" alt="{{ $review->name }}"
                                  class="w-8 h-8 rounded-full object-cover border border-slate-100 flex-shrink-0">
                             @else
                             <div class="w-8 h-8 rounded-full bg-[#A89070]/20 flex items-center justify-center

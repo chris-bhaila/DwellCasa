@@ -214,9 +214,14 @@ $reviews = \App\Models\Review::where('type', 'room_type')
                     <p class="text-slate-600 text-sm leading-relaxed mb-6">"{{ $review->body }}"</p>
                 </div>
                 <div class="flex items-center gap-4 pt-4 border-t border-slate-200/50">
-                    <div class="w-12 h-12 rounded-full bg-[#A89070] flex items-center justify-center font-bold text-white text-lg shadow-inner">
+                    @if($review->avatar)
+                    <img src="{{ asset('storage/' . $review->avatar) }}" alt="{{ $review->name }}"
+                         class="w-12 h-12 rounded-full object-cover shadow-inner flex-shrink-0">
+                    @else
+                    <div class="w-12 h-12 rounded-full bg-[#A89070] flex items-center justify-center font-bold text-white text-lg shadow-inner flex-shrink-0">
                         {{ substr($review->name, 0, 1) }}
                     </div>
+                    @endif
                     <div>
                         <p class="font-bold text-sm text-slate-900">{{ $review->name }}</p>
                         <p class="text-xs text-slate-500 uppercase tracking-wider font-semibold mt-0.5">Verified Guest &bull; {{ $review->created_at->format('M Y') }}</p>

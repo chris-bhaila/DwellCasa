@@ -13,7 +13,8 @@ class UpdateLocationRequest extends FormRequest
 
     public function rules(): array
     {
-        $locationId = $this->route('location') ?? $this->route('id');
+        $location   = $this->route('location');
+        $locationId = $location instanceof \App\Models\Location ? $location->getKey() : $location;
 
         return [
             'name'        => 'sometimes|string|max:255',

@@ -63,6 +63,12 @@ class WebsiteInfoController extends Controller
         return view('admin.info');
     }
 
+    public function faqsPage()
+    {
+        $faqs = \App\Models\Faq::orderBy('sort_order')->orderBy('created_at')->get();
+        return view('admin.faqs', compact('faqs'));
+    }
+
     public function pageGlobal()
     {
         $info = $this->websiteInfoRepository->getGlobal();

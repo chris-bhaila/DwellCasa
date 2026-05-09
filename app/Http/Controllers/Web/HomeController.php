@@ -53,6 +53,7 @@ class HomeController extends Controller
         $featuredRoomTypes = \App\Models\RoomType::withoutGlobalScopes()
             ->where('location_id', $location->id)
             ->where('is_active', true)
+            ->orderBy('price_per_night')
             ->take(3)
             ->get();
         $amenities        = \App\Models\Amenity::withoutGlobalScopes()

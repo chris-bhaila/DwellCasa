@@ -130,6 +130,7 @@ Route::middleware('auth')->prefix('admin')->group(function () {
 
     Route::middleware('permission:manage website info')->group(function () {
         Route::get('/info', [WebsiteInfoController::class, 'page'])->name('admin.info');
+        Route::get('/faqs', [WebsiteInfoController::class, 'faqsPage'])->name('admin.faqs');
     });
 
     Route::middleware('role:super_admin')->group(function () {

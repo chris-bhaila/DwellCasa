@@ -28,6 +28,7 @@ class LocationController extends Controller
 
     public function show($id)
     {
+        $id = $id instanceof \App\Models\Location ? $id->getKey() : $id;
         $location = $this->locationRepository->find($id);
         return response()->json([
             'data'    => $location,
@@ -55,6 +56,7 @@ class LocationController extends Controller
 
     public function update(UpdateLocationRequest $request, $id)
     {
+        $id = $id instanceof \App\Models\Location ? $id->getKey() : $id;
         $data = $request->validated();
         $location = $this->locationRepository->find($id);
 
@@ -77,6 +79,7 @@ class LocationController extends Controller
 
     public function destroy($id)
     {
+        $id = $id instanceof \App\Models\Location ? $id->getKey() : $id;
         $this->locationRepository->delete($id);
         return response()->json([
             'success' => true,
