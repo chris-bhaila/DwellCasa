@@ -23,7 +23,7 @@ $categories = ['interior', 'exterior', 'dining', 'amenities', 'other'];
         document.getElementById('upload-modal').classList.remove('hidden');
         document.getElementById('upload-modal').classList.add('flex');
     " class="inline-flex items-center gap-2 bg-[#A89070] text-white
-              px-5 py-2.5 rounded-xl font-medium hover:bg-[#8E795E]
+              px-5 py-2.5 rounded-xl cursor-pointer font-medium hover:bg-[#8E795E]
               transition-all shadow-sm text-sm flex-shrink-0">
         <i class="bi bi-cloud-arrow-up text-lg"></i>
         Upload Image
@@ -179,7 +179,7 @@ $categories = ['interior', 'exterior', 'dining', 'amenities', 'other'];
                 <!-- Upload Destination -->
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-2">Upload Destination <span class="text-red-500">*</span></label>
-                    <select name="upload_type" id="upload_type" onchange="toggleUploadType()" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors">
+                    <select name="upload_type" id="upload_type" onchange="toggleUploadType()" class="w-full cursor-pointer rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors">
                         <option value="general">General Website</option>
                         <option value="room_type">Specific Room Type</option>
                     </select>
@@ -188,7 +188,7 @@ $categories = ['interior', 'exterior', 'dining', 'amenities', 'other'];
                 <!-- Image File Input -->
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-2">Image Files (Multiple allowed) <span class="text-red-500">*</span></label>
-                    <input type="file" name="images[]" accept="image/*" multiple class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors" required>
+                    <input type="file" name="images[]" accept="image/*" multiple class="w-full cursor-pointer rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors" required>
                 </div>
 
                 <div class="grid grid-cols-2 gap-5">
@@ -221,11 +221,11 @@ $categories = ['interior', 'exterior', 'dining', 'amenities', 'other'];
 
                 <div class="flex items-center gap-6">
                     <label class="flex items-center gap-3 cursor-pointer">
-                        <input type="checkbox" name="is_featured" value="1" class="rounded text-primary focus:ring-primary w-5 h-5 border-slate-300">
+                        <input type="checkbox" name="is_featured" value="1" class="rounded cursor-pointer text-primary focus:ring-primary w-5 h-5 border-slate-300">
                         <span class="text-sm font-medium text-slate-700">Featured Image</span>
                     </label>
                     <label class="flex items-center gap-3 cursor-pointer">
-                        <input type="checkbox" name="is_active" value="1" class="rounded text-primary focus:ring-primary w-5 h-5 border-slate-300" checked>
+                        <input type="checkbox" name="is_active" value="1" class="rounded cursor-pointer text-primary focus:ring-primary w-5 h-5 border-slate-300" checked>
                         <span class="text-sm font-medium text-slate-700">Active (Visible)</span>
                     </label>
                 </div>
@@ -235,8 +235,8 @@ $categories = ['interior', 'exterior', 'dining', 'amenities', 'other'];
                 <button type="button" onclick="
                     document.getElementById('upload-modal').classList.add('hidden');
                     document.getElementById('upload-modal').classList.remove('flex');
-                " class="px-6 py-3 rounded-xl font-medium text-slate-600 hover:bg-slate-50 transition-colors">Cancel</button>
-                <button type="submit" class="bg-primary text-white px-6 py-3 rounded-xl font-medium hover:bg-[#8E795E] transition-colors shadow-sm">Save Image</button>
+                " class="px-6 py-3 rounded-xl font-medium cursor-pointer text-slate-600 hover:bg-slate-50 transition-colors">Cancel</button>
+                <button type="submit" class="bg-primary text-white px-6 py-3 cursor-pointer rounded-xl font-medium hover:bg-[#8E795E] transition-colors shadow-sm">Save Image</button>
             </div>
         </form>
     </div>

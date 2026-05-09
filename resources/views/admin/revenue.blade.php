@@ -26,7 +26,7 @@
                 class="text-sm font-medium text-slate-800 bg-transparent border-none outline-none focus:ring-0 cursor-pointer">
         </div>
         <button type="submit"
-            class="bg-primary text-white px-5 py-2.5 rounded-xl font-medium hover:bg-[#8E795E] transition-all shadow-sm text-sm">
+            class="bg-primary text-white px-5 py-2.5 rounded-xl cursor-pointer font-medium hover:bg-[#8E795E] transition-all shadow-sm text-sm">
             Apply
         </button>
     </form>

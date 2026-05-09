@@ -23,7 +23,7 @@ $amenities = collect([
         <p class="text-slate-500 mt-1">Create and manage amenities available for your properties and rooms.</p>
     </div>
     <button type="button" id="open-add-modal"
-        class="inline-flex items-center gap-2 bg-primary text-white px-5 py-2.5 rounded-xl font-medium hover:bg-[#8E795E] transition-all shadow-sm text-sm flex-shrink-0">
+        class="inline-flex items-center gap-2 bg-primary cursor-pointer text-white px-5 py-2.5 rounded-xl font-medium hover:bg-[#8E795E] transition-all shadow-sm text-sm flex-shrink-0">
         <i class="bi bi-plus-lg"></i> Add Amenity
     </button>
 </div>
@@ -36,14 +36,14 @@ $amenities = collect([
             class="w-full pl-9 pr-4 py-2 text-sm rounded-xl border border-slate-200 focus:ring-primary focus:border-primary transition-colors">
     </div>
     <select id="filter-category"
-        class="text-sm rounded-xl border border-slate-200 px-3 py-2 focus:ring-primary focus:border-primary transition-colors min-w-[140px]">
+        class="text-sm rounded-xl border border-slate-200 px-3 py-2 cursor-pointer focus:ring-primary focus:border-primary transition-colors min-w-[140px]">
         <option value="">All Categories</option>
         @foreach($amenities->pluck('category')->filter()->unique()->sort() as $cat)
         <option value="{{ strtolower($cat) }}">{{ ucfirst($cat) }}</option>
         @endforeach
     </select>
     <select id="filter-status"
-        class="text-sm rounded-xl border border-slate-200 px-3 py-2 focus:ring-primary focus:border-primary transition-colors min-w-[120px]">
+        class="text-sm rounded-xl cursor-pointer border border-slate-200 px-3 py-2 focus:ring-primary focus:border-primary transition-colors min-w-[120px]">
         <option value="">All Status</option>
         <option value="active">Active</option>
         <option value="inactive">Inactive</option>
@@ -87,7 +87,7 @@ $amenities = collect([
                     </td>
                     <td class="px-5 py-3.5 text-right">
                         <div class="flex items-center justify-end gap-2">
-                            <button type="button" class="edit-amenity-btn relative inline-flex items-center justify-center p-2 text-[#A89070] hover:bg-slate-50 hover:text-[#8E795E] rounded-lg transition-colors group"
+                            <button type="button" class="edit-amenity-btn relative cursor-pointer inline-flex items-center justify-center p-2 text-[#A89070] hover:bg-slate-50 hover:text-[#8E795E] rounded-lg transition-colors group"
                                 data-id="{{ $amenity->id }}"
                                 data-name="{{ $amenity->name }}"
                                 data-category="{{ $amenity->category }}"
@@ -98,7 +98,7 @@ $amenities = collect([
                                 <i class="bi bi-pencil text-lg"></i>
                                 <span class="absolute -bottom-8 right-0 w-max px-2 py-1 bg-slate-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 font-normal shadow-sm">Edit</span>
                             </button>
-                            <button type="button" class="delete-amenity-btn relative inline-flex items-center justify-center p-2 text-red-400 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors group"
+                            <button type="button" class="delete-amenity-btn cursor-pointer relative inline-flex items-center justify-center p-2 text-red-400 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors group"
                                 data-id="{{ $amenity->id }}">
                                 <i class="bi bi-trash text-lg"></i>
                                 <span class="absolute -bottom-8 right-0 w-max px-2 py-1 bg-slate-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 font-normal shadow-sm">Delete</span>
@@ -130,7 +130,7 @@ $amenities = collect([
         <div class="flex justify-between items-center px-6 py-5 border-b border-slate-100 sticky top-0 bg-white z-10 rounded-t-2xl">
             <h2 id="modal-title" class="text-xl font-serif font-bold text-slate-900 italic">Add New Amenity</h2>
             <button type="button" id="modal-close"
-                class="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
+                class="w-8 h-8 flex items-center justify-center cursor-pointer text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
                 <i class="bi bi-x-lg"></i>
             </button>
         </div>
@@ -262,7 +262,7 @@ $amenities = collect([
                     @foreach($biIcons as $iconClass)
                     @php $iconName = ucwords(str_replace('-', ' ', substr($iconClass, 3))); @endphp
                     <button type="button" title="{{ $iconName }}"
-                        class="icon-select-btn flex items-center justify-center w-9 h-9 rounded-lg border-2 border-transparent hover:bg-white hover:border-primary hover:text-primary transition-all text-slate-500 bg-slate-100"
+                        class="icon-select-btn cursor-pointer flex items-center justify-center w-9 h-9 rounded-lg border-2 border-transparent hover:bg-white hover:border-primary hover:text-primary transition-all text-slate-500 bg-slate-100"
                         data-icon='<i class="bi {{ $iconClass }}"></i>'>
                         <i class="bi {{ $iconClass }} text-base pointer-events-none"></i>
                     </button>
@@ -301,7 +301,7 @@ $amenities = collect([
                 </div>
                 <div class="flex items-center gap-3 pb-1">
                     <input type="checkbox" name="is_active" id="is_active"
-                        class="rounded text-primary focus:ring-primary w-5 h-5 border-slate-300" checked>
+                        class="rounded text-primary cursor-pointer focus:ring-primary w-5 h-5 border-slate-300" checked>
                     <label for="is_active" class="text-sm font-medium text-slate-700">Active (Visible)</label>
                 </div>
             </div>
@@ -309,11 +309,11 @@ $amenities = collect([
             {{-- Footer --}}
             <div class="mt-6 pt-5 border-t border-slate-100 flex justify-end gap-3">
                 <button type="button" id="modal-cancel"
-                    class="px-5 py-2.5 rounded-xl font-medium text-slate-600 hover:bg-slate-50 border border-slate-200 transition-all text-sm">
+                    class="px-5 py-2.5 rounded-xl cursor-pointer font-medium text-slate-600 hover:bg-slate-50 border border-slate-200 transition-all text-sm">
                     Cancel
                 </button>
                 <button type="submit" id="submit-btn"
-                    class="bg-primary text-white px-6 py-2.5 rounded-xl font-medium hover:bg-[#8E795E] transition-all shadow-sm text-sm">
+                    class="bg-primary text-white cursor-pointer px-6 py-2.5 rounded-xl font-medium hover:bg-[#8E795E] transition-all shadow-sm text-sm">
                     Save Amenity
                 </button>
             </div>

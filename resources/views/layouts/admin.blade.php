@@ -132,7 +132,7 @@
             @php $inventoryActive = request()->routeIs('admin.inventory*'); @endphp
             <div x-data="{ open: {{ $inventoryActive ? 'true' : 'false' }} }">
                 <button @click="open = !open"
-                    class="sidebar-link w-full flex items-center px-4 py-3 rounded-lg transition-colors {{ $inventoryActive ? 'active' : '' }}">
+                    class="sidebar-link w-full flex items-center cursor-pointer px-4 py-3 rounded-lg transition-colors {{ $inventoryActive ? 'active' : '' }}">
                     <i class="bi bi-box-seam sidebar-icon text-slate-400 mr-3 text-lg flex-shrink-0"></i>
                     <span class="font-medium flex-1 text-left">Inventory</span>
                     <i class="bi text-xs transition-transform" :class="open ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
@@ -174,7 +174,7 @@
 
         <!-- Profile & logout -->
         <div class="flex-shrink-0 border-t border-slate-800 p-4 space-y-2">
-            <a href="{{ route('admin.profile') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-800 transition-colors group">
+            <a href="{{ route('admin.profile') }}" class="flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-slate-800 transition-colors group">
                 <div class="w-10 h-10 rounded-full bg-[#A89070] flex items-center justify-center font-bold text-white text-sm flex-shrink-0">
                     {{ substr(Auth::user()->name, 0, 1) }}
                 </div>
@@ -185,7 +185,7 @@
             </a>
             <form method="POST" action="{{ route('admin.logout') }}">
                 @csrf
-                <button type="submit" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-400 hover:bg-red-500/20 hover:text-red-300 transition-colors">
+                <button type="submit" class="w-full flex items-center gap-3 px-3 py-2.5 cursor-pointer rounded-lg text-slate-400 hover:bg-red-500/20 hover:text-red-300 transition-colors">
                     <i class="bi bi-box-arrow-left text-lg flex-shrink-0"></i>
                     <span class="text-sm font-medium">Logout</span>
                 </button>
@@ -210,7 +210,7 @@
                 @if(auth()->user()->hasRole('super_admin'))
                 <div class="flex items-center gap-3">
                     <span class="text-sm text-slate-500">Location:</span>
-                    <select onchange="switchLocation(this.value)" class="...">
+                    <select onchange="switchLocation(this.value)" class="cursor-pointer">
                         <option value="" disabled {{ !session('selected_location_id') ? 'selected' : '' }}>
                             Select Location
                         </option>
@@ -236,11 +236,11 @@
     <!-- Confirm modal -->
     <div id="admin-confirm-modal" class="fixed inset-0 z-[300] hidden items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
         <div class="bg-white rounded-2xl shadow-2xl border border-slate-100 w-full max-w-md p-6">
-            <div class="flex items-start gap-4 mb-6">
+            <div class="flex items-start gap-4 cursor-pointer mb-6">
                 <div id="admin-confirm-icon" class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 mt-0.5"></div>
                 <p id="admin-confirm-message" class="text-slate-700 text-sm leading-relaxed pt-2 whitespace-pre-line"></p>
             </div>
-            <div class="flex justify-end gap-3">
+            <div class="flex justify-end cursor-pointer gap-3">
                 <button id="admin-confirm-cancel" class="px-4 py-2 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 transition-colors">Cancel</button>
                 <button id="admin-confirm-ok" class="px-4 py-2 rounded-xl text-sm font-medium text-white transition-colors"></button>
             </div>

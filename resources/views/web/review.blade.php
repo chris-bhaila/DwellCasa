@@ -1,18 +1,33 @@
-@extends('layouts.app')
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>Share Your Experience - DwellCasa</title>
 
-@section('title', 'Share Your Experience - DwellCasa')
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-@section('content')
-<section class="min-h-screen bg-[#fbfbf9] py-16 px-4">
+    <style>
+        body { font-family: 'DM Sans', sans-serif; }
+        h1, h2, h3, .font-serif { font-family: 'Montserrat', serif; line-height: 1.2 !important; }
+    </style>
+
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+</head>
+<body class="antialiased bg-[#fbfbf9] min-h-screen">
+
+<section class="min-h-screen py-16 px-4">
 
     @if(session('oauth_error'))
     <div class="max-w-2xl mx-auto mb-6">
-        <div class="bg-red-50 border border-red-200 rounded-xl px-4 py-3
-                    flex items-center gap-3">
+        <div class="bg-red-50 border border-red-200 rounded-xl px-4 py-3 flex items-center gap-3">
             <i class="bi bi-exclamation-circle text-red-500"></i>
             <p class="text-sm text-red-700">{{ session('oauth_error') }}</p>
-            <a href="{{ route('review.form', $token) }}"
-               class="ml-auto text-sm font-medium text-red-700 underline">
+            <a href="{{ route('review.form', $token) }}" class="ml-auto text-sm font-medium text-red-700 underline">
                 Try again
             </a>
         </div>
@@ -35,8 +50,8 @@
             <div class="flex items-center gap-6 p-6">
                 @php
                 $imageUrl = $review->roomType->thumbnail
-                ? asset('storage/' . $review->roomType->thumbnail)
-                : 'https://images.unsplash.com/photo-1618773928121-c32242e63f39?auto=format&fit=crop&q=80&w=400';
+                    ? asset('storage/' . $review->roomType->thumbnail)
+                    : 'https://images.unsplash.com/photo-1618773928121-c32242e63f39?auto=format&fit=crop&q=80&w=400';
                 @endphp
                 <div class="w-24 h-24 rounded-2xl overflow-hidden flex-shrink-0">
                     <img src="{{ $imageUrl }}" alt="{{ $review->roomType->name }}" class="w-full h-full object-cover">
@@ -81,11 +96,9 @@
                     <div class="flex items-center gap-2" id="star-rating">
                         @for($i = 1; $i <= 5; $i++)
                             <button type="button" data-value="{{ $i }}"
-                            class="star-btn text-4xl text-slate-200 hover:text-primary transition-colors duration-150 focus:outline-none"
-                            aria-label="{{ $i }} star{{ $i > 1 ? 's' : '' }}">
-                            ★
-                            </button>
-                            @endfor
+                                class="star-btn text-4xl text-slate-200 hover:text-primary transition-colors duration-150 focus:outline-none cursor-pointer"
+                                aria-label="{{ $i }} star{{ $i > 1 ? 's' : '' }}">★</button>
+                        @endfor
                     </div>
                     <input type="hidden" name="rating" id="rating-input" value="">
                     @error('rating')
@@ -121,7 +134,7 @@
                 {{-- Submit --}}
                 <div class="pt-2">
                     <button type="submit" id="submit-btn"
-                        class="w-full bg-slate-900 text-white px-8 py-4 rounded-xl font-medium hover:bg-primary transition-all duration-300 hover:-translate-y-0.5 transform shadow-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0">
+                        class="w-full bg-slate-900 text-white px-8 py-4 rounded-xl font-medium hover:bg-primary transition-all duration-300 hover:-translate-y-0.5 transform shadow-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 cursor-pointer">
                         Submit Review
                     </button>
                     <p class="text-center text-xs text-slate-400 mt-3">Your review will be visible after approval.</p>
@@ -137,42 +150,29 @@
 
     </div>
 </section>
-@endsection
 
-@push('scripts')
 <script>
     const stars = document.querySelectorAll('.star-btn');
     const ratingInput = document.getElementById('rating-input');
-    const submitBtn = document.getElementById('submit-btn');
     let selectedRating = 0;
 
     stars.forEach(star => {
-        // Hover effect
         star.addEventListener('mouseenter', function() {
             const val = parseInt(this.dataset.value);
-            stars.forEach((s, i) => {
-                s.style.color = i < val ? '#A89070' : '#e2e8f0';
-            });
+            stars.forEach((s, i) => { s.style.color = i < val ? '#A89070' : '#e2e8f0'; });
         });
 
-        // Reset on mouse leave
         star.addEventListener('mouseleave', function() {
-            stars.forEach((s, i) => {
-                s.style.color = i < selectedRating ? '#A89070' : '#e2e8f0';
-            });
+            stars.forEach((s, i) => { s.style.color = i < selectedRating ? '#A89070' : '#e2e8f0'; });
         });
 
-        // Select rating
         star.addEventListener('click', function() {
             selectedRating = parseInt(this.dataset.value);
             ratingInput.value = selectedRating;
-            stars.forEach((s, i) => {
-                s.style.color = i < selectedRating ? '#A89070' : '#e2e8f0';
-            });
+            stars.forEach((s, i) => { s.style.color = i < selectedRating ? '#A89070' : '#e2e8f0'; });
         });
     });
 
-    // Validate rating on submit
     document.querySelector('form').addEventListener('submit', function(e) {
         if (!ratingInput.value) {
             e.preventDefault();
@@ -180,4 +180,6 @@
         }
     });
 </script>
-@endpush
+
+</body>
+</html>

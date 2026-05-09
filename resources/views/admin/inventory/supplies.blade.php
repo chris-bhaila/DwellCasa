@@ -15,13 +15,13 @@
     <div class="flex items-center gap-3">
         @can('manage inventory items')
         <button onclick="openItemModal()"
-            class="inline-flex items-center gap-2 px-4 py-2 bg-[#A89070] hover:bg-[#8E795E] text-white text-sm font-medium rounded-xl transition-colors">
+            class="inline-flex items-center gap-2 px-4 py-2 bg-[#A89070] hover:bg-[#8E795E] text-white text-sm font-medium rounded-xl transition-colors cursor-pointer">
             <i class="bi bi-plus-lg"></i> Add Supply
         </button>
         @endcan
         @can('manage inventory categories')
         <button onclick="openCategoryModal()"
-            class="inline-flex items-center gap-2 px-4 py-2 bg-white hover:bg-slate-50 text-slate-700 text-sm font-medium rounded-xl border border-slate-200 transition-colors">
+            class="inline-flex items-center gap-2 px-4 py-2 bg-white hover:bg-slate-50 text-slate-700 text-sm font-medium rounded-xl border border-slate-200 transition-colors cursor-pointer">
             <i class="bi bi-tags"></i> Manage Categories
         </button>
         @endcan
@@ -75,11 +75,11 @@
         <span id="page-info"></span>
         <div class="flex items-center gap-2">
             <button id="btn-prev" onclick="changePage(-1)"
-                class="px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+                class="px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer">
                 <i class="bi bi-chevron-left"></i> Prev
             </button>
             <button id="btn-next" onclick="changePage(1)"
-                class="px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+                class="px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer">
                 Next <i class="bi bi-chevron-right"></i>
             </button>
         </div>
@@ -93,7 +93,7 @@
     <div class="bg-white rounded-3xl shadow-2xl border border-slate-100 w-full max-w-lg overflow-hidden transform scale-95 transition-transform duration-300">
         <div class="p-6 border-b border-slate-100 flex justify-between items-start bg-slate-50/50">
             <h2 class="text-xl font-serif font-bold text-slate-900 italic" id="item-modal-title">Add Supply Item</h2>
-            <button onclick="closeItemModal()" class="text-slate-400 hover:text-slate-600 transition-colors">
+            <button onclick="closeItemModal()" class="text-slate-400 hover:text-slate-600 transition-colors cursor-pointer">
                 <i class="bi bi-x-lg text-xl"></i>
             </button>
         </div>
@@ -125,8 +125,8 @@
             </div>
         </form>
         <div class="px-6 pb-6 flex justify-end gap-3">
-            <button onclick="closeItemModal()" class="px-5 py-2.5 rounded-xl font-medium text-slate-600 hover:bg-slate-100 transition-colors text-sm">Cancel</button>
-            <button onclick="saveItem()" id="item-save-btn" class="px-5 py-2.5 rounded-xl font-medium bg-[#A89070] text-white hover:bg-[#967860] transition-colors text-sm">Save</button>
+            <button onclick="closeItemModal()" class="px-5 py-2.5 rounded-xl font-medium text-slate-600 hover:bg-slate-100 transition-colors text-sm cursor-pointer">Cancel</button>
+            <button onclick="saveItem()" id="item-save-btn" class="px-5 py-2.5 rounded-xl font-medium bg-[#A89070] text-white hover:bg-[#967860] transition-colors text-sm cursor-pointer">Save</button>
         </div>
     </div>
 </div>
@@ -139,7 +139,7 @@
                 <h2 class="text-xl font-serif font-bold text-slate-900 italic">Restock Supply</h2>
                 <p class="text-sm text-slate-500 mt-0.5" id="restock-item-name"></p>
             </div>
-            <button onclick="closeRestockModal()" class="text-slate-400 hover:text-slate-600 transition-colors">
+            <button onclick="closeRestockModal()" class="text-slate-400 hover:text-slate-600 transition-colors cursor-pointer">
                 <i class="bi bi-x-lg text-xl"></i>
             </button>
         </div>
@@ -161,8 +161,8 @@
             </div>
         </div>
         <div class="px-6 pb-6 flex justify-end gap-3">
-            <button onclick="closeRestockModal()" class="px-5 py-2.5 rounded-xl font-medium text-slate-600 hover:bg-slate-100 transition-colors text-sm">Cancel</button>
-            <button onclick="saveRestock()" class="px-5 py-2.5 rounded-xl font-medium bg-green-600 text-white hover:bg-green-700 transition-colors text-sm">
+            <button onclick="closeRestockModal()" class="px-5 py-2.5 rounded-xl font-medium text-slate-600 hover:bg-slate-100 transition-colors text-sm cursor-pointer">Cancel</button>
+            <button onclick="saveRestock()" class="px-5 py-2.5 rounded-xl font-medium bg-green-600 text-white hover:bg-green-700 transition-colors text-sm cursor-pointer">
                 <i class="bi bi-plus-circle mr-1.5"></i>Restock
             </button>
         </div>
@@ -177,7 +177,7 @@
                 <h2 class="text-xl font-serif font-bold text-slate-900 italic">Log Usage</h2>
                 <p class="text-sm text-slate-500 mt-0.5" id="use-item-name"></p>
             </div>
-            <button onclick="closeUseModal()" class="text-slate-400 hover:text-slate-600 transition-colors">
+            <button onclick="closeUseModal()" class="text-slate-400 hover:text-slate-600 transition-colors cursor-pointer">
                 <i class="bi bi-x-lg text-xl"></i>
             </button>
         </div>
@@ -199,8 +199,8 @@
             </div>
         </div>
         <div class="px-6 pb-6 flex justify-end gap-3">
-            <button onclick="closeUseModal()" class="px-5 py-2.5 rounded-xl font-medium text-slate-600 hover:bg-slate-100 transition-colors text-sm">Cancel</button>
-            <button onclick="saveUse()" class="px-5 py-2.5 rounded-xl font-medium bg-blue-600 text-white hover:bg-blue-700 transition-colors text-sm">
+            <button onclick="closeUseModal()" class="px-5 py-2.5 rounded-xl font-medium text-slate-600 hover:bg-slate-100 transition-colors text-sm cursor-pointer">Cancel</button>
+            <button onclick="saveUse()" class="px-5 py-2.5 rounded-xl font-medium bg-blue-600 text-white hover:bg-blue-700 transition-colors text-sm cursor-pointer">
                 <i class="bi bi-dash-circle mr-1.5"></i>Log Usage
             </button>
         </div>
@@ -212,7 +212,7 @@
     <div class="bg-white rounded-3xl shadow-2xl border border-slate-100 w-full max-w-2xl overflow-hidden transform scale-95 transition-transform duration-300 flex flex-col max-h-[85vh]">
         <div class="p-6 border-b border-slate-100 flex justify-between items-start bg-slate-50/50 flex-shrink-0">
             <h2 class="text-xl font-serif font-bold text-slate-900 italic">Supply Categories</h2>
-            <button onclick="closeCategoryModal()" class="text-slate-400 hover:text-slate-600 transition-colors">
+            <button onclick="closeCategoryModal()" class="text-slate-400 hover:text-slate-600 transition-colors cursor-pointer">
                 <i class="bi bi-x-lg text-xl"></i>
             </button>
         </div>
@@ -231,14 +231,14 @@
                 <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-3">Add Category</h3>
                 <div class="space-y-3">
                     <input type="text" id="new-category-name" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#A89070]/40 focus:border-[#A89070]" placeholder="Category name">
-                    <button onclick="addCategory()" class="w-full px-4 py-2 rounded-xl text-sm font-medium bg-[#A89070] text-white hover:bg-[#967860] transition-colors">
+                    <button onclick="addCategory()" class="w-full px-4 py-2 rounded-xl text-sm font-medium bg-[#A89070] text-white hover:bg-[#967860] transition-colors cursor-pointer">
                         <i class="bi bi-plus-lg mr-1"></i>Add Category
                     </button>
                 </div>
             </div>
         </div>
         <div class="p-4 border-t border-slate-100 flex justify-end bg-slate-50/50 flex-shrink-0">
-            <button onclick="closeCategoryModal()" class="px-5 py-2 rounded-xl font-medium text-slate-600 hover:bg-slate-200 transition-colors text-sm">Close</button>
+            <button onclick="closeCategoryModal()" class="px-5 py-2 rounded-xl font-medium text-slate-600 hover:bg-slate-200 transition-colors text-sm cursor-pointer">Close</button>
         </div>
     </div>
 </div>
@@ -253,7 +253,7 @@
                 <h2 class="text-xl font-serif font-bold text-slate-900 italic" id="slm-title">— Stock History</h2>
                 <p class="text-slate-500 text-sm mt-0.5" id="slm-subtitle"></p>
             </div>
-            <button onclick="closeSupplyLogModal()" class="text-slate-400 hover:text-slate-600 transition-colors mt-1">
+            <button onclick="closeSupplyLogModal()" class="text-slate-400 hover:text-slate-600 transition-colors mt-1 cursor-pointer">
                 <i class="bi bi-x-lg text-xl"></i>
             </button>
         </div>
@@ -301,7 +301,7 @@
 
         <!-- Footer -->
         <div class="p-6 border-t border-slate-100 flex justify-end bg-slate-50/50 flex-shrink-0">
-            <button onclick="closeSupplyLogModal()" class="px-6 py-2.5 rounded-xl font-medium text-slate-600 hover:bg-slate-200 transition-colors">Close</button>
+            <button onclick="closeSupplyLogModal()" class="px-6 py-2.5 rounded-xl font-medium text-slate-600 hover:bg-slate-200 transition-colors cursor-pointer">Close</button>
         </div>
 
     </div>
@@ -312,7 +312,7 @@
     <div class="bg-white rounded-3xl shadow-2xl border border-slate-100 w-full max-w-md overflow-hidden transform scale-95 transition-transform duration-300">
         <div class="p-6 border-b border-slate-100 flex justify-between items-start bg-slate-50/50">
             <h2 class="text-xl font-serif font-bold text-slate-900 italic">Adjust Stock Usage</h2>
-            <button onclick="closeAdjustModal()" class="text-slate-400 hover:text-slate-600 transition-colors">
+            <button onclick="closeAdjustModal()" class="text-slate-400 hover:text-slate-600 transition-colors cursor-pointer">
                 <i class="bi bi-x-lg text-xl"></i>
             </button>
         </div>
@@ -337,8 +337,8 @@
             </div>
         </div>
         <div class="px-6 pb-6 flex justify-end gap-3">
-            <button onclick="closeAdjustModal()" class="px-5 py-2.5 rounded-xl font-medium text-slate-600 hover:bg-slate-100 transition-colors text-sm">Cancel</button>
-            <button onclick="saveAdjust()" class="px-5 py-2.5 rounded-xl font-medium bg-amber-600 text-white hover:bg-amber-700 transition-colors text-sm">Save Adjustment</button>
+            <button onclick="closeAdjustModal()" class="px-5 py-2.5 rounded-xl font-medium text-slate-600 hover:bg-slate-100 transition-colors text-sm cursor-pointer">Cancel</button>
+            <button onclick="saveAdjust()" class="px-5 py-2.5 rounded-xl font-medium bg-amber-600 text-white hover:bg-amber-700 transition-colors text-sm cursor-pointer">Save Adjustment</button>
         </div>
     </div>
 </div>
@@ -475,10 +475,10 @@ function renderTable(items) {
         const status = stock.status ?? 'out_of_stock';
         const editBtn = canManageItems
             ? `<button onclick="openItemModal(${JSON.stringify(item).replace(/"/g, '&quot;')})"
-                class="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-[#A89070] rounded-md hover:bg-slate-100 transition-colors" title="Edit">
+                class="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-[#A89070] rounded-md hover:bg-slate-100 transition-colors cursor-pointer" title="Edit">
                 <i class="bi bi-pencil"></i></button>
                <button onclick="deleteItem(${item.id}, '${escHtml(item.name)}')"
-                class="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-rose-500 rounded-md hover:bg-rose-50 transition-colors" title="Delete">
+                class="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-rose-500 rounded-md hover:bg-rose-50 transition-colors cursor-pointer" title="Delete">
                 <i class="bi bi-trash3"></i></button>`
             : '';
         return `<tr class="hover:bg-slate-50/30 transition-colors cursor-pointer" onclick="openSupplyLogModal(${item.id}, '${escHtml(item.name)}')">
@@ -494,10 +494,10 @@ function renderTable(items) {
             <td class="px-5 py-3.5" onclick="event.stopPropagation()">
                 <div class="flex items-center justify-end gap-1">
                     ${canEditInventory ? `<button onclick="openRestockModal(${item.id}, '${escHtml(item.name)}')"
-                        class="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-green-600 rounded-md hover:bg-green-50 transition-colors" title="Restock">
+                        class="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-green-600 rounded-md hover:bg-green-50 transition-colors cursor-pointer" title="Restock">
                         <i class="bi bi-plus-circle"></i></button>
                     <button onclick="openUseModal(${item.id}, '${escHtml(item.name)}')"
-                        class="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-blue-600 rounded-md hover:bg-blue-50 transition-colors" title="Log usage">
+                        class="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-blue-600 rounded-md hover:bg-blue-50 transition-colors cursor-pointer" title="Log usage">
                         <i class="bi bi-dash-circle"></i></button>` : ''}
                     ${editBtn}
                 </div>
@@ -679,7 +679,7 @@ async function loadCategories() {
             <div class="flex items-center justify-between px-3 py-2 rounded-xl bg-slate-50 hover:bg-slate-100 transition-colors">
                 <span class="text-sm font-medium text-slate-700">${escHtml(c.name)}</span>
                 <button onclick="deleteCategory(${c.id}, '${escHtml(c.name)}')"
-                    class="w-7 h-7 flex items-center justify-center text-slate-400 hover:text-rose-500 rounded-md hover:bg-rose-50 transition-colors">
+                    class="w-7 h-7 flex items-center justify-center text-slate-400 hover:text-rose-500 rounded-md hover:bg-rose-50 transition-colors cursor-pointer">
                     <i class="bi bi-trash3 text-sm"></i>
                 </button>
             </div>`).join('');
@@ -765,7 +765,7 @@ window.openSupplyLogModal = async function(id, name) {
                 }
                 const notesStr = l.action === 'adjusted' && !l.notes ? 'Corrects a previous entry' : escHtml(l.notes ?? '—');
                 const adjustCell = l.action === 'used' && isWithinWindow(l.created_at)
-                    ? `<button onclick="openAdjustModal(${id}, ${l.id}, ${l.quantity ?? 0})" class="text-xs px-2 py-1 rounded-lg bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100 transition-colors">Adjust</button>`
+                    ? `<button onclick="openAdjustModal(${id}, ${l.id}, ${l.quantity ?? 0})" class="text-xs px-2 py-1 rounded-lg bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100 transition-colors cursor-pointer">Adjust</button>`
                     : '<span class="text-slate-300 text-xs">—</span>';
                 return `<tr class="${l.action === 'adjusted' ? 'text-slate-400' : 'hover:bg-slate-50/30'}">
                     <td class="px-6 py-3">${actionBadge[l.action] ?? escHtml(l.action)}</td>

@@ -57,11 +57,11 @@
                     </td>
                     <td class="p-4 text-right">
                         <div class="flex items-center justify-end gap-2">
-                            <button type="button" class="view-inquiry-btn w-8 h-8 flex items-center justify-center text-slate-400 hover:text-primary transition-colors font-medium rounded-md hover:bg-slate-100"
+                            <button type="button" class="view-inquiry-btn w-8 h-8 cursor-pointer flex items-center justify-center text-slate-400 hover:text-primary transition-colors font-medium rounded-md hover:bg-slate-100"
                                 data-inquiry="{{ json_encode($inquiry) }}">
                                 <i class="bi bi-eye"></i>
                             </button>
-                            <button type="button" class="delete-inquiry-btn w-8 h-8 flex items-center justify-center text-slate-400 hover:text-red-500 transition-colors font-medium rounded-md hover:bg-red-50"
+                            <button type="button" class="delete-inquiry-btn w-8 h-8 cursor-pointer flex items-center justify-center text-slate-400 hover:text-red-500 transition-colors font-medium rounded-md hover:bg-red-50"
                                 data-id="{{ $inquiry->id }}">
                                 <i class="bi bi-trash"></i>
                             </button>
@@ -128,14 +128,14 @@
             </div>
         </div>
         <div class="p-6 border-t border-slate-100 flex justify-end gap-3 bg-slate-50/50">
-            <button type="button" onclick="closeViewModal()" class="px-6 py-2.5 rounded-xl font-medium text-slate-600 hover:bg-slate-200 transition-colors">Close</button>
-            <button type="button" id="modal-phone-reply-btn" class="px-6 py-2.5 rounded-xl font-medium bg-emerald-600 text-white hover:bg-emerald-700 transition-colors shadow-sm">
+            <button type="button" onclick="closeViewModal()" class="px-6 py-2.5 cursor-pointer rounded-xl font-medium text-slate-600 hover:bg-slate-200 transition-colors">Close</button>
+            <button type="button" id="modal-phone-reply-btn" class="px-6 py-2.5 cursor-pointer rounded-xl font-medium bg-emerald-600 text-white hover:bg-emerald-700 transition-colors shadow-sm">
                 <i class="bi bi-telephone-fill mr-2"></i>Replied via Phone
             </button>
-            <button type="button" id="modal-reply-toggle-btn" class="px-6 py-2.5 rounded-xl font-medium bg-slate-600 text-white hover:bg-slate-700 transition-colors shadow-sm">
+            <button type="button" id="modal-reply-toggle-btn" class="px-6 py-2.5 cursor-pointer rounded-xl font-medium bg-slate-600 text-white hover:bg-slate-700 transition-colors shadow-sm">
                 <i class="bi bi-reply-fill mr-2"></i>Reply
             </button>
-            <button type="button" id="modal-send-btn" class="hidden px-6 py-2.5 rounded-xl font-medium bg-primary text-white hover:bg-[#8E795E] transition-colors shadow-sm">
+            <button type="button" id="modal-send-btn" class="hidden px-6 py-2.5 cursor-pointer rounded-xl font-medium bg-primary text-white hover:bg-[#8E795E] transition-colors shadow-sm">
                 <i class="bi bi-send-fill mr-2"></i>Send Reply
             </button>
         </div>

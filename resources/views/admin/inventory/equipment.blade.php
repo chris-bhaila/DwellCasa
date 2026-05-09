@@ -15,13 +15,13 @@
     <div class="flex items-center gap-3">
         @can('manage inventory items')
         <button onclick="openEquipmentTypeModal()"
-            class="inline-flex items-center gap-2 px-4 py-2 bg-[#A89070] hover:bg-[#8E795E] text-white text-sm font-medium rounded-xl transition-colors">
+            class="inline-flex items-center gap-2 px-4 py-2 bg-[#A89070] hover:bg-[#8E795E] text-white text-sm font-medium rounded-xl transition-colors cursor-pointer">
             <i class="bi bi-plus-lg"></i> Add Equipment Type
         </button>
         @endcan
         @can('manage inventory categories')
         <button onclick="openCategoryModal()"
-            class="inline-flex items-center gap-2 px-4 py-2 bg-white hover:bg-slate-50 text-slate-700 text-sm font-medium rounded-xl border border-slate-200 transition-colors">
+            class="inline-flex items-center gap-2 px-4 py-2 bg-white hover:bg-slate-50 text-slate-700 text-sm font-medium rounded-xl border border-slate-200 transition-colors cursor-pointer">
             <i class="bi bi-tags"></i> Manage Categories
         </button>
         @endcan
@@ -55,11 +55,11 @@
         <span id="page-info"></span>
         <div class="flex items-center gap-2">
             <button id="btn-prev" onclick="changePage(-1)"
-                class="px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+                class="px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer">
                 <i class="bi bi-chevron-left"></i> Prev
             </button>
             <button id="btn-next" onclick="changePage(1)"
-                class="px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+                class="px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer">
                 Next <i class="bi bi-chevron-right"></i>
             </button>
         </div>
@@ -73,7 +73,7 @@
     <div class="bg-white rounded-3xl shadow-2xl border border-slate-100 w-full max-w-lg overflow-hidden transform scale-95 transition-transform duration-300">
         <div class="p-6 border-b border-slate-100 flex justify-between items-start bg-slate-50/50">
             <h2 class="text-xl font-serif font-bold text-slate-900 italic">Add Equipment Type</h2>
-            <button onclick="closeEquipmentTypeModal()" class="text-slate-400 hover:text-slate-600 transition-colors">
+            <button onclick="closeEquipmentTypeModal()" class="text-slate-400 hover:text-slate-600 transition-colors cursor-pointer">
                 <i class="bi bi-x-lg text-xl"></i>
             </button>
         </div>
@@ -94,8 +94,8 @@
             </div>
         </div>
         <div class="px-6 pb-6 flex justify-end gap-3">
-            <button onclick="closeEquipmentTypeModal()" class="px-5 py-2.5 rounded-xl font-medium text-slate-600 hover:bg-slate-100 transition-colors text-sm">Cancel</button>
-            <button onclick="saveEquipmentType()" class="px-5 py-2.5 rounded-xl font-medium bg-[#A89070] text-white hover:bg-[#967860] transition-colors text-sm">Save</button>
+            <button onclick="closeEquipmentTypeModal()" class="px-5 py-2.5 rounded-xl font-medium text-slate-600 hover:bg-slate-100 transition-colors text-sm cursor-pointer">Cancel</button>
+            <button onclick="saveEquipmentType()" class="px-5 py-2.5 rounded-xl font-medium bg-[#A89070] text-white hover:bg-[#967860] transition-colors text-sm cursor-pointer">Save</button>
         </div>
     </div>
 </div>
@@ -108,7 +108,7 @@
                 <h2 class="text-xl font-serif font-bold text-slate-900 italic">Add Equipment Unit</h2>
                 <p class="text-sm text-slate-500 mt-0.5" id="unit-item-name"></p>
             </div>
-            <button onclick="closeUnitModal()" class="text-slate-400 hover:text-slate-600 transition-colors">
+            <button onclick="closeUnitModal()" class="text-slate-400 hover:text-slate-600 transition-colors cursor-pointer">
                 <i class="bi bi-x-lg text-xl"></i>
             </button>
         </div>
@@ -155,8 +155,8 @@
             </div>
         </div>
         <div class="px-6 pb-6 flex justify-end gap-3">
-            <button onclick="closeUnitModal()" class="px-5 py-2.5 rounded-xl font-medium text-slate-600 hover:bg-slate-100 transition-colors text-sm">Cancel</button>
-            <button onclick="saveUnit()" class="px-5 py-2.5 rounded-xl font-medium bg-[#A89070] text-white hover:bg-[#967860] transition-colors text-sm">Add Unit</button>
+            <button onclick="closeUnitModal()" class="px-5 py-2.5 rounded-xl font-medium text-slate-600 hover:bg-slate-100 transition-colors text-sm cursor-pointer">Cancel</button>
+            <button onclick="saveUnit()" class="px-5 py-2.5 rounded-xl font-medium bg-[#A89070] text-white hover:bg-[#967860] transition-colors text-sm cursor-pointer">Add Unit</button>
         </div>
     </div>
 </div>
@@ -166,7 +166,7 @@
     <div class="bg-white rounded-3xl shadow-2xl border border-slate-100 w-full max-w-md overflow-hidden transform scale-95 transition-transform duration-300">
         <div class="p-6 border-b border-slate-100 flex justify-between items-start bg-slate-50/50">
             <h2 class="text-xl font-serif font-bold text-slate-900 italic">Assign to Room</h2>
-            <button onclick="closeAssignModal()" class="text-slate-400 hover:text-slate-600 transition-colors">
+            <button onclick="closeAssignModal()" class="text-slate-400 hover:text-slate-600 transition-colors cursor-pointer">
                 <i class="bi bi-x-lg text-xl"></i>
             </button>
         </div>
@@ -184,8 +184,8 @@
             </div>
         </div>
         <div class="px-6 pb-6 flex justify-end gap-3">
-            <button onclick="closeAssignModal()" class="px-5 py-2.5 rounded-xl font-medium text-slate-600 hover:bg-slate-100 transition-colors text-sm">Cancel</button>
-            <button onclick="saveAssign()" class="px-5 py-2.5 rounded-xl font-medium bg-teal-600 text-white hover:bg-teal-700 transition-colors text-sm">
+            <button onclick="closeAssignModal()" class="px-5 py-2.5 rounded-xl font-medium text-slate-600 hover:bg-slate-100 transition-colors text-sm cursor-pointer">Cancel</button>
+            <button onclick="saveAssign()" class="px-5 py-2.5 rounded-xl font-medium bg-teal-600 text-white hover:bg-teal-700 transition-colors text-sm cursor-pointer">
                 <i class="bi bi-box-arrow-in-right mr-1.5"></i>Assign
             </button>
         </div>
@@ -197,7 +197,7 @@
     <div class="bg-white rounded-3xl shadow-2xl border border-slate-100 w-full max-w-md overflow-hidden transform scale-95 transition-transform duration-300">
         <div class="p-6 border-b border-slate-100 flex justify-between items-start bg-slate-50/50">
             <h2 class="text-xl font-serif font-bold text-slate-900 italic">Return to Storage</h2>
-            <button onclick="closeReturnModal()" class="text-slate-400 hover:text-slate-600 transition-colors">
+            <button onclick="closeReturnModal()" class="text-slate-400 hover:text-slate-600 transition-colors cursor-pointer">
                 <i class="bi bi-x-lg text-xl"></i>
             </button>
         </div>
@@ -210,8 +210,8 @@
             </div>
         </div>
         <div class="px-6 pb-6 flex justify-end gap-3">
-            <button onclick="closeReturnModal()" class="px-5 py-2.5 rounded-xl font-medium text-slate-600 hover:bg-slate-100 transition-colors text-sm">Cancel</button>
-            <button onclick="saveReturn()" class="px-5 py-2.5 rounded-xl font-medium bg-slate-700 text-white hover:bg-slate-800 transition-colors text-sm">
+            <button onclick="closeReturnModal()" class="px-5 py-2.5 rounded-xl font-medium text-slate-600 hover:bg-slate-100 transition-colors text-sm cursor-pointer">Cancel</button>
+            <button onclick="saveReturn()" class="px-5 py-2.5 rounded-xl font-medium bg-slate-700 text-white hover:bg-slate-800 transition-colors text-sm cursor-pointer">
                 <i class="bi bi-box-arrow-left mr-1.5"></i>Return
             </button>
         </div>
@@ -223,7 +223,7 @@
     <div class="bg-white rounded-3xl shadow-2xl border border-slate-100 w-full max-w-md overflow-hidden transform scale-95 transition-transform duration-300">
         <div class="p-6 border-b border-slate-100 flex justify-between items-start bg-slate-50/50">
             <h2 class="text-xl font-serif font-bold text-slate-900 italic">Update Condition</h2>
-            <button onclick="closeConditionModal()" class="text-slate-400 hover:text-slate-600 transition-colors">
+            <button onclick="closeConditionModal()" class="text-slate-400 hover:text-slate-600 transition-colors cursor-pointer">
                 <i class="bi bi-x-lg text-xl"></i>
             </button>
         </div>
@@ -245,8 +245,8 @@
             </div>
         </div>
         <div class="px-6 pb-6 flex justify-end gap-3">
-            <button onclick="closeConditionModal()" class="px-5 py-2.5 rounded-xl font-medium text-slate-600 hover:bg-slate-100 transition-colors text-sm">Cancel</button>
-            <button onclick="saveCondition()" class="px-5 py-2.5 rounded-xl font-medium bg-amber-600 text-white hover:bg-amber-700 transition-colors text-sm">
+            <button onclick="closeConditionModal()" class="px-5 py-2.5 rounded-xl font-medium text-slate-600 hover:bg-slate-100 transition-colors text-sm cursor-pointer">Cancel</button>
+            <button onclick="saveCondition()" class="px-5 py-2.5 rounded-xl font-medium bg-amber-600 text-white hover:bg-amber-700 transition-colors text-sm cursor-pointer">
                 <i class="bi bi-tools mr-1.5"></i>Update Condition
             </button>
         </div>
@@ -258,7 +258,7 @@
     <div class="bg-white rounded-3xl shadow-2xl border border-slate-100 w-full max-w-2xl overflow-hidden transform scale-95 transition-transform duration-300 flex flex-col max-h-[85vh]">
         <div class="p-6 border-b border-slate-100 flex justify-between items-start bg-slate-50/50 flex-shrink-0">
             <h2 class="text-xl font-serif font-bold text-slate-900 italic">Equipment Categories</h2>
-            <button onclick="closeCategoryModal()" class="text-slate-400 hover:text-slate-600 transition-colors">
+            <button onclick="closeCategoryModal()" class="text-slate-400 hover:text-slate-600 transition-colors cursor-pointer">
                 <i class="bi bi-x-lg text-xl"></i>
             </button>
         </div>
@@ -275,14 +275,14 @@
                 <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-3">Add Category</h3>
                 <div class="space-y-3">
                     <input type="text" id="new-category-name" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#A89070]/40 focus:border-[#A89070]" placeholder="Category name">
-                    <button onclick="addCategory()" class="w-full px-4 py-2 rounded-xl text-sm font-medium bg-[#A89070] text-white hover:bg-[#967860] transition-colors">
+                    <button onclick="addCategory()" class="w-full px-4 py-2 rounded-xl text-sm font-medium bg-[#A89070] text-white hover:bg-[#967860] transition-colors cursor-pointer">
                         <i class="bi bi-plus-lg mr-1"></i>Add Category
                     </button>
                 </div>
             </div>
         </div>
         <div class="p-4 border-t border-slate-100 flex justify-end bg-slate-50/50 flex-shrink-0">
-            <button onclick="closeCategoryModal()" class="px-5 py-2 rounded-xl font-medium text-slate-600 hover:bg-slate-200 transition-colors text-sm">Close</button>
+            <button onclick="closeCategoryModal()" class="px-5 py-2 rounded-xl font-medium text-slate-600 hover:bg-slate-200 transition-colors text-sm cursor-pointer">Close</button>
         </div>
     </div>
 </div>
@@ -292,7 +292,7 @@
     <div class="bg-white rounded-3xl shadow-2xl border border-slate-100 w-full max-w-md overflow-hidden transform scale-95 transition-transform duration-300">
         <div class="p-6 border-b border-slate-100 flex justify-between items-start bg-slate-50/50">
             <h2 class="text-xl font-serif font-bold text-slate-900 italic">Undo Assignment</h2>
-            <button onclick="closeCorrectModal()" class="text-slate-400 hover:text-slate-600 transition-colors">
+            <button onclick="closeCorrectModal()" class="text-slate-400 hover:text-slate-600 transition-colors cursor-pointer">
                 <i class="bi bi-x-lg text-xl"></i>
             </button>
         </div>
@@ -308,8 +308,8 @@
             </div>
         </div>
         <div class="px-6 pb-6 flex justify-end gap-3">
-            <button onclick="closeCorrectModal()" class="px-5 py-2.5 rounded-xl font-medium text-slate-600 hover:bg-slate-100 transition-colors text-sm">Cancel</button>
-            <button onclick="saveCorrect()" class="px-5 py-2.5 rounded-xl font-medium bg-rose-600 text-white hover:bg-rose-700 transition-colors text-sm">Undo Assignment</button>
+            <button onclick="closeCorrectModal()" class="px-5 py-2.5 rounded-xl font-medium text-slate-600 hover:bg-slate-100 transition-colors text-sm cursor-pointer">Cancel</button>
+            <button onclick="saveCorrect()" class="px-5 py-2.5 rounded-xl font-medium bg-rose-600 text-white hover:bg-rose-700 transition-colors text-sm cursor-pointer">Undo Assignment</button>
         </div>
     </div>
 </div>
@@ -324,7 +324,7 @@
                 <h2 class="text-xl font-serif font-bold text-slate-900 italic" id="udet-title">Unit Details</h2>
                 <p class="text-slate-500 text-sm mt-0.5" id="udet-serial"></p>
             </div>
-            <button onclick="closeUnitDetailModal()" class="text-slate-400 hover:text-slate-600 transition-colors mt-1">
+            <button onclick="closeUnitDetailModal()" class="text-slate-400 hover:text-slate-600 transition-colors mt-1 cursor-pointer">
                 <i class="bi bi-x-lg text-xl"></i>
             </button>
         </div>
@@ -397,7 +397,7 @@
 
         <!-- Footer -->
         <div class="p-6 border-t border-slate-100 flex justify-end bg-slate-50/50 flex-shrink-0">
-            <button onclick="closeUnitDetailModal()" class="px-6 py-2.5 rounded-xl font-medium text-slate-600 hover:bg-slate-200 transition-colors">Close</button>
+            <button onclick="closeUnitDetailModal()" class="px-6 py-2.5 rounded-xl font-medium text-slate-600 hover:bg-slate-200 transition-colors cursor-pointer">Close</button>
         </div>
 
     </div>
@@ -557,7 +557,7 @@ function renderTable(items) {
 
         const addUnitBtn = canManageItems
             ? `<button onclick="event.stopPropagation(); openUnitModal(${item.id}, '${escHtml(item.name)}')"
-                class="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-[#A89070] rounded-md hover:bg-slate-100 transition-colors" title="Add unit">
+                class="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-[#A89070] rounded-md hover:bg-slate-100 transition-colors cursor-pointer" title="Add unit">
                 <i class="bi bi-plus-circle"></i></button>`
             : '';
 
@@ -583,18 +583,18 @@ function renderTable(items) {
 function buildSubRows(item) {
     return (item.units ?? []).map(unit => {
         const assignBtn = (canEditInventory && unit.status === 'available')
-            ? `<button onclick="openAssignModal(${unit.id})" class="w-7 h-7 flex items-center justify-center text-teal-500 hover:text-teal-700 rounded-md hover:bg-teal-50 transition-colors" title="Assign"><i class="bi bi-box-arrow-in-right text-sm"></i></button>`
+            ? `<button onclick="openAssignModal(${unit.id})" class="w-7 h-7 flex items-center justify-center text-teal-500 hover:text-teal-700 rounded-md hover:bg-teal-50 transition-colors cursor-pointer" title="Assign"><i class="bi bi-box-arrow-in-right text-sm"></i></button>`
             : '';
         const returnBtn = (canEditInventory && unit.status === 'assigned')
-            ? `<button onclick="openReturnModal(${unit.id})" class="w-7 h-7 flex items-center justify-center text-slate-500 hover:text-slate-700 rounded-md hover:bg-slate-100 transition-colors" title="Return"><i class="bi bi-box-arrow-left text-sm"></i></button>`
+            ? `<button onclick="openReturnModal(${unit.id})" class="w-7 h-7 flex items-center justify-center text-slate-500 hover:text-slate-700 rounded-md hover:bg-slate-100 transition-colors cursor-pointer" title="Return"><i class="bi bi-box-arrow-left text-sm"></i></button>`
             : '';
         const condBtn = canEditInventory
-            ? `<button onclick="openConditionModal(${unit.id}, '${escHtml(unit.condition)}')" class="w-7 h-7 flex items-center justify-center text-amber-500 hover:text-amber-700 rounded-md hover:bg-amber-50 transition-colors" title="Update condition"><i class="bi bi-tools text-sm"></i></button>`
+            ? `<button onclick="openConditionModal(${unit.id}, '${escHtml(unit.condition)}')" class="w-7 h-7 flex items-center justify-center text-amber-500 hover:text-amber-700 rounded-md hover:bg-amber-50 transition-colors cursor-pointer" title="Update condition"><i class="bi bi-tools text-sm"></i></button>`
             : '';
         const writeOffBtn = (canEditInventory && unit.status !== 'retired')
-            ? `<button onclick="writeOffUnit(${unit.id})" class="w-7 h-7 flex items-center justify-center text-rose-400 hover:text-rose-600 rounded-md hover:bg-rose-50 transition-colors" title="Write off"><i class="bi bi-x-octagon text-sm"></i></button>`
+            ? `<button onclick="writeOffUnit(${unit.id})" class="w-7 h-7 flex items-center justify-center text-rose-400 hover:text-rose-600 rounded-md hover:bg-rose-50 transition-colors cursor-pointer" title="Write off"><i class="bi bi-x-octagon text-sm"></i></button>`
             : '';
-        const detailBtn  = `<button onclick="openUnitDetailModal(${unit.id})" class="w-8 h-8 inline-flex items-center justify-center text-slate-400 hover:text-[#A89070] transition-colors rounded-md hover:bg-slate-100" title="View details"><i class="bi bi-eye"></i></button>`;
+        const detailBtn  = `<button onclick="openUnitDetailModal(${unit.id})" class="w-8 h-8 inline-flex items-center justify-center text-slate-400 hover:text-[#A89070] transition-colors rounded-md hover:bg-slate-100 cursor-pointer" title="View details"><i class="bi bi-eye"></i></button>`;
 
         return `<tr data-parent="${item.id}" class="bg-slate-50/40 hover:bg-slate-50 transition-colors border-l-2 border-[#A89070]/30">
             <td class="px-5 py-2.5"></td>
@@ -837,7 +837,7 @@ async function loadCategories() {
             <div class="flex items-center justify-between px-3 py-2 rounded-xl bg-slate-50 hover:bg-slate-100 transition-colors">
                 <span class="text-sm font-medium text-slate-700">${escHtml(c.name)}</span>
                 <button onclick="deleteCategory(${c.id}, '${escHtml(c.name)}')"
-                    class="w-7 h-7 flex items-center justify-center text-slate-400 hover:text-rose-500 rounded-md hover:bg-rose-50 transition-colors">
+                    class="w-7 h-7 flex items-center justify-center text-slate-400 hover:text-rose-500 rounded-md hover:bg-rose-50 transition-colors cursor-pointer">
                     <i class="bi bi-trash3 text-sm"></i>
                 </button>
             </div>`).join('');
@@ -923,7 +923,7 @@ window.openUnitDetailModal = async function(id) {
                     <td class="px-6 py-3 text-slate-500 text-sm">${condChange}</td>
                     <td class="px-6 py-3 text-slate-500 text-sm max-w-[140px] truncate">${escHtml(l.notes ?? '—')}</td>
                     <td class="px-6 py-3 text-slate-400 text-sm whitespace-nowrap">${l.created_at ? formatLogDate(l.created_at) : '—'}</td>
-                    ${l.action === 'assigned' && isWithinWindow(l.created_at) ? `<td class="px-6 py-3"><button onclick="openCorrectModal(${id}, ${l.id})" class="text-xs px-2 py-1 rounded-lg bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100 transition-colors">Undo</button></td>` : '<td class="px-6 py-3 text-slate-300 text-xs">—</td>'}
+                    ${l.action === 'assigned' && isWithinWindow(l.created_at) ? `<td class="px-6 py-3"><button onclick="openCorrectModal(${id}, ${l.id})" class="text-xs px-2 py-1 rounded-lg bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100 transition-colors cursor-pointer">Undo</button></td>` : '<td class="px-6 py-3 text-slate-300 text-xs">—</td>'}
                 </tr>`;
             }).join('');
         }

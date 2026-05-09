@@ -109,25 +109,25 @@
                             @if($filter === 'trashed')
                             @can('edit bookings')
                             <button onclick="restoreGuest({{ $guest->id }}, '{{ addslashes($guest->full_name) }}')"
-                                class="w-8 h-8 flex items-center justify-center text-green-500 hover:text-green-700 transition-colors rounded-md hover:bg-green-50"
+                                class="w-8 h-8 flex items-center justify-center text-green-500 hover:text-green-700 transition-colors rounded-md hover:bg-green-50 cursor-pointer"
                                 title="Restore">
                                 <i class="bi bi-arrow-counterclockwise"></i>
                             </button>
                             <button onclick="forceDeleteGuest({{ $guest->id }}, '{{ addslashes($guest->full_name) }}')"
-                                class="w-8 h-8 flex items-center justify-center text-red-400 hover:text-red-600 transition-colors rounded-md hover:bg-red-50"
+                                class="w-8 h-8 flex items-center justify-center text-red-400 hover:text-red-600 transition-colors rounded-md hover:bg-red-50 cursor-pointer"
                                 title="Delete permanently">
                                 <i class="bi bi-trash3"></i>
                             </button>
                             @endcan
                             @else
                             <button onclick="openGuestModal({{ $guest->id }})"
-                                class="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-slate-900 transition-colors rounded-md hover:bg-slate-100"
+                                class="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-slate-900 transition-colors rounded-md hover:bg-slate-100 cursor-pointer"
                                 title="View bookings">
                                 <i class="bi bi-eye"></i>
                             </button>
                             @can('edit bookings')
                             <button onclick="deleteGuest({{ $guest->id }}, '{{ addslashes($guest->full_name) }}')"
-                                class="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-red-500 transition-colors rounded-md hover:bg-red-50"
+                                class="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-red-500 transition-colors rounded-md hover:bg-red-50 cursor-pointer"
                                 title="Delete">
                                 <i class="bi bi-trash3"></i>
                             </button>
@@ -161,7 +161,7 @@
                 <p class="text-slate-500 text-sm mt-0.5" id="modal-guest-email"></p>
                 <p class="text-slate-500 text-sm" id="modal-guest-phone"></p>
             </div>
-            <button type="button" onclick="closeGuestModal()" class="text-slate-400 hover:text-slate-600 transition-colors mt-1">
+            <button type="button" onclick="closeGuestModal()" class="text-slate-400 hover:text-slate-600 transition-colors mt-1 cursor-pointer">
                 <i class="bi bi-x-lg text-xl"></i>
             </button>
         </div>
@@ -209,7 +209,7 @@
         </div>
 
         <div class="p-6 border-t border-slate-100 flex justify-end bg-slate-50/50 flex-shrink-0">
-            <button type="button" onclick="closeGuestModal()" class="px-6 py-2.5 rounded-xl font-medium text-slate-600 hover:bg-slate-200 transition-colors">Close</button>
+            <button type="button" onclick="closeGuestModal()" class="px-6 py-2.5 rounded-xl font-medium text-slate-600 hover:bg-slate-200 transition-colors cursor-pointer">Close</button>
         </div>
     </div>
 </div>

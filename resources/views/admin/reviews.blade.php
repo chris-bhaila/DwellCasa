@@ -99,11 +99,11 @@
                     </td>
                     <td class="p-4 text-right">
                         <div class="flex items-center justify-end gap-2">
-                            <button type="button" class="view-review-btn w-8 h-8 flex items-center justify-center text-slate-400 hover:text-primary transition-colors font-medium rounded-md hover:bg-slate-100"
+                            <button type="button" class="view-review-btn w-8 h-8 flex items-center cursor-pointer justify-center text-slate-400 hover:text-primary transition-colors font-medium rounded-md hover:bg-slate-100"
                                 data-review="{{ json_encode(array_merge($review->toArray(), ['target_name' => $targetName])) }}">
                                 <i class="bi bi-eye"></i>
                             </button>
-                            <button type="button" class="delete-review-btn w-8 h-8 flex items-center justify-center text-slate-400 hover:text-red-500 transition-colors font-medium rounded-md hover:bg-red-50"
+                            <button type="button" class="delete-review-btn w-8 h-8 flex items-center cursor-pointer justify-center text-slate-400 hover:text-red-500 transition-colors font-medium rounded-md hover:bg-red-50"
                                 data-id="{{ $review->id }}">
                                 <i class="bi bi-trash"></i>
                             </button>
@@ -137,9 +137,17 @@
         <div class="p-6 space-y-6 max-h-[70vh] overflow-y-auto">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <label class="block text-sm font-bold text-slate-400 uppercase tracking-wider mb-1">Reviewer</label>
-                    <p class="font-medium text-slate-900" id="modal-name"></p>
-                    <p class="text-slate-600 text-sm" id="modal-email"></p>
+                    <label class="block text-sm font-bold text-slate-400 uppercase tracking-wider mb-3">Reviewer</label>
+                    <div class="flex items-center gap-3">
+                        <img id="modal-avatar-img" src="" alt=""
+                            class="w-12 h-12 rounded-full object-cover border border-slate-100 flex-shrink-0 hidden">
+                        <div id="modal-avatar-initials"
+                            class="w-12 h-12 rounded-full bg-[#A89070]/20 flex items-center justify-center text-[#A89070] text-lg font-bold flex-shrink-0 hidden"></div>
+                        <div>
+                            <p class="font-medium text-slate-900" id="modal-name"></p>
+                            <p class="text-slate-600 text-sm" id="modal-email"></p>
+                        </div>
+                    </div>
                 </div>
                 <div>
                     <label class="block text-sm font-bold text-slate-400 uppercase tracking-wider mb-1">Details</label>
@@ -158,10 +166,10 @@
 
             <div class="pt-4 border-t border-slate-100 flex gap-4">
                 <input type="hidden" id="modal-review-id">
-                <button type="button" id="btn-approve" class="flex-1 py-3 rounded-xl font-medium bg-green-50 text-green-700 hover:bg-green-100 transition-colors border border-green-200">
+                <button type="button" id="btn-approve" class="flex-1 py-3 rounded-xl font-medium bg-green-50 cursor-pointer text-green-700 hover:bg-green-500 transition-colors border border-green-200">
                     <i class="bi bi-check-circle mr-2"></i> Approve Review
                 </button>
-                <button type="button" id="btn-reject" class="flex-1 py-3 rounded-xl font-medium bg-red-50 text-red-700 hover:bg-red-100 transition-colors border border-red-200">
+                <button type="button" id="btn-reject" class="flex-1 py-3 rounded-xl font-medium bg-red-50 cursor-pointer text-red-700 hover:bg-red-100 transition-colors border border-red-200">
                     <i class="bi bi-x-circle mr-2"></i> Reject Review
                 </button>
             </div>
@@ -207,6 +215,19 @@
             document.getElementById('modal-name').textContent = review.name;
             document.getElementById('modal-email').textContent = review.email;
             document.getElementById('modal-type').textContent = review.target_name || 'Hotel';
+
+            // Avatar
+            const avatarImg = document.getElementById('modal-avatar-img');
+            const avatarInitials = document.getElementById('modal-avatar-initials');
+            if (review.avatar) {
+                avatarImg.src = '/storage/' + review.avatar;
+                avatarImg.classList.remove('hidden');
+                avatarInitials.classList.add('hidden');
+            } else {
+                avatarInitials.textContent = (review.name || '?').charAt(0).toUpperCase();
+                avatarInitials.classList.remove('hidden');
+                avatarImg.classList.add('hidden');
+            }
             document.getElementById('modal-date').textContent = new Date(review.created_at).toLocaleString();
             document.getElementById('modal-body').textContent = review.body;
 

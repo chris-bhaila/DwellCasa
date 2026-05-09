@@ -205,7 +205,7 @@
             </div>
         </div>
 
-        @if($reviews->count() > 0)
+        @if($reviews->count() >= 4)
         <div class="marquee-container flex overflow-hidden w-full relative group">
             <!-- Fade gradients to blend sides into background -->
             <div class="absolute inset-y-0 left-0 w-16 md:w-32 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none"></div>
@@ -276,6 +276,38 @@
                 </div>
                 @endforeach
             </div>
+        </div>
+        @elseif($reviews->count() > 0)
+        <div class="flex flex-wrap justify-center gap-6 md:gap-8 px-6 sm:px-12 lg:px-24 pb-8">
+            @foreach($reviews as $review)
+            <div class="w-full md:w-[30rem] bg-slate-50 p-10 rounded-[2rem] shadow-sm border border-slate-100 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center mb-4">
+                        @for($i = 1; $i <= 5; $i++)
+                            <span class="text-3xl {{ $i <= $review->rating ? 'text-yellow-400' : 'text-slate-200' }}">★</span>
+                        @endfor
+                    </div>
+                    @if($review->type === 'room_type' && $review->roomType)
+                    <p class="text-xs text-[#A89070] font-bold uppercase tracking-widest mb-2">Stayed in {{ $review->roomType->name }}</p>
+                    @endif
+                    <p class="text-slate-600 text-base leading-relaxed mb-8 line-clamp-4">"{{ $review->body }}"</p>
+                </div>
+                <div class="flex items-center gap-4 pt-4 border-t border-slate-200/50">
+                    @if($review->avatar)
+                    <img src="{{ asset('storage/' . $review->avatar) }}" alt="{{ $review->name }}"
+                         class="w-14 h-14 rounded-full object-cover shadow-inner flex-shrink-0">
+                    @else
+                    <div class="w-14 h-14 rounded-full bg-[#A89070] flex items-center justify-center font-bold text-white text-xl shadow-inner flex-shrink-0">
+                        {{ substr($review->name, 0, 1) }}
+                    </div>
+                    @endif
+                    <div>
+                        <p class="font-bold text-base text-slate-900">{{ $review->name }}</p>
+                        <p class="text-sm text-slate-500 uppercase tracking-wider font-semibold mt-0.5">Verified Guest</p>
+                    </div>
+                </div>
+            </div>
+            @endforeach
         </div>
         @else
         <div class="text-center text-slate-500 italic pb-8">
