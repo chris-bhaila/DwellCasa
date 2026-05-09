@@ -37,6 +37,13 @@
 
 <!-- Table -->
 <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+    <div class="p-4 border-b border-slate-100">
+        <div class="relative max-w-sm">
+            <i class="bi bi-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm pointer-events-none"></i>
+            <input type="text" id="guest-search" placeholder="Search by name, email, or phone…"
+                class="w-full pl-9 pr-4 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#A89070]/30 focus:border-[#A89070] cursor-text">
+        </div>
+    </div>
     <div class="overflow-x-auto">
         <table class="w-full min-w-[640px] text-left border-collapse">
             <thead>
@@ -63,7 +70,8 @@
                     );
                     $lastBooking = $guest->bookings->sortByDesc('created_at')->first();
                 @endphp
-                <tr class="hover:bg-slate-50/50 transition-colors {{ $filter === 'trashed' ? 'opacity-75' : '' }}">
+                <tr class="hover:bg-slate-50/50 transition-colors {{ $filter === 'trashed' ? 'opacity-75' : '' }}"
+                    data-search="{{ strtolower(implode(' ', array_filter([$guest->full_name, $guest->email, $guest->phone ?? '']))) }}">
                     <td class="p-4">
                         <div class="font-bold text-slate-900">{{ $guest->full_name }}</div>
                         <div class="text-slate-500 text-sm mt-0.5">{{ $guest->email }}</div>
@@ -129,12 +137,15 @@
                     </td>
                 </tr>
                 @empty
-                <tr>
+                <tr class="no-data-row">
                     <td colspan="7" class="p-8 text-center text-slate-500">
                         {{ $filter === 'trashed' ? 'No deleted guests.' : 'No guests found.' }}
                     </td>
                 </tr>
                 @endforelse
+                <tr id="no-search-results" class="hidden">
+                    <td colspan="7" class="p-8 text-center text-slate-400 italic">No guests match your search.</td>
+                </tr>
             </tbody>
         </table>
     </div>
@@ -205,6 +216,25 @@
 @endsection
 
 @push('scripts')
+<script>
+(function () {
+    const input = document.getElementById('guest-search');
+    if (!input) return;
+    const rows = document.querySelectorAll('tbody tr[data-search]');
+    const noResults = document.getElementById('no-search-results');
+
+    input.addEventListener('input', function () {
+        const q = this.value.toLowerCase().trim();
+        let visible = 0;
+        rows.forEach(row => {
+            const match = !q || row.dataset.search.includes(q);
+            row.classList.toggle('hidden', !match);
+            if (match) visible++;
+        });
+        noResults.classList.toggle('hidden', visible > 0 || rows.length === 0);
+    });
+})();
+</script>
 <script>
 const guestData = @json($guestJson);
 

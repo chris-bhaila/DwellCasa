@@ -119,40 +119,31 @@
     window.__mapAddress = @json($webInfo->contact_address ?? '');
     window.__mapPhone   = @json($webInfo->contact_phone ?? '');
 
-    window.initPropertyMap = async function() {
-        const { Map, InfoWindow } = await google.maps.importLibrary("maps");
-        const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
-
+    window.initPropertyMap = function() {
         const center = { lat: window.__mapLat, lng: window.__mapLng };
 
-        // TODO: Replace "MAP_ID_PLACEHOLDER" with your real Map ID from
-        // https://console.cloud.google.com/google/maps-apis/credentials
-        // Note: custom `styles` are ignored when mapId is set — configure
-        // map styling via the Cloud Console for your Map ID instead.
-        const map = new Map(document.getElementById('property-map'), {
+        const map = new google.maps.Map(document.getElementById('property-map'), {
             center,
             zoom: 15,
-            mapId: "MAP_ID_PLACEHOLDER",
             disableDefaultUI: true,
             zoomControl: true,
             zoomControlOptions: { position: google.maps.ControlPosition.RIGHT_BOTTOM },
         });
 
-        const markerSvg = `
-            <svg xmlns="http://www.w3.org/2000/svg" width="36" height="44" viewBox="0 0 36 44">
-                <path d="M18 0C8.06 0 0 8.06 0 18c0 13.5 18 26 18 26S36 31.5 36 18C36 8.06 27.94 0 18 0z"
-                      fill="#A89070"/>
-                <circle cx="18" cy="18" r="7" fill="#ffffff"/>
-            </svg>`;
-
-        const markerEl = document.createElement('div');
-        markerEl.innerHTML = markerSvg;
-
-        const marker = new AdvancedMarkerElement({
+        const marker = new google.maps.Marker({
             position: center,
             map,
-            content: markerEl,
             title: window.__mapName,
+            icon: {
+                url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(
+                    '<svg xmlns="http://www.w3.org/2000/svg" width="36" height="44" viewBox="0 0 36 44">' +
+                    '<path d="M18 0C8.06 0 0 8.06 0 18c0 13.5 18 26 18 26S36 31.5 36 18C36 8.06 27.94 0 18 0z" fill="#A89070"/>' +
+                    '<circle cx="18" cy="18" r="7" fill="#ffffff"/>' +
+                    '</svg>'
+                ),
+                scaledSize: new google.maps.Size(36, 44),
+                anchor: new google.maps.Point(18, 44),
+            },
         });
 
         const infoContent = `
@@ -162,14 +153,14 @@
                 ${window.__mapPhone   ? `<p style="color:#475569;font-size:13px;margin:0;">${window.__mapPhone}</p>` : ''}
             </div>`;
 
-        const infoWindow = new InfoWindow({ content: infoContent });
+        const infoWindow = new google.maps.InfoWindow({ content: infoContent });
 
         marker.addListener('click', () => infoWindow.open({ anchor: marker, map }));
         infoWindow.open({ anchor: marker, map });
     };
 </script>
 <script
-    src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google_maps.key') }}&callback=initPropertyMap&loading=async"
+    src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google_maps.key') }}&callback=initPropertyMap"
     async defer></script>
 @endif
 @endpush

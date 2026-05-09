@@ -14,6 +14,20 @@
 
 <!-- List Section -->
 <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+    <div class="p-4 border-b border-slate-100 flex flex-col sm:flex-row gap-3">
+        <div class="relative flex-1 max-w-sm">
+            <i class="bi bi-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm pointer-events-none"></i>
+            <input type="text" id="review-search" placeholder="Search by name, email, or review…"
+                class="w-full pl-9 pr-4 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#A89070]/30 focus:border-[#A89070] cursor-text">
+        </div>
+        <select id="review-status-filter"
+            class="py-2 px-3 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#A89070]/30 focus:border-[#A89070] text-slate-600 bg-white cursor-pointer">
+            <option value="">All Statuses</option>
+            <option value="pending">Pending</option>
+            <option value="approved">Approved</option>
+            <option value="rejected">Rejected</option>
+        </select>
+    </div>
     <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse">
             <thead>
@@ -32,7 +46,9 @@
                 @php
                 $targetName = $review->type === 'room_type' && $review->roomType ? $review->roomType->name : 'Hotel';
                 @endphp
-                <tr class="hover:bg-slate-50/50 transition-colors">
+                <tr class="hover:bg-slate-50/50 transition-colors"
+                    data-search="{{ strtolower(implode(' ', array_filter([$review->name ?? '', $review->email ?? '', $review->body ?? '', $targetName]))) }}"
+                    data-status="{{ $review->status }}">
                     <td class="p-4 text-slate-700 whitespace-nowrap">
                         {{ $review->created_at ? \Carbon\Carbon::parse($review->created_at)->format('M d, Y') : 'N/A' }}
                     </td>
@@ -95,12 +111,15 @@
                     </td>
                 </tr>
                 @empty
-                <tr>
+                <tr class="no-data-row">
                     <td colspan="7" class="p-8 text-center text-slate-500">
                         No reviews found.
                     </td>
                 </tr>
                 @endforelse
+                <tr id="no-search-results" class="hidden">
+                    <td colspan="7" class="p-8 text-center text-slate-400 italic">No reviews match your search.</td>
+                </tr>
             </tbody>
         </table>
     </div>
@@ -152,6 +171,31 @@
 @endsection
 
 @push('scripts')
+<script>
+(function () {
+    const searchInput = document.getElementById('review-search');
+    const statusFilter = document.getElementById('review-status-filter');
+    const rows = document.querySelectorAll('tbody tr[data-search]');
+    const noResults = document.getElementById('no-search-results');
+
+    function applyFilters() {
+        const q = searchInput.value.toLowerCase().trim();
+        const status = statusFilter.value;
+        let visible = 0;
+        rows.forEach(row => {
+            const matchSearch = !q || row.dataset.search.includes(q);
+            const matchStatus = !status || row.dataset.status === status;
+            const show = matchSearch && matchStatus;
+            row.classList.toggle('hidden', !show);
+            if (show) visible++;
+        });
+        noResults.classList.toggle('hidden', visible > 0 || rows.length === 0);
+    }
+
+    searchInput.addEventListener('input', applyFilters);
+    statusFilter.addEventListener('change', applyFilters);
+})();
+</script>
 <script>
     // Handle View Modal
     document.querySelectorAll('.view-review-btn').forEach(btn => {

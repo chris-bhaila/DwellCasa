@@ -190,7 +190,6 @@ $reviews = \App\Models\Review::where('type', 'room_type')
 ->where('status', 'approved')
 ->orderByDesc('rating')
 ->latest()
-->take(6)
 ->get();
 @endphp
 
@@ -202,14 +201,14 @@ $reviews = \App\Models\Review::where('type', 'room_type')
             <h2 class="font-serif font-bold text-3xl md:text-4xl text-slate-900 italic">Reviews for {{ $roomType->name }}</h2>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="reviews-grid">
             @foreach($reviews as $review)
-            <div class="bg-slate-50 p-8 rounded-[2rem] shadow-sm border border-slate-100 flex flex-col justify-between transition-transform duration-300 hover:-translate-y-1" data-aos="fade-up" data-aos-delay="{{ $loop->index * 100 }}">
+            <div class="bg-slate-50 p-8 rounded-[2rem] shadow-sm border border-slate-100 flex flex-col justify-between transition-transform duration-300 hover:-translate-y-1 {{ $loop->index >= 6 ? 'hidden review-hidden' : '' }}" data-aos="fade-up" data-aos-delay="{{ min($loop->index, 5) * 100 }}">
                 <div>
                     <div class="flex items-center mb-4">
                         @for($i = 1; $i <= 5; $i++)
                             <span class="text-2xl {{ $i <= $review->rating ? 'text-yellow-400' : 'text-slate-200' }}">★</span>
-                            @endfor
+                        @endfor
                     </div>
                     <p class="text-slate-600 text-sm leading-relaxed mb-6">"{{ $review->body }}"</p>
                 </div>
@@ -230,6 +229,16 @@ $reviews = \App\Models\Review::where('type', 'room_type')
             </div>
             @endforeach
         </div>
+
+        @if($reviews->count() > 6)
+        <div class="text-center mt-10">
+            <button type="button" id="show-more-reviews"
+                class="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl border border-slate-200 text-slate-700 text-sm font-medium hover:border-primary hover:text-primary transition-colors cursor-pointer">
+                Show more reviews
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+        </div>
+        @endif
     </div>
 </section>
 @endif
@@ -519,6 +528,12 @@ $reviews = \App\Models\Review::where('type', 'room_type')
 
         document.getElementById('bw-guests').addEventListener('change', updateSummary);
     })();
+
+    // Show more reviews
+    document.getElementById('show-more-reviews')?.addEventListener('click', function () {
+        document.querySelectorAll('.review-hidden').forEach(card => card.classList.remove('hidden'));
+        this.closest('div').remove();
+    });
 </script>
 @endpush
 @endsection

@@ -38,6 +38,7 @@
 <!-- Primary KPI Cards -->
 <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
 
+    @can('view bookings')
     <!-- Today's Arrivals -->
     <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
         <div class="flex items-center justify-between mb-3">
@@ -50,7 +51,9 @@
         <p class="text-3xl font-bold text-slate-900">{{ $todayArrivals }}</p>
         <p class="text-sm text-slate-400 mt-1">Confirmed &amp; pending check-ins</p>
     </div>
+    @endcan
 
+    @can('check-in guests')
     <!-- Guests In-House -->
     <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
         <div class="flex items-center justify-between mb-3">
@@ -63,7 +66,9 @@
         <p class="text-3xl font-bold text-slate-900">{{ $inHouseCount }}</p>
         <p class="text-sm text-slate-400 mt-1">Currently checked in</p>
     </div>
+    @endcan
 
+    @can('view revenue')
     <!-- Monthly Revenue -->
     <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
         <div class="flex items-center justify-between mb-3">
@@ -76,7 +81,9 @@
         <p class="text-3xl font-bold text-slate-900">Rs. {{ number_format($monthlyRevenue, 0) }}</p>
         <p class="text-sm text-slate-400 mt-1">From check-ins this month</p>
     </div>
+    @endcan
 
+    @can('manage inquiries')
     <!-- Unreplied Inquiries -->
     <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
         <div class="flex items-center justify-between mb-3">
@@ -93,12 +100,14 @@
         <p class="text-3xl font-bold text-slate-900">{{ $unrepliedInquiries }}</p>
         <p class="text-sm text-slate-400 mt-1">Waiting for a response</p>
     </div>
+    @endcan
 
 </div>
 
 <!-- Secondary Stats Row -->
 <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
 
+    @can('check-out guests')
     <div class="bg-white rounded-xl border border-slate-100 shadow-sm px-5 py-4 flex items-center gap-4">
         <div class="w-9 h-9 rounded-lg bg-orange-50 flex items-center justify-center text-orange-400 flex-shrink-0">
             <i class="bi bi-box-arrow-right"></i>
@@ -108,7 +117,9 @@
             <p class="text-xl font-bold text-slate-900">{{ $todayDepartures }}</p>
         </div>
     </div>
+    @endcan
 
+    @can('manage rooms')
     <div class="bg-white rounded-xl border border-slate-100 shadow-sm px-5 py-4 flex items-center gap-4">
         <div class="w-9 h-9 rounded-lg bg-teal-50 flex items-center justify-center text-teal-500 flex-shrink-0">
             <i class="bi bi-door-open"></i>
@@ -118,7 +129,9 @@
             <p class="text-xl font-bold text-slate-900">{{ $availableRooms }} <span class="text-sm font-normal text-slate-400">/ {{ $totalRooms }}</span></p>
         </div>
     </div>
+    @endcan
 
+    @can('manage reviews')
     <div class="bg-white rounded-xl border border-slate-100 shadow-sm px-5 py-4 flex items-center gap-4">
         <div class="w-9 h-9 rounded-lg bg-amber-50 flex items-center justify-center text-amber-500 flex-shrink-0">
             <i class="bi bi-star-half"></i>
@@ -131,7 +144,9 @@
             </p>
         </div>
     </div>
+    @endcan
 
+    @can('view bookings')
     <div class="bg-white rounded-xl border border-slate-100 shadow-sm px-5 py-4 flex items-center gap-4">
         <div class="w-9 h-9 rounded-lg bg-violet-50 flex items-center justify-center text-violet-500 flex-shrink-0">
             <i class="bi bi-calendar-check"></i>
@@ -141,12 +156,14 @@
             <p class="text-xl font-bold text-slate-900">{{ $monthlyBookings }}</p>
         </div>
     </div>
+    @endcan
 
 </div>
 
 <!-- Main Content Grid -->
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
 
+    @can('view bookings')
     <!-- Recent Bookings -->
     <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
         <div class="p-5 border-b border-slate-100 flex justify-between items-center">
@@ -211,6 +228,7 @@
             </table>
         </div>
     </div>
+    @endcan
 
     <!-- Right Column -->
     <div class="space-y-6">
@@ -219,18 +237,24 @@
         <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
             <h2 class="text-lg font-serif font-bold text-slate-900 italic mb-4">Quick Actions</h2>
             <div class="grid grid-cols-2 gap-3">
+                @can('create bookings')
                 <a href="{{ route('admin.bookings.create') }}" class="flex flex-col items-center justify-center gap-2 p-4 bg-slate-50 rounded-xl hover:bg-[#A89070] hover:text-white transition-colors text-slate-600 text-center">
                     <i class="bi bi-plus-circle text-xl"></i>
                     <span class="text-sm font-medium leading-tight">New Booking</span>
                 </a>
+                @endcan
+                @can('view bookings')
                 <a href="{{ route('admin.bookings') }}" class="flex flex-col items-center justify-center gap-2 p-4 bg-slate-50 rounded-xl hover:bg-[#A89070] hover:text-white transition-colors text-slate-600 text-center">
                     <i class="bi bi-calendar3 text-xl"></i>
                     <span class="text-sm font-medium leading-tight">All Bookings</span>
                 </a>
+                @endcan
+                @can('manage room types')
                 <a href="{{ route('admin.room_type.index') }}" class="flex flex-col items-center justify-center gap-2 p-4 bg-slate-50 rounded-xl hover:bg-[#A89070] hover:text-white transition-colors text-slate-600 text-center">
                     <i class="bi bi-building text-xl"></i>
                     <span class="text-sm font-medium leading-tight">Rooms</span>
                 </a>
+                @endcan
                 <a href="{{ route('admin.settings') }}" class="flex flex-col items-center justify-center gap-2 p-4 bg-slate-50 rounded-xl hover:bg-[#A89070] hover:text-white transition-colors text-slate-600 text-center">
                     <i class="bi bi-gear text-xl"></i>
                     <span class="text-sm font-medium leading-tight">Settings</span>
@@ -238,6 +262,7 @@
             </div>
         </div>
 
+        @can('manage room types')
         <!-- Room Availability -->
         <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
             <h2 class="text-lg font-serif font-bold text-slate-900 italic mb-4">Availability</h2>
@@ -268,10 +293,12 @@
             <p class="text-sm text-slate-400 italic">No room types configured.</p>
             @endforelse
         </div>
+        @endcan
 
     </div>
 </div>
 
+@can('view inventory')
 <!-- Inventory Snapshot -->
 <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 mb-6">
     <div class="flex justify-between items-center mb-4">
@@ -345,10 +372,12 @@
 
     </div>
 </div>
+@endcan
 
 <!-- Bottom Row -->
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
+    @can('manage inquiries')
     <!-- Recent Inquiries -->
     <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
         <div class="p-5 border-b border-slate-100 flex justify-between items-center">
@@ -378,7 +407,9 @@
             @endforelse
         </div>
     </div>
+    @endcan
 
+    @can('view revenue')
     <!-- Revenue Snapshot -->
     <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5">
         <div class="flex justify-between items-center mb-5">
@@ -425,6 +456,7 @@
             @endif
         </div>
     </div>
+    @endcan
 
 </div>
 

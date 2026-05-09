@@ -61,6 +61,13 @@
 
     <!-- Data Table -->
     <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+        <div class="p-4 border-b border-slate-100">
+            <div class="relative max-w-sm">
+                <i class="bi bi-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm pointer-events-none"></i>
+                <input type="text" id="booking-search" placeholder="Search by ref, guest, or room type…"
+                    class="w-full pl-9 pr-4 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#A89070]/30 focus:border-[#A89070] cursor-text">
+            </div>
+        </div>
         <div class="overflow-x-auto">
             <table class="w-full min-w-[720px] text-left border-collapse">
                 <thead>
@@ -80,7 +87,8 @@
                 </thead>
                 <tbody class="text-sm divide-y divide-slate-100">
                     @forelse($bookings as $booking)
-                    <tr class="hover:bg-slate-50/50 transition-colors {{ $filter === 'trashed' ? 'opacity-75' : '' }}">
+                    <tr class="hover:bg-slate-50/50 transition-colors {{ $filter === 'trashed' ? 'opacity-75' : '' }}"
+                        data-search="{{ strtolower(implode(' ', array_filter([$booking->booking_ref, $booking->guest->full_name ?? '', $booking->guest->email ?? '', $booking->roomType->name ?? '']))) }}">
                         <td class="p-4">
                             <div class="font-bold text-slate-900 mb-0.5">{{ $booking->booking_ref }}</div>
                             <div class="font-medium text-slate-700">
@@ -196,12 +204,15 @@
                         </td>
                     </tr>
                     @empty
-                    <tr>
+                    <tr class="no-data-row">
                         <td colspan="7" class="p-8 text-center text-slate-500">
                             {{ $filter === 'trashed' ? 'No deleted bookings.' : 'No bookings found.' }}
                         </td>
                     </tr>
                     @endforelse
+                    <tr id="no-search-results" class="hidden">
+                        <td colspan="7" class="p-8 text-center text-slate-400 italic">No bookings match your search.</td>
+                    </tr>
                 </tbody>
             </table>
         </div>
@@ -210,6 +221,25 @@
 @endsection
 
 @push('scripts')
+<script>
+(function () {
+    const input = document.getElementById('booking-search');
+    if (!input) return;
+    const rows = document.querySelectorAll('tbody tr[data-search]');
+    const noResults = document.getElementById('no-search-results');
+
+    input.addEventListener('input', function () {
+        const q = this.value.toLowerCase().trim();
+        let visible = 0;
+        rows.forEach(row => {
+            const match = !q || row.dataset.search.includes(q);
+            row.classList.toggle('hidden', !match);
+            if (match) visible++;
+        });
+        noResults.classList.toggle('hidden', visible > 0 || rows.length === 0);
+    });
+})();
+</script>
 @if($filter === 'trashed')
 <script>
 async function restoreBooking(id, ref) {
