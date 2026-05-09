@@ -62,7 +62,7 @@ class CheckOutController extends Controller
                     $room->save();
                 }
 
-                if ($booking->guest && $booking->room_type_id) {
+                if ($booking->guest && $booking->room_type_id && !Review::where('booking_id', $booking->id)->exists()) {
                     $token = Str::uuid()->toString();
 
                     Review::create([
@@ -71,7 +71,7 @@ class CheckOutController extends Controller
                         'booking_id'   => $booking->id,
                         'room_type_id' => $booking->room_type_id,
                         'guest_id'     => $booking->guest_id,
-                        'location_id'  => $booking->location_id,
+                        'location_id'  => $booking->roomType->location_id,
                         'type'         => 'room_type',
                         'status'       => 'pending',
                         'review_token' => $token,
