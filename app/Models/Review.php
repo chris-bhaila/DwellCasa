@@ -15,6 +15,7 @@ class Review extends Model
         'name',
         'email',
         'avatar',
+        'location_id',
         'booking_id',
         'room_type_id',
         'guest_id',
