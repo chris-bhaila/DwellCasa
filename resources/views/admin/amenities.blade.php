@@ -22,10 +22,54 @@ $amenities = collect([
         <h1 class="text-3xl font-serif font-bold text-slate-900 italic lg:hidden">Amenities</h1>
         <p class="text-slate-500 mt-1">Create and manage amenities available for your properties and rooms.</p>
     </div>
-    <button type="button" id="open-add-modal"
-        class="inline-flex items-center gap-2 bg-primary cursor-pointer text-white px-5 py-2.5 rounded-xl font-medium hover:bg-[#8E795E] transition-all shadow-sm text-sm flex-shrink-0">
-        <i class="bi bi-plus-lg"></i> Add Amenity
-    </button>
+    <div class="flex items-center gap-3 flex-wrap">
+        @role('super_admin')
+        @if(isset($otherLocations) && $otherLocations->isNotEmpty())
+        <div x-data="{ open: false, loading: false }" class="relative">
+            <button
+                @click="open = !open"
+                :disabled="loading"
+                class="inline-flex items-center gap-2 cursor-pointer border border-slate-200 bg-white text-slate-700 px-4 py-2.5 rounded-xl font-medium hover:bg-slate-50 transition-all shadow-sm text-sm disabled:opacity-60">
+                <template x-if="!loading">
+                    <i class="bi bi-download"></i>
+                </template>
+                <template x-if="loading">
+                    <i class="bi bi-hourglass-split animate-spin"></i>
+                </template>
+                <span x-text="loading ? 'Importing...' : 'Import Data From'"></span>
+                <i class="bi bi-chevron-down text-sm transition-transform duration-200" :class="open ? 'rotate-180' : ''"></i>
+            </button>
+
+            <div
+                x-show="open"
+                x-transition:enter="transition ease-out duration-150"
+                x-transition:enter-start="opacity-0 scale-95"
+                x-transition:enter-end="opacity-100 scale-100"
+                x-transition:leave="transition ease-in duration-100"
+                x-transition:leave-start="opacity-100 scale-100"
+                x-transition:leave-end="opacity-0 scale-95"
+                @click.outside="open = false"
+                class="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-slate-100 py-1 z-50"
+                x-cloak>
+                @foreach($otherLocations as $loc)
+                <button
+                    type="button"
+                    @click="loading = true; open = false; importAmenitiesFrom({{ $loc->id }}, '{{ addslashes($loc->name) }}').finally(() => loading = false)"
+                    class="w-full text-left px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2 transition-colors">
+                    <i class="bi bi-geo-alt text-slate-400"></i>
+                    {{ $loc->name }}
+                </button>
+                @endforeach
+            </div>
+        </div>
+        @endif
+        @endrole
+
+        <button type="button" id="open-add-modal"
+            class="inline-flex items-center gap-2 bg-primary cursor-pointer text-white px-5 py-2.5 rounded-xl font-medium hover:bg-[#8E795E] transition-all shadow-sm text-sm flex-shrink-0">
+            <i class="bi bi-plus-lg"></i> Add Amenity
+        </button>
+    </div>
 </div>
 
 {{-- Filter Row --}}
@@ -38,8 +82,8 @@ $amenities = collect([
     <select id="filter-category"
         class="text-sm rounded-xl border border-slate-200 px-3 py-2 cursor-pointer focus:ring-primary focus:border-primary transition-colors min-w-[140px]">
         <option value="">All Categories</option>
-        @foreach($amenities->pluck('category')->filter()->unique()->sort() as $cat)
-        <option value="{{ strtolower($cat) }}">{{ ucfirst($cat) }}</option>
+        @foreach(\App\Enums\AmenityCategory::cases() as $cat)
+        <option value="{{ $cat->value }}">{{ $cat->label() }}</option>
         @endforeach
     </select>
     <select id="filter-status"
@@ -65,7 +109,7 @@ $amenities = collect([
             <tbody class="text-sm divide-y divide-slate-100" id="amenities-tbody">
                 @forelse($amenities as $amenity)
                 <tr class="hover:bg-slate-50/50 transition-colors"
-                    data-row-category="{{ strtolower($amenity->category ?: '') }}"
+                    data-row-category="{{ $amenity->category instanceof \App\Enums\AmenityCategory ? $amenity->category->value : strtolower($amenity->category ?: '') }}"
                     data-row-status="{{ $amenity->is_active ? 'active' : 'inactive' }}">
                     <td class="px-5 py-3.5">
                         <div class="flex items-center gap-3">
@@ -76,7 +120,9 @@ $amenities = collect([
                         </div>
                     </td>
                     <td class="px-5 py-3.5 text-slate-600 capitalize">
-                        <span class="bg-slate-100 text-slate-600 px-2.5 py-1 rounded-lg text-sm font-medium">{{ $amenity->category ?: 'General' }}</span>
+                        <span class="bg-slate-100 text-slate-600 px-2.5 py-1 rounded-lg text-sm font-medium">
+                            {{ $amenity->category instanceof \App\Enums\AmenityCategory ? $amenity->category->label() : ucfirst($amenity->category ?: 'General') }}
+                        </span>
                     </td>
                     <td class="px-5 py-3.5">
                         @if($amenity->is_active)
@@ -152,9 +198,12 @@ $amenities = collect([
                 </div>
                 <div>
                     <label for="category" class="block text-sm font-medium text-slate-700 mb-2">Category</label>
-                    <input type="text" name="category" id="category"
-                        placeholder="e.g. Hygiene"
-                        class="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm focus:ring-primary focus:border-primary transition-colors">
+                    <select name="category" id="category"
+                        class="w-full rounded-xl cursor-pointer border border-slate-200 px-4 py-2.5 text-sm focus:ring-primary focus:border-primary transition-colors">
+                        @foreach(\App\Enums\AmenityCategory::cases() as $cat)
+                        <option value="{{ $cat->value }}">{{ $cat->label() }}</option>
+                        @endforeach
+                    </select>
                 </div>
             </div>
 
@@ -164,6 +213,11 @@ $amenities = collect([
                     Select Icon <span class="text-red-500">*</span>
                 </label>
                 <input type="hidden" name="icon" id="icon" required>
+                <div class="relative mb-2">
+                    <i class="bi bi-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
+                    <input type="text" id="icon-search" placeholder="Search icons (e.g. wifi, bed, coffee)..."
+                        class="w-full pl-9 pr-4 py-2 text-sm rounded-xl border border-slate-200 focus:ring-primary focus:border-primary transition-colors">
+                </div>
                 <div class="grid grid-cols-8 sm:grid-cols-10 gap-2 max-h-[200px] overflow-y-auto p-3 border border-slate-200 rounded-xl bg-slate-50 mb-2">
                     @php
                     $biIcons = [
@@ -208,6 +262,29 @@ $amenities = collect([
                     'bi-clock', 'bi-stars', 'bi-heart-pulse', 'bi-shop',
                     'bi-building', 'bi-house-door', 'bi-tools', 'bi-recycle',
                     'bi-bag-check', 'bi-lightning-charge', 'bi-bandaid',
+
+                    // Wellness & spa
+                    'bi-droplet-half', 'bi-steam', 'bi-heart', 'bi-emoji-smile',
+                    'bi-person-arms-up', 'bi-moon-stars', 'bi-peace',
+
+                    // Sports & fitness
+                    'bi-trophy', 'bi-stopwatch', 'bi-activity', 'bi-person-walking',
+                    'bi-person-standing', 'bi-bullseye',
+
+                    // Business facilities
+                    'bi-easel', 'bi-easel2', 'bi-display', 'bi-calendar-check',
+                    'bi-clipboard', 'bi-journals', 'bi-diagram-3', 'bi-headset',
+
+                    // Accessibility
+                    'bi-wheelchair', 'bi-elevator', 'bi-sign-intersection-y',
+
+                    // Outdoor & recreation
+                    'bi-geo-alt', 'bi-map', 'bi-signpost', 'bi-binoculars',
+                    'bi-compass', 'bi-sunrise', 'bi-sunset', 'bi-snow2',
+                    'bi-water', 'bi-waves',
+
+                    // Cleaning & housekeeping
+                    'bi-bucket', 'bi-trash', 'bi-stars', // stars = cleanliness rating feel
                     ];
 
                     $lucideIcons = [
@@ -256,6 +333,28 @@ $amenities = collect([
                     // Misc
                     'alarm-clock', 'calendar-check', 'air-vent',
                     'plug-zap', 'thermometer', 'clock-3',
+
+                    // Wellness & spa
+                    'dumbbell', 'brain',
+                    'eye', 'hand', 'feather',
+
+                    // Sports & fitness
+                    'bike', 'volleyball',
+                    'dumbbell', 'mountain', 'PersonStanding', 'activity',
+
+                    // Business facilities
+                    'monitor', 'presentation', 'projector', 'layout-dashboard',
+                    'table-2', 'video', 'podcast', 'network',
+
+                    // Accessibility
+                    'accessibility', 'hand-helping', 'ear',
+
+                    // Outdoor & recreation
+                    'tent', 'mountain-snow', 'waves', 'sailboat', 'map-pin',
+                    'map', 'compass', 'sunset', 'sunrise', 'trees',
+
+                    // Cleaning & housekeeping
+                    'sparkles', 'wind', 'trash-2', 'brush',
                     ];
                     @endphp
 
@@ -271,7 +370,7 @@ $amenities = collect([
                     @foreach($lucideIcons as $iconName)
                     @php $label = ucwords(str_replace('-', ' ', $iconName)); @endphp
                     <button type="button" title="{{ $label }}"
-                        class="icon-select-btn flex items-center justify-center w-9 h-9 rounded-lg border-2 border-transparent hover:bg-white hover:border-primary hover:text-primary transition-all text-slate-500 bg-slate-100"
+                        class="icon-select-btn flex cursor-pointer items-center justify-center w-9 h-9 rounded-lg border-2 border-transparent hover:bg-white hover:border-primary hover:text-primary transition-all text-slate-500 bg-slate-100"
                         data-icon='<i data-lucide="{{ $iconName }}"></i>'>
                         <i data-lucide="{{ $iconName }}" class="pointer-events-none" style="width:16px;height:16px;"></i>
                     </button>
@@ -326,18 +425,20 @@ $amenities = collect([
 @push('scripts')
 <script>
     // ─── Modal helpers ─────────────────────────────────────────────────────────
-    const modal       = document.getElementById('amenity-modal');
-    const modalTitle  = document.getElementById('modal-title');
-    const submitBtn   = document.getElementById('submit-btn');
-    const iconInput   = document.getElementById('icon');
+    const modal = document.getElementById('amenity-modal');
+    const modalTitle = document.getElementById('modal-title');
+    const submitBtn = document.getElementById('submit-btn');
+    const iconInput = document.getElementById('icon');
     const iconPreview = document.getElementById('selected-icon-preview');
-    const iconBtns    = document.querySelectorAll('.icon-select-btn');
+    const iconBtns = document.querySelectorAll('.icon-select-btn');
 
     function openModal() {
         modal.classList.remove('hidden');
         modal.classList.add('flex');
         document.body.style.overflow = 'hidden';
-        if (window.lucide) lucide.createIcons({ root: modal });
+        if (window.lucide) lucide.createIcons({
+            root: modal
+        });
     }
 
     function closeModal() {
@@ -351,9 +452,19 @@ $amenities = collect([
     document.getElementById('modal-cancel').addEventListener('click', closeModal);
     document.getElementById('modal-backdrop').addEventListener('click', closeModal);
 
+    // ─── Icon search ───────────────────────────────────────────────────────────
+    const iconSearch = document.getElementById('icon-search');
+    iconSearch.addEventListener('input', function() {
+        const term = this.value.trim().toLowerCase();
+        iconBtns.forEach(btn => {
+            const match = !term || btn.title.toLowerCase().includes(term);
+            btn.classList.toggle('hidden', !match);
+        });
+    });
+
     // ─── Icon picker ───────────────────────────────────────────────────────────
     iconBtns.forEach(btn => {
-        btn.addEventListener('click', function () {
+        btn.addEventListener('click', function() {
             iconBtns.forEach(b => {
                 b.classList.remove('border-primary', 'text-primary', 'bg-white');
                 b.classList.add('border-transparent', 'text-slate-500', 'bg-slate-100');
@@ -367,7 +478,9 @@ $amenities = collect([
             iconPreview.classList.add('text-primary');
 
             if (iconHtml.includes('data-lucide') && window.lucide) {
-                lucide.createIcons({ root: iconPreview });
+                lucide.createIcons({
+                    root: iconPreview
+                });
             }
         });
     });
@@ -379,12 +492,13 @@ $amenities = collect([
         iconInput.value = '';
         iconPreview.innerHTML = '?';
         iconPreview.classList.remove('text-primary');
+        iconSearch.value = '';
         iconBtns.forEach(b => {
-            b.classList.remove('border-primary', 'text-primary', 'bg-white');
+            b.classList.remove('border-primary', 'text-primary', 'bg-white', 'hidden');
             b.classList.add('border-transparent', 'text-slate-500', 'bg-slate-100');
         });
         modalTitle.innerText = 'Add New Amenity';
-        submitBtn.innerText  = 'Save Amenity';
+        submitBtn.innerText = 'Save Amenity';
     }
 
     // ─── Open add ──────────────────────────────────────────────────────────────
@@ -395,14 +509,14 @@ $amenities = collect([
 
     // ─── Open edit ─────────────────────────────────────────────────────────────
     document.querySelectorAll('.edit-amenity-btn').forEach(btn => {
-        btn.addEventListener('click', function () {
+        btn.addEventListener('click', function() {
             resetForm();
 
-            document.getElementById('amenity_id').value  = this.dataset.id;
-            document.getElementById('name').value        = this.dataset.name;
-            document.getElementById('category').value    = this.dataset.category;
+            document.getElementById('amenity_id').value = this.dataset.id;
+            document.getElementById('name').value = this.dataset.name;
+            document.getElementById('category').value = this.dataset.category;
             document.getElementById('description').value = this.dataset.description;
-            document.getElementById('sort_order').value  = this.dataset.sort_order;
+            document.getElementById('sort_order').value = this.dataset.sort_order;
             document.getElementById('is_active').checked = this.dataset.is_active === '1';
 
             const iconHtml = this.dataset.icon;
@@ -411,37 +525,39 @@ $amenities = collect([
             if (iconHtml) {
                 iconPreview.classList.add('text-primary');
                 if (iconHtml.includes('data-lucide') && window.lucide) {
-                    lucide.createIcons({ root: iconPreview });
+                    lucide.createIcons({
+                        root: iconPreview
+                    });
                 }
             }
             iconBtns.forEach(b => {
                 const active = b.dataset.icon === iconHtml;
-                b.classList.toggle('border-primary',     active);
-                b.classList.toggle('text-primary',       active);
-                b.classList.toggle('bg-white',           active);
+                b.classList.toggle('border-primary', active);
+                b.classList.toggle('text-primary', active);
+                b.classList.toggle('bg-white', active);
                 b.classList.toggle('border-transparent', !active);
-                b.classList.toggle('text-slate-500',     !active);
-                b.classList.toggle('bg-slate-100',       !active);
+                b.classList.toggle('text-slate-500', !active);
+                b.classList.toggle('bg-slate-100', !active);
             });
 
             modalTitle.innerText = 'Edit Amenity';
-            submitBtn.innerText  = 'Update Amenity';
+            submitBtn.innerText = 'Update Amenity';
             openModal();
         });
     });
 
     // ─── Submit (add / update) ─────────────────────────────────────────────────
-    document.getElementById('amenity-form').addEventListener('submit', async function (e) {
+    document.getElementById('amenity-form').addEventListener('submit', async function(e) {
         e.preventDefault();
 
         const formData = new FormData(this);
-        const data     = Object.fromEntries(formData.entries());
+        const data = Object.fromEntries(formData.entries());
         data.is_active = this.querySelector('#is_active').checked;
 
         const id = data.id;
         delete data.id;
 
-        const url    = id ? `/api/amenities/${id}` : '/api/amenities';
+        const url = id ? `/api/amenities/${id}` : '/api/amenities';
         const method = id ? 'put' : 'post';
 
         try {
@@ -454,8 +570,11 @@ $amenities = collect([
 
     // ─── Delete ────────────────────────────────────────────────────────────────
     document.querySelectorAll('.delete-amenity-btn').forEach(btn => {
-        btn.addEventListener('click', async function () {
-            if (!await adminConfirm('Are you sure you want to delete this amenity?', { confirmLabel: 'Delete', type: 'danger' })) return;
+        btn.addEventListener('click', async function() {
+            if (!await adminConfirm('Are you sure you want to delete this amenity?', {
+                    confirmLabel: 'Delete',
+                    type: 'danger'
+                })) return;
 
             try {
                 await axios.delete(`/api/amenities/${this.dataset.id}`);
@@ -467,27 +586,27 @@ $amenities = collect([
     });
 
     // ─── Client-side filter ────────────────────────────────────────────────────
-    const searchInput    = document.getElementById('filter-search');
+    const searchInput = document.getElementById('filter-search');
     const categorySelect = document.getElementById('filter-category');
-    const statusSelect   = document.getElementById('filter-status');
-    const tbody          = document.getElementById('amenities-tbody');
-    const noResults      = document.getElementById('no-results-row');
+    const statusSelect = document.getElementById('filter-status');
+    const tbody = document.getElementById('amenities-tbody');
+    const noResults = document.getElementById('no-results-row');
 
     function applyFilters() {
-        const search   = searchInput.value.trim().toLowerCase();
+        const search = searchInput.value.trim().toLowerCase();
         const category = categorySelect.value.toLowerCase();
-        const status   = statusSelect.value;
+        const status = statusSelect.value;
 
         let visible = 0;
         tbody.querySelectorAll('tr[data-row-status]').forEach(row => {
             const nameEl = row.querySelector('td:first-child p');
-            const name   = nameEl ? nameEl.textContent.toLowerCase() : '';
+            const name = nameEl ? nameEl.textContent.toLowerCase() : '';
             const rowCat = row.dataset.rowCategory;
-            const rowSt  = row.dataset.rowStatus;
+            const rowSt = row.dataset.rowStatus;
 
-            const show = (!search   || name.includes(search))
-                      && (!category || rowCat === category)
-                      && (!status   || rowSt  === status);
+            const show = (!search || name.includes(search)) &&
+                (!category || rowCat === category) &&
+                (!status || rowSt === status);
 
             row.classList.toggle('hidden', !show);
             if (show) visible++;
@@ -500,8 +619,40 @@ $amenities = collect([
     categorySelect.addEventListener('change', applyFilters);
     statusSelect.addEventListener('change', applyFilters);
 
+    // ─── Import amenities from another location ────────────────────────────────
+    window.importAmenitiesFrom = async function(locationId, locationName) {
+        const confirmed = await adminConfirm(
+            `Import all amenities from "${locationName}" into this location? Amenities that already exist here will be skipped.`,
+            { confirmLabel: 'Import', type: 'primary' }
+        );
+
+        if (!confirmed) return;
+
+        try {
+            const response = await fetch('/api/amenities/import', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({ source_location_id: locationId })
+            });
+
+            const result = await response.json();
+            if (response.ok) {
+                adminToast(result.message, 'success');
+                window.location.reload();
+            } else {
+                adminToast('Import failed: ' + (result.message || 'Unknown error'));
+            }
+        } catch (err) {
+            adminToast('An error occurred during import.');
+        }
+    };
+
     // ─── Lucide icons ──────────────────────────────────────────────────────────
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function() {
         lucide.createIcons();
     });
 </script>

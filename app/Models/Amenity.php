@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\AmenityCategory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -24,6 +25,7 @@ class Amenity extends Model
 
     protected $casts = [
         'is_active' => 'boolean',
+        'category'  => AmenityCategory::class,
     ];
 
     protected static function booted(): void

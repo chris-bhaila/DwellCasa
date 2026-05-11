@@ -34,6 +34,7 @@ class RoomController extends Controller
     {
         $roomType = $this->roomTypeRepository->find($id);
         abort_if($roomType->location_id !== $location->id, 404);
+        abort_if(!$roomType->is_active, 404);
 
         $totalRooms = \App\Models\Room::where('room_type_id', $id)
             ->whereNotIn('status', ['maintenance', 'out_of_service'])

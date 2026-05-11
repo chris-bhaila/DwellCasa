@@ -150,6 +150,7 @@ Route::middleware(['web', 'auth'])->group(function () {
 
     // ── Amenities ─────────────────────────────────────────────────────
     Route::middleware('permission:manage amenities')->group(function () {
+        Route::post('amenities/import', [AmenityController::class, 'importFrom']);
         Route::apiResource('amenities', AmenityController::class);
     });
 

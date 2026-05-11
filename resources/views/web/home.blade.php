@@ -114,49 +114,6 @@
             </div>
         </section>
 
-        {{-- Reviews --}}
-        @if(isset($reviews) && $reviews->count() > 0)
-        <section class="py-24 bg-slate-50 overflow-hidden">
-            <div class="max-w-7xl mx-auto px-6 mb-16">
-                <div class="text-center" data-aos="fade-up">
-                    <span class="uppercase tracking-[0.1em] text-xs text-[#A89070] font-bold mb-4 block">{{ $webInfo->reviews_sub_heading ?? 'Guest Experiences' }}</span>
-                    <h2 class="font-serif font-bold text-4xl md:text-5xl text-black italic">{{ $webInfo->reviews_heading ?? 'What They Say' }}</h2>
-                    <div class="w-24 h-1 bg-black mx-auto mt-8"></div>
-                </div>
-            </div>
-
-            <div class="marquee-container flex overflow-hidden w-full relative">
-                <div class="absolute inset-y-0 left-0 w-16 md:w-32 bg-gradient-to-r from-slate-50 to-transparent z-10 pointer-events-none"></div>
-                <div class="absolute inset-y-0 right-0 w-16 md:w-32 bg-gradient-to-l from-slate-50 to-transparent z-10 pointer-events-none"></div>
-
-                @foreach([1, 2] as $track)
-                <div class="marquee-track flex gap-6 md:gap-8 px-3 md:px-4" @if($track === 2) aria-hidden="true" @endif>
-                    @foreach($reviews as $review)
-                    <div class="flex-none w-[90vw] md:w-[30rem] bg-white p-10 rounded-[2rem] shadow-sm border border-slate-100 flex flex-col justify-between">
-                        <div>
-                            <div class="flex items-center mb-4">
-                                @for($i = 1; $i <= 5; $i++)
-                                <span class="text-2xl {{ $i <= $review->rating ? 'text-yellow-400' : 'text-slate-200' }}">★</span>
-                                @endfor
-                            </div>
-                            <p class="text-slate-600 text-base leading-relaxed mb-8 line-clamp-4">"{{ $review->body }}"</p>
-                        </div>
-                        <div class="flex items-center gap-4 pt-4 border-t border-slate-200/50">
-                            <div class="w-12 h-12 rounded-full bg-[#A89070] flex items-center justify-center font-bold text-white text-lg">
-                                {{ substr($review->name, 0, 1) }}
-                            </div>
-                            <div>
-                                <p class="font-bold text-sm text-slate-900">{{ $review->name }}</p>
-                                <p class="text-xs text-slate-500 uppercase tracking-wider font-semibold mt-0.5">Verified Guest</p>
-                            </div>
-                        </div>
-                    </div>
-                    @endforeach
-                </div>
-                @endforeach
-            </div>
-        </section>
-        @endif
 
     </main>
 
@@ -186,8 +143,7 @@
                 <div>
                     <h4 class="text-xs uppercase tracking-[0.3em] font-bold text-white mb-8">Contact</h4>
                     <ul class="space-y-4 text-white font-light">
-                        <li class="flex items-center gap-3">📍 {{ $webInfo->contact_address }}</li>
-                        <li class="flex items-center gap-3">📞 {{ $webInfo->contact_phone }}</li>
+                        <li class="flex items-center gap-3">📞 {{ implode(', ', array_filter((array) ($webInfo->contact_phone ?? []))) }}</li>
                         <li class="flex items-center gap-3">✉️ {{ $webInfo->contact_email }}</li>
                     </ul>
                     <div class="flex space-x-6 mt-8">

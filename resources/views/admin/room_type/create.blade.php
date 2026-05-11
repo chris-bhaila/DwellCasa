@@ -78,7 +78,7 @@
                             <label class="flex items-center justify-between p-3 border border-slate-200 rounded-xl hover:bg-slate-50 cursor-pointer transition-colors">
                                 <span class="text-xl text-black flex items-center gap-3">{!! $amenity->icon ?: '✨' !!}
                                 <span class="text-sm font-medium text-slate-700">{{ $amenity->name }}</span></span>
-                                <input type="checkbox" name="amenities[]" value="{{ $amenity->id }}" class="rounded text-primary focus:ring-primary w-5 h-5 border-slate-300">
+                                <input type="checkbox" name="amenities[]" value="{{ $amenity->id }}" class="rounded cursor-pointer text-primary focus:ring-primary w-5 h-5 border-slate-300">
                             </label>
                         @endforeach
                     </div>
@@ -93,7 +93,7 @@
                 <div class="p-6 space-y-4">
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-2">Upload Multiple Images</label>
-                        <input type="file" name="images[]" accept="image/*" multiple class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors">
+                        <input type="file" name="images[]" accept="image/*" multiple class="w-full rounded-xl cursor-pointer border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors">
                     </div>
                 </div>
             </div>
@@ -109,18 +109,18 @@
                 <div class="p-6 space-y-6">
                     <div class="flex items-center">
                         <input type="hidden" name="is_active" value="0">
-                        <input type="checkbox" name="is_active" id="is_active" value="1" class="rounded text-primary focus:ring-primary w-5 h-5 border-slate-300" checked>
+                        <input type="checkbox" name="is_active" id="is_active" value="1" class="rounded cursor-pointer text-primary focus:ring-primary w-5 h-5 border-slate-300" checked>
                         <label for="is_active" class="ml-3 text-sm font-medium text-slate-700">Active (Visible on website)</label>
                     </div>
                     
                     <div class="flex items-center">
                         <input type="hidden" name="is_standalone" value="0">
-                        <input type="checkbox" name="is_standalone" id="is_standalone" value="1" class="rounded text-primary focus:ring-primary w-5 h-5 border-slate-300">
+                        <input type="checkbox" name="is_standalone" id="is_standalone" value="1" class="rounded cursor-pointer text-primary focus:ring-primary w-5 h-5 border-slate-300">
                         <label for="is_standalone" class="ml-3 text-sm font-medium text-slate-700">Standalone Property (Only select if there is only one of this room type)</label>
                     </div>
 
                     <div class="pt-4 border-t border-slate-100 flex flex-col gap-3">
-                        <button type="submit" class="w-full bg-primary text-white px-6 py-3 rounded-xl font-medium hover:bg-[#8E795E] transition-all shadow-sm">
+                        <button type="submit" class="w-full bg-primary text-white px-6 py-3 cursor-pointer rounded-xl font-medium hover:bg-[#8E795E] transition-all shadow-sm">
                             Create Room Type
                         </button>
                         <a href="{{ route('admin.room_type.index') }}" class="w-full text-center bg-slate-50 text-slate-600 px-6 py-3 rounded-xl font-medium hover:bg-slate-100 transition-all shadow-sm">
@@ -138,7 +138,7 @@
                 <div class="p-6 space-y-4">
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-2">Thumbnail</label>
-                        <input type="file" name="thumbnail" accept="image/*" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors">
+                        <input type="file" name="thumbnail" accept="image/*" class="w-full cursor-pointer rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors">
                     </div>
                 </div>
             </div>
@@ -177,5 +177,7 @@
             adminToast('An error occurred creating the room type.');
         }
     });
+
+    document.addEventListener('DOMContentLoaded', () => lucide.createIcons());
 </script>
 @endpush

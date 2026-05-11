@@ -85,7 +85,7 @@
                 </div>
 
                 <div class="mt-8 flex justify-end">
-                    <button type="submit" class="bg-[#A89070] text-white px-8 py-3 rounded-xl font-medium hover:bg-[#8E795E] transition-all shadow-sm flex items-center gap-2">
+                    <button type="submit" class="bg-[#A89070] text-white cursor-pointer px-8 py-3 rounded-xl font-medium hover:bg-[#8E795E] transition-all shadow-sm flex items-center gap-2">
                         Save Changes
                     </button>
                 </div>
@@ -134,7 +134,7 @@
                 </div>
 
                 <div class="mt-8 flex justify-end">
-                    <button type="submit" class="bg-slate-800 text-white px-8 py-3 rounded-xl font-medium hover:bg-slate-700 transition-all shadow-sm flex items-center gap-2">
+                    <button type="submit" class="bg-slate-800 cursor-pointer text-white px-8 py-3 rounded-xl font-medium hover:bg-slate-700 transition-all shadow-sm flex items-center gap-2">
                         Update Password
                     </button>
                 </div>

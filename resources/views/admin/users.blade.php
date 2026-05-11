@@ -25,13 +25,13 @@ $superAdminOnlyPerms = ['manage users', 'manage locations', 'manage logs'];
         </div>
         <div class="flex items-center gap-3 flex-wrap">
             <div x-show="activeTab === 'users'">
-                <button onclick="openModal('add')" class="bg-primary text-white px-5 py-2.5 rounded-xl font-medium hover:bg-[#8E795E] transition-all shadow-sm flex items-center gap-2">
+                <button onclick="openModal('add')" class="bg-primary cursor-pointer text-white px-5 py-2.5 rounded-xl font-medium hover:bg-[#8E795E] transition-all shadow-sm flex items-center gap-2">
                     <i class="bi bi-person-plus"></i> Add User
                 </button>
             </div>
             @role('super_admin')
             <div x-show="activeTab === 'roles'" x-cloak>
-                <button onclick="openRoleModal()" class="bg-slate-800 text-white px-5 py-2.5 rounded-xl font-medium hover:bg-slate-700 transition-all shadow-sm flex items-center gap-2">
+                <button onclick="openRoleModal()" class="bg-slate-800 cursor-pointer text-white px-5 py-2.5 rounded-xl font-medium hover:bg-slate-700 transition-all shadow-sm flex items-center gap-2">
                     <i class="bi bi-shield-plus"></i> Add Role
                 </button>
             </div>
@@ -41,9 +41,9 @@ $superAdminOnlyPerms = ['manage users', 'manage locations', 'manage logs'];
 
     <!-- Tabs Navigation -->
     <div class="flex space-x-6 mb-8 border-b border-slate-200">
-        <button @click="activeTab = 'users'" :class="activeTab === 'users' ? 'border-primary text-primary border-b-2' : 'text-slate-500 hover:text-slate-700'" class="pb-3 font-medium px-2 transition-colors">Users</button>
+        <button @click="activeTab = 'users'" :class="activeTab === 'users' ? 'border-primary text-primary border-b-2' : 'text-slate-500 hover:text-slate-700'" class="pb-3 cursor-pointer font-medium px-2 transition-colors">Users</button>
         @role('super_admin')
-        <button @click="activeTab = 'roles'" :class="activeTab === 'roles' ? 'border-primary text-primary border-b-2' : 'text-slate-500 hover:text-slate-700'" class="pb-3 font-medium px-2 transition-colors">Role Permissions</button>
+        <button @click="activeTab = 'roles'" :class="activeTab === 'roles' ? 'border-primary text-primary border-b-2' : 'text-slate-500 hover:text-slate-700'" class="pb-3 cursor-pointer font-medium px-2 transition-colors">Role Permissions</button>
         @endrole
     </div>
 
@@ -98,18 +98,18 @@ $superAdminOnlyPerms = ['manage users', 'manage locations', 'manage logs'];
                         </td>
                         <td class="p-4 text-right">
                             <div class="flex items-center justify-end gap-2">
-                                <button type="button" class="w-8 h-8 flex items-center justify-center text-[#A89070] hover:bg-slate-50 hover:text-[#8E795E] rounded-md transition-colors"
+                                <button type="button" class="w-8 h-8 flex items-center cursor-pointer justify-center text-[#A89070] hover:bg-slate-50 hover:text-[#8E795E] rounded-md transition-colors"
                                     onclick="openModal('edit', {{ $user->id }})">
                                     <i class="bi bi-pencil-square"></i>
                                 </button>
                                 @if(auth()->id() !== $user->id)
                                 <button type="button"
-                                    class="w-8 h-8 flex items-center justify-center rounded-md transition-colors {{ $user->is_active ? 'text-slate-400 hover:text-amber-600 hover:bg-amber-50' : 'text-amber-500 hover:text-green-600 hover:bg-green-50' }}"
+                                    class="w-8 h-8 flex items-center cursor-pointer justify-center rounded-md transition-colors {{ $user->is_active ? 'text-slate-400 hover:text-amber-600 hover:bg-amber-50' : 'text-amber-500 hover:text-green-600 hover:bg-green-50' }}"
                                     onclick="toggleUser({{ $user->id }}, {{ $user->is_active ? 'true' : 'false' }})"
                                     title="{{ $user->is_active ? 'Disable user' : 'Enable user' }}">
                                     <i class="bi {{ $user->is_active ? 'bi-slash-circle' : 'bi-check-circle' }}"></i>
                                 </button>
-                                <button type="button" class="w-8 h-8 flex items-center justify-center text-red-400 hover:bg-red-50 hover:text-red-600 rounded-md transition-colors"
+                                <button type="button" class="w-8 h-8 flex items-center cursor-pointer justify-center text-red-400 hover:bg-red-50 hover:text-red-600 rounded-md transition-colors"
                                     onclick="deleteUser({{ $user->id }})">
                                     <i class="bi bi-trash"></i>
                                 </button>
@@ -142,12 +142,12 @@ $superAdminOnlyPerms = ['manage users', 'manage locations', 'manage logs'];
                         @if(!in_array($role->name, ['super_admin', 'admin']))
                         <button type="button"
                             onclick="deleteRole({{ $role->id }}, '{{ $role->name }}')"
-                            class="px-4 py-2 rounded-xl font-medium text-red-500 border border-red-200 hover:bg-red-50 transition-all text-sm flex items-center gap-1.5">
+                            class="px-4 py-2 rounded-xl font-medium text-red-500 cursor-pointer border border-red-200 hover:bg-red-50 transition-all text-sm flex items-center gap-1.5">
                             <i class="bi bi-trash"></i> Delete Role
                         </button>
                         @endif
                         @if($role->name !== 'super_admin')
-                        <button type="submit" class="bg-primary text-white px-5 py-2 rounded-xl font-medium hover:bg-[#8E795E] transition-all shadow-sm">
+                        <button type="submit" class="bg-primary text-white px-5 cursor-pointer py-2 rounded-xl font-medium hover:bg-[#8E795E] transition-all shadow-sm">
                             Save Changes
                         </button>
                         @endif
@@ -164,7 +164,7 @@ $superAdminOnlyPerms = ['manage users', 'manage locations', 'manage logs'];
                             @foreach($perms as $perm)
                             <label class="flex items-center gap-2 text-sm text-slate-700 cursor-pointer group">
                                 <input type="checkbox" name="permissions[]" value="{{ $perm }}"
-                                    class="rounded border-slate-300 text-primary focus:ring-primary w-4 h-4 disabled:opacity-50"
+                                    class="rounded border-slate-300 cursor-pointer text-primary focus:ring-primary w-4 h-4 disabled:opacity-50"
                                     @if($role->name === 'super_admin') checked disabled
                                 @elseif($role->permissions->contains('name', $perm)) checked
                                 @endif>
@@ -210,7 +210,7 @@ $superAdminOnlyPerms = ['manage users', 'manage locations', 'manage logs'];
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-slate-700 mb-1">Role <span class="text-red-500">*</span></label>
-                            <select id="role-select" name="role" required class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors bg-white">
+                            <select id="role-select" name="role" required class="w-full cursor-pointer rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors bg-white">
                                 <option value="" disabled selected>Select Role</option>
                                 @foreach($roles->where('name', '!=', 'super_admin') as $role)
                                 @if(auth()->user()->hasRole('super_admin') || $role->name !== 'admin')
@@ -223,7 +223,7 @@ $superAdminOnlyPerms = ['manage users', 'manage locations', 'manage logs'];
                         <div>
                             <label class="block text-sm font-medium text-slate-700 mb-1">Location <span class="text-red-500">*</span></label>
                             <select id="location-select" name="location_id"
-                                class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors bg-white">
+                                class="w-full cursor-pointer rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors bg-white">
                                 <option value="" disabled selected>Select Location</option>
                                 @foreach(\App\Models\Location::where('is_active', true)->orderBy('name')->get() as $loc)
                                 <option value="{{ $loc->id }}">{{ $loc->name }}</option>
@@ -250,7 +250,7 @@ $superAdminOnlyPerms = ['manage users', 'manage locations', 'manage logs'];
                                     @foreach($perms as $perm)
                                     @if(auth()->user()->hasRole('super_admin') || (auth()->user()->hasPermissionTo($perm) && !in_array($perm, $superAdminOnlyPerms)))
                                     <label class="flex items-center gap-2 text-sm text-slate-700 perm-wrapper cursor-pointer group">
-                                        <input type="checkbox" name="permissions[]" value="{{ $perm }}" class="user-perm-checkbox rounded border-slate-300 text-primary focus:ring-primary w-4 h-4">
+                                        <input type="checkbox" name="permissions[]" value="{{ $perm }}" class="user-perm-checkbox cursor-pointer rounded border-slate-300 text-primary focus:ring-primary w-4 h-4">
                                         <span class="group-hover:text-primary transition-colors">{{ ucwords(str_replace('-', ' ', $perm)) }}</span>
                                     </label>
                                     @endif
@@ -263,8 +263,8 @@ $superAdminOnlyPerms = ['manage users', 'manage locations', 'manage logs'];
                 </div>
 
                 <div class="p-6 border-t border-slate-100 flex justify-end gap-3 bg-slate-50/50 shrink-0">
-                    <button type="button" class="px-5 py-2.5 rounded-xl font-medium text-slate-600 hover:bg-slate-200 transition-colors" onclick="closeModal()">Cancel</button>
-                    <button type="submit" id="submit-btn" class="w-full sm:w-auto bg-primary text-white px-6 py-2.5 rounded-xl font-medium hover:bg-[#8E795E] transition-all shadow-sm">Save User</button>
+                    <button type="button" class="px-5 py-2.5 rounded-xl cursor-pointer font-medium text-slate-600 hover:bg-slate-200 transition-colors" onclick="closeModal()">Cancel</button>
+                    <button type="submit" id="submit-btn" class="w-full cursor-pointer sm:w-auto bg-primary text-white px-6 py-2.5 rounded-xl font-medium hover:bg-[#8E795E] transition-all shadow-sm">Save User</button>
                 </div>
             </form>
         </div>
@@ -275,7 +275,7 @@ $superAdminOnlyPerms = ['manage users', 'manage locations', 'manage logs'];
         <div class="bg-white rounded-3xl shadow-2xl border border-slate-100 w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden transform scale-95 transition-transform duration-300">
             <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
                 <h2 class="text-xl font-serif font-bold text-slate-900 italic">Add New Role</h2>
-                <button type="button" onclick="closeRoleModal()" class="text-slate-400 hover:text-slate-600 transition-colors">
+                <button type="button" onclick="closeRoleModal()" class="text-slate-400 cursor-pointer hover:text-slate-600 transition-colors">
                     <i class="bi bi-x-lg text-xl"></i>
                 </button>
             </div>
@@ -301,7 +301,7 @@ $superAdminOnlyPerms = ['manage users', 'manage locations', 'manage logs'];
                                     @foreach($perms as $perm)
                                     @if(auth()->user()->hasRole('super_admin') || (auth()->user()->hasPermissionTo($perm) && !in_array($perm, $superAdminOnlyPerms)))
                                     <label class="flex items-center gap-2 text-sm text-slate-700 perm-wrapper cursor-pointer group">
-                                        <input type="checkbox" name="permissions[]" value="{{ $perm }}" class="user-perm-checkbox rounded border-slate-300 text-primary focus:ring-primary w-4 h-4">
+                                        <input type="checkbox" name="permissions[]" value="{{ $perm }}" class="user-perm-checkbox cursor-pointer rounded border-slate-300 text-primary focus:ring-primary w-4 h-4">
                                         <span class="group-hover:text-primary transition-colors">{{ ucwords(str_replace('-', ' ', $perm)) }}</span>
                                     </label>
                                     @endif
@@ -314,8 +314,8 @@ $superAdminOnlyPerms = ['manage users', 'manage locations', 'manage logs'];
                 </div>
 
                 <div class="p-6 border-t border-slate-100 flex justify-end gap-3 bg-slate-50/50 shrink-0">
-                    <button type="button" class="px-5 py-2.5 rounded-xl font-medium text-slate-600 hover:bg-slate-200 transition-colors" onclick="closeRoleModal()">Cancel</button>
-                    <button type="submit" id="submit-role-btn" class="w-full sm:w-auto bg-primary text-white px-6 py-2.5 rounded-xl font-medium hover:bg-[#8E795E] transition-all shadow-sm">Save Role</button>
+                    <button type="button" class="px-5 py-2.5 cursor-pointer rounded-xl font-medium text-slate-600 hover:bg-slate-200 transition-colors" onclick="closeRoleModal()">Cancel</button>
+                    <button type="submit" id="submit-role-btn" class="w-full cursor-pointer sm:w-auto bg-primary text-white px-6 py-2.5 rounded-xl font-medium hover:bg-[#8E795E] transition-all shadow-sm">Save Role</button>
                 </div>
             </form>
         </div>

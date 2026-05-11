@@ -95,6 +95,20 @@ class RoomTypeController extends Controller
 
         $roomType = $this->roomTypeRepository->find($id);
 
+        if (!empty($data['is_standalone'])) {
+            $roomCount = Room::where('room_type_id', $roomType->id)->count();
+            if ($roomCount > 1) {
+                return response()->json([
+                    'message' => 'Cannot set as standalone: this room type has ' . $roomCount . ' rooms. Remove all but one before marking it as standalone.',
+                    'errors'  => [
+                        'is_standalone' => [
+                            'This room type has ' . $roomCount . ' rooms. Remove all but one before marking it as standalone.'
+                        ]
+                    ]
+                ], 422);
+            }
+        }
+
         if ($request->hasFile('thumbnail')) {
             $file = $request->file('thumbnail');
             $name = $data['name'] ?? $roomType->name;

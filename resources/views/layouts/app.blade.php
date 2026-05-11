@@ -217,7 +217,7 @@
                     <h4 class="text-xs uppercase tracking-[0.3em] font-bold text-white mb-8">Contact</h4>
                     <ul class="space-y-4 text-white font-light">
                         <li class="flex items-center gap-3">📍 {{ $webInfo->contact_address }}</li>
-                        <li class="flex items-center gap-3">📞 {{ $webInfo->contact_phone }}</li>
+                        <li class="flex items-center gap-3">📞 {{ implode(', ', array_filter((array) ($webInfo?->contact_phone ?? []))) }}</li>
                         <li class="flex items-center gap-3">✉️ {{ $webInfo->contact_email }}</li>
                     </ul>
                 </div>

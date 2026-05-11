@@ -95,7 +95,7 @@
                         <label class="flex items-center justify-between p-3 border border-slate-200 rounded-xl hover:bg-slate-50 cursor-pointer transition-colors">
                             <span class="text-xl text-black flex items-center gap-3">{!! $amenity->icon ?: '✨' !!}
                                 <span class="text-sm font-medium text-slate-700">{{ $amenity->name }}</span></span>
-                            <input type="checkbox" name="amenities[]" value="{{ $amenity->id }}" class="rounded text-primary focus:ring-primary w-5 h-5 border-slate-300" {{ $roomType->amenities->contains($amenity->id) ? 'checked' : '' }}>
+                            <input type="checkbox" name="amenities[]" value="{{ $amenity->id }}" class="rounded cursor-pointer text-primary focus:ring-primary w-5 h-5 border-slate-300" {{ $roomType->amenities->contains($amenity->id) ? 'checked' : '' }}>
                         </label>
                         @endforeach
                     </div>
@@ -110,7 +110,7 @@
                 <div class="p-6 space-y-4">
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-2">Upload More Images</label>
-                        <input type="file" name="images[]" accept="image/*" multiple class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors">
+                        <input type="file" name="images[]" accept="image/*" multiple class="w-full cursor-pointer rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors">
                     </div>
                     @if($roomType->galleryImages && $roomType->galleryImages->count() > 0)
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
@@ -142,21 +142,21 @@
                 <div class="p-6 space-y-6">
                     <div class="flex items-center">
                         <input type="hidden" name="is_active" value="0">
-                        <input type="checkbox" name="is_active" id="is_active" value="1" class="rounded text-primary focus:ring-primary w-5 h-5 border-slate-300" {{ ($roomType->is_active ?? true) ? 'checked' : '' }}>
+                        <input type="checkbox" name="is_active" id="is_active" value="1" class="rounded text-primary cursor-pointer focus:ring-primary w-5 h-5 border-slate-300" {{ ($roomType->is_active ?? true) ? 'checked' : '' }}>
                         <label for="is_active" class="ml-3 text-sm font-medium text-slate-700">Active (Visible on website)</label>
                     </div>
 
                     <div class="flex items-center">
                         <input type="hidden" name="is_standalone" value="0">
-                        <input type="checkbox" name="is_standalone" id="is_standalone" value="1" class="rounded text-primary focus:ring-primary w-5 h-5 border-slate-300" {{ ($roomType->is_standalone ?? false) ? 'checked' : '' }}>
+                        <input type="checkbox" name="is_standalone" id="is_standalone" value="1" class="rounded cursor-pointer text-primary focus:ring-primary w-5 h-5 border-slate-300" {{ ($roomType->is_standalone ?? false) ? 'checked' : '' }}>
                         <label for="is_standalone" class="ml-3 text-sm font-medium text-slate-700">Standalone Property (Only select if there is only one of this room type)</label>
                     </div>
 
                     <div class="pt-4 border-t border-slate-100 flex flex-col gap-3">
-                        <button type="submit" class="w-full bg-primary text-white px-6 py-3 rounded-xl font-medium hover:bg-[#8E795E] transition-all shadow-sm">
+                        <button type="submit" class="w-full bg-primary text-white px-6 py-3 cursor-pointer rounded-xl font-medium hover:bg-[#8E795E] transition-all shadow-sm">
                             Save Changes
                         </button>
-                        <button type="button" class="w-full bg-red-50 text-red-600 px-6 py-3 rounded-xl font-medium hover:bg-red-100 transition-all shadow-sm">
+                        <button type="button" class="w-full bg-red-50 text-red-600 px-6 cursor-pointer py-3 rounded-xl font-medium hover:bg-red-100 transition-all shadow-sm">
                             Delete Room Type
                         </button>
                     </div>
@@ -174,7 +174,7 @@
                     </div>
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-2">Thumbnail</label>
-                    <input type="file" name="thumbnail" accept="image/*" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors">
+                    <input type="file" name="thumbnail" accept="image/*" class="w-full rounded-xl cursor-pointer border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors">
                 </div>
                 </div>
             </div>
@@ -187,23 +187,23 @@
     <!-- Controls -->
     <div class="absolute top-0 left-0 w-full p-4 flex justify-between items-center z-10 bg-gradient-to-b from-black/50 to-transparent">
         <div id="lightbox-counter" class="text-white font-medium text-sm">1 / 10</div>
-        <button type="button" onclick="closeLightbox()" class="text-black bg-white/80 hover:bg-white transition-colors w-10 h-10 flex items-center justify-center rounded-full">
+        <button type="button" onclick="closeLightbox()" class="text-black cursor-pointer bg-white/80 hover:bg-white transition-colors w-10 h-10 flex items-center justify-center rounded-full">
             <i class="bi bi-x-lg text-xl"></i>
         </button>
     </div>
 
-    <!-- Image Container -->
-    <div id="lightbox-img-container" class="relative w-full h-full flex items-center justify-center p-4 md:p-12 overflow-hidden touch-pan-y gap-4 md:gap-8">
-        <button type="button" onclick="prevImage(event)" class="shrink-0 text-black bg-white/80 hover:bg-white transition-colors w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full z-10 focus:outline-none shadow-sm">
-            <i class="bi bi-chevron-left text-xl md:text-2xl"></i>
-        </button>
+    <button type="button" onclick="prevImage(event)" class="absolute cursor-pointer left-4 top-1/2 -translate-y-1/2 z-20 text-black bg-white/80 hover:bg-white transition-colors w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full focus:outline-none shadow-sm">
+        <i class="bi bi-chevron-left text-xl md:text-2xl"></i>
+    </button>
 
+    <!-- Image Container -->
+    <div id="lightbox-img-container" class="relative w-full h-full flex items-center justify-center px-16 md:px-20 py-4 overflow-hidden touch-pan-y">
         <img id="lightbox-img" src="" alt="" class="max-h-full min-w-0 object-contain select-none transition-transform duration-300 shadow-2xl">
-        
-        <button type="button" onclick="nextImage(event)" class="shrink-0 text-black bg-white/80 hover:bg-white transition-colors w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full z-10 focus:outline-none shadow-sm">
-            <i class="bi bi-chevron-right text-xl md:text-2xl"></i>
-        </button>
     </div>
+
+    <button type="button" onclick="nextImage(event)" class="absolute cursor-pointer right-4 top-1/2 -translate-y-1/2 z-20 text-black bg-white/80 hover:bg-white transition-colors w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full focus:outline-none shadow-sm">
+        <i class="bi bi-chevron-right text-xl md:text-2xl"></i>
+    </button>
 
     <!-- Caption -->
     <div class="absolute bottom-0 left-0 w-full p-6 text-center z-10 bg-gradient-to-t from-black/80 to-transparent">
@@ -349,5 +349,7 @@
             if (e.key === 'ArrowLeft') prevImage();
         }
     });
+
+    document.addEventListener('DOMContentLoaded', () => lucide.createIcons());
 </script>
 @endpush

@@ -39,7 +39,7 @@
 
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-2">Room Type <span class="text-red-500">*</span></label>
-                    <select name="room_type_id" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors">
+                    <select name="room_type_id" class="w-full cursor-pointer rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors">
                         <option value="">Select a room type...</option>
                         @foreach($roomTypes ?? [] as $roomType)
                         @if ($roomType->is_standalone == 0 || $roomType->rooms_count == 0 || $room->room_type_id == $roomType->id)
@@ -56,7 +56,7 @@
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-2">Current Status <span class="text-red-500">*</span></label>
-                        <select name="status" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors" required>
+                        <select name="status" class="w-full rounded-xl cursor-pointer border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors" required>
                             <option value="available" {{ $room->status === 'available' ? 'selected' : '' }}>Available</option>
                             <option value="maintenance" {{ $room->status === 'maintenance' ? 'selected' : '' }}>Under Maintenance</option>
                             <option value="occupied" {{ $room->status === 'occupied' ? 'selected' : '' }}>Occupied</option>
@@ -70,26 +70,15 @@
                     <textarea name="notes" rows="4" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors" placeholder="Any specific notes about this room...">{{ $room->notes }}</textarea>
                 </div>
 
-                <label class="block text-sm font-medium text-slate-700 mb-4">Select Room Amenities</label>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-64 overflow-y-auto pr-2">
-                    @php $roomAmenityIds = isset($room->amenities) ? $room->amenities->pluck('id')->toArray() : []; @endphp
-                    @foreach($amenities ?? [] as $amenity)
-                    <label class="flex items-center justify-between p-3 border border-slate-200 rounded-xl hover:bg-slate-50 cursor-pointer transition-colors">
-                        <span class="text-xl text-black flex items-center gap-3">{!! $amenity->icon ?: '✨' !!}
-                            <span class="text-sm font-medium text-slate-700">{{ $amenity->name }}</span></span>
-                        <input type="checkbox" name="amenities[]" value="{{ $amenity->id }}" class="rounded text-primary focus:ring-primary w-5 h-5 border-slate-300" {{ in_array($amenity->id, $roomAmenityIds) ? 'checked' : '' }}>
-                    </label>
-                    @endforeach
-                </div>
 
             </div>
             <div class="p-6 bg-slate-50/50 border-t border-slate-100 flex items-center justify-between gap-4">
-                <button type="button" onclick="deleteRoom({{ $room->id }})" class="bg-red-50 text-red-600 border border-red-200 px-4 py-2.5 rounded-xl font-medium hover:bg-red-100 transition-all flex items-center gap-2">
+                <button type="button" onclick="deleteRoom({{ $room->id }})" class="bg-red-50 cursor-pointer text-red-600 cursor-pointer border border-red-200 px-4 py-2.5 rounded-xl font-medium hover:bg-red-100 transition-all flex items-center gap-2">
                     <i class="bi bi-trash"></i> Delete Room
                 </button>
                 <div class="flex items-center gap-4">
                     <a href="{{ route('admin.room_type.index') }}" class="text-sm font-medium text-slate-600 hover:text-slate-900">Cancel</a>
-                    <button type="submit" class="bg-primary text-white px-6 py-2.5 rounded-xl font-medium hover:bg-[#8E795E] transition-all shadow-sm">
+                    <button type="submit" class="bg-primary cursor-pointer text-white px-6 py-2.5 rounded-xl font-medium hover:bg-[#8E795E] transition-all shadow-sm">
                         Save Changes
                     </button>
                 </div>
@@ -129,10 +118,6 @@
         e.preventDefault();
         const formData = new FormData(this);
         const data = Object.fromEntries(formData.entries());
-
-        // Capture all selected checkbox values, or send an empty array if none are selected
-        data.amenities = formData.getAll('amenities[]');
-        delete data['amenities[]']; // Clean up the array notation key
 
         try {
             const response = await fetch(`/api/rooms/${data.id}`, {

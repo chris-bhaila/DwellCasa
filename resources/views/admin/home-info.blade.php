@@ -55,25 +55,6 @@
             </div>
         </div>
 
-        <!-- Reviews Section -->
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
-            <h2 class="text-xl font-serif font-bold text-slate-900 italic mb-6 border-b border-slate-100 pb-4">Reviews Section</h2>
-            <div class="space-y-5">
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-2">Sub Heading</label>
-                    <input type="text" name="reviews_sub_heading" value="{{ $info?->reviews_sub_heading }}"
-                        placeholder="e.g. Guest Experiences"
-                        class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-2">Heading</label>
-                    <input type="text" name="reviews_heading" value="{{ $info?->reviews_heading }}"
-                        placeholder="e.g. What They Say"
-                        class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary">
-                </div>
-            </div>
-        </div>
-
         <!-- Footer -->
         <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
             <h2 class="text-xl font-serif font-bold text-slate-900 italic mb-6 border-b border-slate-100 pb-4">Footer</h2>
@@ -88,10 +69,28 @@
                     <input type="text" name="contact_address" value="{{ $info?->contact_address }}"
                         class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary">
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-2">Phone</label>
-                    <input type="text" name="contact_phone" value="{{ $info?->contact_phone }}"
-                        class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary">
+                <div x-data="{ phones: @js(!empty($info?->contact_phone) ? $info->contact_phone : ['']) }">
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Phone Numbers</label>
+                    <div class="space-y-2">
+                        <template x-for="(phone, index) in phones" :key="index">
+                            <div class="flex gap-2">
+                                <input type="text" name="contact_phone[]"
+                                    :value="phone"
+                                    @input="phones[index] = $event.target.value"
+                                    placeholder="e.g. +977 01-XXXXXXX"
+                                    class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors text-sm">
+                                <button type="button" x-show="phones.length > 1"
+                                    @click="phones.splice(index, 1)"
+                                    class="flex-shrink-0 w-10 h-[46px] flex items-center justify-center text-red-400 hover:text-red-600 hover:bg-red-50 rounded-xl border border-slate-200 transition-colors">
+                                    <i class="bi bi-trash text-sm"></i>
+                                </button>
+                            </div>
+                        </template>
+                    </div>
+                    <button type="button" @click="phones.push('')"
+                        class="mt-2 inline-flex items-center gap-1.5 text-sm text-primary hover:text-[#8E795E] font-medium transition-colors">
+                        <i class="bi bi-plus-circle"></i> Add another number
+                    </button>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-2">Email</label>

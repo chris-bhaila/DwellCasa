@@ -67,6 +67,8 @@ class LocationController extends Controller
             $file = $request->file('hero_image');
             $filename = Str::slug($data['name'] ?? $location->name) . '_hero.' . $file->getClientOriginalExtension();
             $data['hero_image'] = $file->storeAs('locations', $filename, 'public');
+        } else {
+            unset($data['hero_image']);
         }
 
         $location = $this->locationRepository->update($id, $data);

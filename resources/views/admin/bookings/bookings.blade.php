@@ -16,12 +16,31 @@
         <h1 class="text-3xl font-serif font-bold text-slate-900 italic lg:hidden">Booking Management</h1>
         <p class="text-slate-500 mt-1">View and manage all guest reservations and inquiries.</p>
     </div>
-    @if($filter !== 'trashed')
-    <a href="{{ route('admin.bookings.create') }}" class="inline-flex items-center justify-center bg-primary text-white px-5 py-2.5 rounded-xl font-medium hover:bg-[#8E795E] transition-all shadow-sm self-start md:self-auto">
-        <i class="bi bi-plus-lg mr-2 text-lg"></i>
-        Add Booking
-    </a>
-    @endif
+    <div class="flex items-center gap-3 flex-wrap self-start md:self-auto">
+        @if($filter !== 'trashed')
+        <form method="GET" action="{{ route('admin.bookings') }}" class="flex items-center gap-2 flex-wrap">
+            <input type="hidden" name="filter" value="{{ $filter }}">
+            <div class="flex items-center gap-2 bg-white border border-slate-200 rounded-xl px-4 py-2.5 shadow-sm">
+                <label class="text-sm font-medium text-slate-500 whitespace-nowrap">From</label>
+                <input type="date" name="from" value="{{ $from }}"
+                    class="text-sm font-medium cursor-pointer text-slate-800 bg-transparent border-none outline-none focus:ring-0 cursor-pointer">
+            </div>
+            <div class="flex items-center gap-2 bg-white border border-slate-200 rounded-xl px-4 py-2.5 shadow-sm">
+                <label class="text-sm font-medium text-slate-500 whitespace-nowrap">To</label>
+                <input type="date" name="to" value="{{ $to }}"
+                    class="text-sm font-medium cursor-pointer text-slate-800 bg-transparent border-none outline-none focus:ring-0 cursor-pointer">
+            </div>
+            <button type="submit"
+                class="bg-primary text-white px-5 py-2.5 rounded-xl cursor-pointer font-medium hover:bg-[#8E795E] transition-all shadow-sm text-sm">
+                Apply
+            </button>
+        </form>
+        <a href="{{ route('admin.bookings.create') }}" class="inline-flex items-center justify-center bg-primary text-white px-5 py-2.5 rounded-xl font-medium hover:bg-[#8E795E] transition-all shadow-sm">
+            <i class="bi bi-plus-lg mr-2 text-lg"></i>
+            Add Booking
+        </a>
+        @endif
+    </div>
 </div>
 
 <!-- List Section -->
@@ -29,23 +48,23 @@
     <!-- Filters / Tabs -->
     <div class="mb-6 border-b border-slate-200 overflow-x-auto">
         <nav class="flex min-w-max space-x-6" aria-label="Tabs">
-            <a href="{{ request()->fullUrlWithQuery(['filter' => 'all']) }}"
+            <a href="{{ route('admin.bookings', ['filter' => 'all', 'from' => $from, 'to' => $to]) }}"
                 class="{{ (!request('filter') || request('filter') === 'all') ? 'border-[#A89070] text-[#A89070]' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300' }} whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm">
                 All Bookings
             </a>
-            <a href="{{ request()->fullUrlWithQuery(['filter' => 'upcoming']) }}"
+            <a href="{{ route('admin.bookings', ['filter' => 'upcoming', 'from' => $from, 'to' => $to]) }}"
                 class="{{ request('filter') === 'upcoming' ? 'border-[#A89070] text-[#A89070]' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300' }} whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm">
                 Upcoming
             </a>
-            <a href="{{ request()->fullUrlWithQuery(['filter' => 'inhouse']) }}"
+            <a href="{{ route('admin.bookings', ['filter' => 'inhouse', 'from' => $from, 'to' => $to]) }}"
                 class="{{ request('filter') === 'inhouse' ? 'border-[#A89070] text-[#A89070]' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300' }} whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm">
                 In-house
             </a>
-            <a href="{{ request()->fullUrlWithQuery(['filter' => 'completed']) }}"
+            <a href="{{ route('admin.bookings', ['filter' => 'completed', 'from' => $from, 'to' => $to]) }}"
                 class="{{ request('filter') === 'completed' ? 'border-[#A89070] text-[#A89070]' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300' }} whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm">
                 Completed
             </a>
-            <a href="{{ request()->fullUrlWithQuery(['filter' => 'trashed']) }}"
+            <a href="{{ route('admin.bookings', ['filter' => 'trashed']) }}"
                 class="{{ request('filter') === 'trashed' ? 'border-red-400 text-red-500' : 'border-transparent text-slate-400 hover:text-slate-600 hover:border-slate-300' }} whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm flex items-center gap-1.5">
                 <i class="bi bi-trash3"></i> Trash
             </a>

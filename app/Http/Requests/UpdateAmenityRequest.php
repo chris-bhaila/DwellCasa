@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\AmenityCategory;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rules\Enum;
 
 class UpdateAmenityRequest extends FormRequest
 {
@@ -16,7 +18,7 @@ class UpdateAmenityRequest extends FormRequest
         return [
             'name' => 'sometimes|required|string|max:255',
             'icon' => 'nullable|string|max:255',
-            'category' => 'nullable|string|max:255',
+            'category' => ['nullable', new Enum(AmenityCategory::class)],
             'description' => 'nullable|string',
             'is_active' => 'boolean',
             'sort_order' => 'integer',

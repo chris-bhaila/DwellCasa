@@ -113,7 +113,15 @@ class AdminController extends Controller
 
         $allBookings = Booking::with(['guest', 'roomType', 'checkOut'])
             ->whereBetween('check_in_date', [$from, $to])
-            ->whereNotIn('status', ['cancelled'])
+            ->where(function ($q) {
+                // Exclude cancelled bookings only when no payment was made
+                $q->whereNotIn('status', ['cancelled'])
+                  ->orWhere(function ($q2) {
+                      $q2->where('status', 'cancelled')
+                         ->where(fn ($q3) => $q3->where('amount_paid', '>', 0)
+                                                 ->orWhere('deposit_amount', '>', 0));
+                  });
+            })
             ->orderBy('check_in_date')
             ->get();
 
@@ -138,7 +146,7 @@ class AdminController extends Controller
         }
 
         $bookings = match ($filter) {
-            'outstanding' => $bookings->filter(fn($b) => ($b->total_amount - ($b->discount ?? 0) + ($b->checkOut->extra_charges ?? 0) - ($b->amount_paid ?? 0) - ($b->deposit_amount ?? 0)) > 0)->values(),
+            'outstanding' => $bookings->filter(fn($b) => $b->status !== 'cancelled' && ($b->total_amount - ($b->discount ?? 0) + ($b->checkOut->extra_charges ?? 0) - ($b->amount_paid ?? 0) - ($b->deposit_amount ?? 0)) > 0)->values(),
             'collected'   => $bookings->filter(fn($b) => (($b->amount_paid ?? 0) + ($b->deposit_amount ?? 0)) >= ($b->total_amount - ($b->discount ?? 0)))->values(),
             'discounted'  => $bookings->filter(fn($b) => ($b->discount ?? 0) > 0)->values(),
             'extra'       => $bookings->filter(fn($b) => ($b->checkOut->extra_charges ?? 0) > 0)->values(),
@@ -155,9 +163,9 @@ class AdminController extends Controller
                 'extra'       => $group->sum(fn($b) => $b->checkOut->extra_charges ?? 0),
                 'refunds'     => $group->sum('refund_amount'),
                 'outstanding' => max(0,
-                    $group->sum('total_amount')
-                    - $group->sum(fn($b) => $b->discount ?? 0)
-                    + $group->sum(fn($b) => $b->checkOut->extra_charges ?? 0)
+                    $group->where('status', '!=', 'cancelled')->sum('total_amount')
+                    - $group->where('status', '!=', 'cancelled')->sum(fn($b) => $b->discount ?? 0)
+                    + $group->where('status', '!=', 'cancelled')->sum(fn($b) => $b->checkOut->extra_charges ?? 0)
                     - $group->sum(fn($b) => ($b->amount_paid ?? 0) + ($b->deposit_amount ?? 0))
                 ),
             ]);

@@ -306,6 +306,8 @@ class BookingController extends Controller
     public function page(\Illuminate\Http\Request $request)
     {
         $filter = $request->query('filter', 'all');
+        $from   = $request->query('from', now()->startOfMonth()->toDateString());
+        $to     = $request->query('to',   now()->endOfMonth()->toDateString());
 
         if ($filter === 'trashed') {
             $bookings = Booking::onlyTrashed()
@@ -313,7 +315,7 @@ class BookingController extends Controller
                 ->latest('deleted_at')
                 ->get();
 
-            return view('admin.bookings.bookings', compact('bookings', 'filter'));
+            return view('admin.bookings.bookings', compact('bookings', 'filter', 'from', 'to'));
         }
 
         $relations = ['guest', 'roomType'];
@@ -321,7 +323,7 @@ class BookingController extends Controller
             $relations[] = 'checkIn';
             $relations[] = 'checkOut';
         }
-        $query = Booking::with($relations);
+        $query = Booking::with($relations)->whereBetween('check_in_date', [$from, $to]);
         match ($filter) {
             'upcoming'  => $query->whereIn('status', ['pending', 'confirmed']),
             'inhouse'   => $query->where('status', 'checked_in'),
@@ -331,7 +333,7 @@ class BookingController extends Controller
         $query->orderByRaw("CASE WHEN status IN ('checked_out', 'cancelled') THEN 1 ELSE 0 END ASC");
         $bookings = $query->latest()->get();
 
-        return view('admin.bookings.bookings', compact('bookings', 'filter'));
+        return view('admin.bookings.bookings', compact('bookings', 'filter', 'from', 'to'));
     }
 
     public function createPage(RoomTypeRepositoryInterface $roomTypeRepository)

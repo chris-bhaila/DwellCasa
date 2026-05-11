@@ -40,7 +40,7 @@
 
     @can('view bookings')
     <!-- Today's Arrivals -->
-    <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
+    <a href="{{ route('admin.bookings') }}?filter=upcoming" class="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 hover:shadow-md hover:border-slate-200 transition-all block">
         <div class="flex items-center justify-between mb-3">
             <div class="w-10 h-10 rounded-xl bg-[#A89070]/10 flex items-center justify-center text-[#A89070]">
                 <i class="bi bi-box-arrow-in-right text-lg"></i>
@@ -50,12 +50,12 @@
         <p class="text-slate-500 text-sm font-medium mb-1">Today's Arrivals</p>
         <p class="text-3xl font-bold text-slate-900">{{ $todayArrivals }}</p>
         <p class="text-sm text-slate-400 mt-1">Confirmed &amp; pending check-ins</p>
-    </div>
+    </a>
     @endcan
 
     @can('check-in guests')
     <!-- Guests In-House -->
-    <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
+    <a href="{{ route('admin.bookings') }}?filter=inhouse" class="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 hover:shadow-md hover:border-slate-200 transition-all block">
         <div class="flex items-center justify-between mb-3">
             <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-500">
                 <i class="bi bi-people text-lg"></i>
@@ -65,12 +65,12 @@
         <p class="text-slate-500 text-sm font-medium mb-1">Guests In-House</p>
         <p class="text-3xl font-bold text-slate-900">{{ $inHouseCount }}</p>
         <p class="text-sm text-slate-400 mt-1">Currently checked in</p>
-    </div>
+    </a>
     @endcan
 
     @can('view revenue')
     <!-- Monthly Revenue -->
-    <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
+    <a href="{{ route('admin.revenue') }}" class="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 hover:shadow-md hover:border-slate-200 transition-all block">
         <div class="flex items-center justify-between mb-3">
             <div class="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center text-green-600">
                 <i class="bi bi-currency-rupee text-lg"></i>
@@ -80,12 +80,12 @@
         <p class="text-slate-500 text-sm font-medium mb-1">Revenue Collected</p>
         <p class="text-3xl font-bold text-slate-900">Rs. {{ number_format($monthlyRevenue, 0) }}</p>
         <p class="text-sm text-slate-400 mt-1">From check-ins this month</p>
-    </div>
+    </a>
     @endcan
 
     @can('manage inquiries')
     <!-- Unreplied Inquiries -->
-    <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
+    <a href="{{ route('admin.inquiry') }}" class="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 hover:shadow-md hover:border-slate-200 transition-all block">
         <div class="flex items-center justify-between mb-3">
             <div class="w-10 h-10 rounded-xl bg-rose-50 flex items-center justify-center text-rose-500">
                 <i class="bi bi-chat-left-dots text-lg"></i>
@@ -99,7 +99,7 @@
         <p class="text-slate-500 text-sm font-medium mb-1">Unreplied Inquiries</p>
         <p class="text-3xl font-bold text-slate-900">{{ $unrepliedInquiries }}</p>
         <p class="text-sm text-slate-400 mt-1">Waiting for a response</p>
-    </div>
+    </a>
     @endcan
 
 </div>
@@ -108,7 +108,7 @@
 <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
 
     @can('check-out guests')
-    <div class="bg-white rounded-xl border border-slate-100 shadow-sm px-5 py-4 flex items-center gap-4">
+    <a href="{{ route('admin.bookings') }}?filter=inhouse" class="bg-white rounded-xl border border-slate-100 shadow-sm px-5 py-4 flex items-center gap-4 hover:shadow-md hover:border-slate-200 transition-all">
         <div class="w-9 h-9 rounded-lg bg-orange-50 flex items-center justify-center text-orange-400 flex-shrink-0">
             <i class="bi bi-box-arrow-right"></i>
         </div>
@@ -116,7 +116,7 @@
             <p class="text-sm text-slate-500 font-medium">Today's Departures</p>
             <p class="text-xl font-bold text-slate-900">{{ $todayDepartures }}</p>
         </div>
-    </div>
+    </a>
     @endcan
 
     @can('manage rooms')
@@ -132,7 +132,7 @@
     @endcan
 
     @can('manage reviews')
-    <div class="bg-white rounded-xl border border-slate-100 shadow-sm px-5 py-4 flex items-center gap-4">
+    <a href="{{ route('admin.reviews') }}" class="bg-white rounded-xl border border-slate-100 shadow-sm px-5 py-4 flex items-center gap-4 hover:shadow-md hover:border-slate-200 transition-all">
         <div class="w-9 h-9 rounded-lg bg-amber-50 flex items-center justify-center text-amber-500 flex-shrink-0">
             <i class="bi bi-star-half"></i>
         </div>
@@ -143,11 +143,11 @@
                 <span class="text-sm font-normal text-slate-400">/ 5</span>
             </p>
         </div>
-    </div>
+    </a>
     @endcan
 
     @can('view bookings')
-    <div class="bg-white rounded-xl border border-slate-100 shadow-sm px-5 py-4 flex items-center gap-4">
+    <a href="{{ route('admin.bookings') }}" class="bg-white rounded-xl border border-slate-100 shadow-sm px-5 py-4 flex items-center gap-4 hover:shadow-md hover:border-slate-200 transition-all">
         <div class="w-9 h-9 rounded-lg bg-violet-50 flex items-center justify-center text-violet-500 flex-shrink-0">
             <i class="bi bi-calendar-check"></i>
         </div>
@@ -155,7 +155,7 @@
             <p class="text-sm text-slate-500 font-medium">Bookings This Month</p>
             <p class="text-xl font-bold text-slate-900">{{ $monthlyBookings }}</p>
         </div>
-    </div>
+    </a>
     @endcan
 
 </div>
@@ -183,7 +183,7 @@
                 </thead>
                 <tbody class="text-sm divide-y divide-slate-100">
                     @forelse($bookings as $booking)
-                    <tr class="hover:bg-slate-50/30 transition-colors">
+                    <tr class="hover:bg-slate-50/30 transition-colors cursor-pointer" onclick="window.location='{{ route('admin.bookings.view', $booking->id) }}'">
                         <td class="px-5 py-3.5">
                             <p class="font-medium text-slate-900 text-sm">{{ $booking->guest->full_name ?? 'N/A' }}</p>
                             <p class="text-slate-400 text-sm">{{ $booking->guest->email ?? '' }}</p>

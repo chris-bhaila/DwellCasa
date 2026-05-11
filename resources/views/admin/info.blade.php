@@ -159,9 +159,28 @@
                     <input type="text" name="contact_address" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary">
                 </div>
                 <div class="grid grid-cols-2 gap-5">
-                    <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-2">Phone</label>
-                        <input type="text" name="contact_phone" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary">
+                    <div id="phone-field-container" x-data="{ phones: [''] }">
+                        <label class="block text-sm font-medium text-slate-700 mb-2">Phone Numbers</label>
+                        <div class="space-y-2">
+                            <template x-for="(phone, index) in phones" :key="index">
+                                <div class="flex gap-2">
+                                    <input type="text" name="contact_phone[]"
+                                        :value="phone"
+                                        @input="phones[index] = $event.target.value"
+                                        placeholder="e.g. +977 01-XXXXXXX"
+                                        class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors text-sm">
+                                    <button type="button" x-show="phones.length > 1"
+                                        @click="phones.splice(index, 1)"
+                                        class="flex-shrink-0 w-10 h-[46px] flex items-center justify-center text-red-400 hover:text-red-600 hover:bg-red-50 rounded-xl border border-slate-200 transition-colors">
+                                        <i class="bi bi-trash text-sm"></i>
+                                    </button>
+                                </div>
+                            </template>
+                        </div>
+                        <button type="button" @click="phones.push('')"
+                            class="mt-2 inline-flex items-center gap-1.5 text-sm text-primary hover:text-[#8E795E] font-medium transition-colors">
+                            <i class="bi bi-plus-circle"></i> Add another number
+                        </button>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-2">Email</label>
@@ -259,7 +278,19 @@ const imageFields = ['homepage_main_image', 'homepage_end_image', 'about_image']
 function fillForm(data) {
     const form = document.getElementById('website-info-form');
 
+    // Handle phone array via Alpine component
+    if (data.contact_phone !== undefined) {
+        const phoneEl = document.getElementById('phone-field-container');
+        if (phoneEl && window.Alpine) {
+            const phones = Array.isArray(data.contact_phone) && data.contact_phone.length
+                ? data.contact_phone
+                : (data.contact_phone ? [data.contact_phone] : ['']);
+            Alpine.$data(phoneEl).phones = phones;
+        }
+    }
+
     Object.keys(data).forEach(key => {
+        if (key === 'contact_phone') return; // handled above
         const input = form.elements[key];
         if (input) {
             if (input.type === 'time' && data[key]) {

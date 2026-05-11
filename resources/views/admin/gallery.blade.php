@@ -132,7 +132,7 @@ $categories = ['interior', 'exterior', 'dining', 'amenities', 'other'];
 
         {{-- Delete button --}}
         <button type="button"
-            class="absolute top-2 right-2 w-7 h-7 bg-white/90
+            class="absolute top-2 right-2 w-7 h-7 bg-white/90 cursor-pointer
                    text-slate-600 rounded-lg flex items-center
                    justify-center opacity-0 group-hover:opacity-100
                    transition-opacity hover:text-red-500
@@ -194,7 +194,7 @@ $categories = ['interior', 'exterior', 'dining', 'amenities', 'other'];
                 <div class="grid grid-cols-2 gap-5">
                     <div id="general_category_wrapper">
                         <label class="block text-sm font-medium text-slate-700 mb-2">Sub Category</label>
-                        <select name="category" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors">
+                        <select name="category" class="w-full rounded-xl border border-slate-200 cursor-pointer px-4 py-3 focus:ring-primary focus:border-primary transition-colors">
                             @foreach($categories as $category)
                             <option value="{{ $category }}">{{ ucfirst($category) }}</option>
                             @endforeach
@@ -202,7 +202,7 @@ $categories = ['interior', 'exterior', 'dining', 'amenities', 'other'];
                     </div>
                     <div id="room_type_wrapper" style="display: none;">
                         <label class="block text-sm font-medium text-slate-700 mb-2">Select Room Type</label>
-                        <select name="room_type_id" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors" disabled>
+                        <select name="room_type_id" class="w-full rounded-xl border border-slate-200 cursor-pointer px-4 py-3 focus:ring-primary focus:border-primary transition-colors" disabled>
                             @foreach($roomTypes as $rt)
                             <option value="{{ $rt->id }}">{{ $rt->name }}</option>
                             @endforeach
@@ -247,14 +247,14 @@ $categories = ['interior', 'exterior', 'dining', 'amenities', 'other'];
     <!-- Controls -->
     <div class="absolute top-0 left-0 w-full p-4 flex justify-between items-center z-10 bg-gradient-to-b from-black/50 to-transparent">
         <div id="lightbox-counter" class="text-white font-medium text-sm">1 / 10</div>
-        <button onclick="closeLightbox()" class="text-black bg-white/80 hover:bg-white transition-colors w-10 h-10 flex items-center justify-center rounded-full">
+        <button onclick="closeLightbox()" class="text-black bg-white/80 hover:bg-white cursor-pointer transition-colors w-10 h-10 flex items-center justify-center rounded-full">
             <i class="bi bi-x-lg text-xl"></i>
         </button>
     </div>
 
     <!-- Prev / Next buttons — fixed at horizontal edges, vertically centred -->
     <button onclick="prevImage(event)"
-        class="absolute left-4 top-1/2 -translate-y-1/2 z-20
+        class="absolute left-4 top-1/2 -translate-y-1/2 z-20 cursor-pointer
                text-black bg-white/80 hover:bg-white transition-colors
                w-10 h-10 md:w-12 md:h-12 flex items-center justify-center
                rounded-full focus:outline-none shadow-sm">
@@ -267,7 +267,7 @@ $categories = ['interior', 'exterior', 'dining', 'amenities', 'other'];
     </div>
 
     <button onclick="nextImage(event)"
-        class="absolute right-4 top-1/2 -translate-y-1/2 z-20
+        class="absolute right-4 top-1/2 -translate-y-1/2 z-20 cursor-pointer
                text-black bg-white/80 hover:bg-white transition-colors
                w-10 h-10 md:w-12 md:h-12 flex items-center justify-center
                rounded-full focus:outline-none shadow-sm">

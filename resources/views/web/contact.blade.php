@@ -71,7 +71,7 @@
                             </div>
                             <div>
                                 <h3 class="!font-sans font-bold text-slate-900 text-lg">Phone</h3>
-                                <p class="text-slate-700 mt-1">{{ $webInfo->contact_phone }}</p>
+                                <p class="text-slate-700 mt-1">{{ implode(', ', array_filter((array) ($webInfo->contact_phone ?? []))) }}</p>
                             </div>
                         </div>
 

@@ -43,8 +43,9 @@ class WebsiteInfo extends Model
     ];
 
     protected $casts = [
-        'check_in'  => 'string',
-        'check_out' => 'string',
+        'check_in'      => 'string',
+        'check_out'     => 'string',
+        'contact_phone' => 'array',
     ];
 
     protected static function booted(): void

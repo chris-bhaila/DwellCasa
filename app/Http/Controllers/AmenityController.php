@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Contracts\AmenityRepositoryInterface;
 use App\Http\Requests\StoreAmenityRequest;
 use App\Http\Requests\UpdateAmenityRequest;
+use App\Models\Amenity;
+use App\Models\Location;
+use Illuminate\Http\Request;
 
 class AmenityController extends Controller
 {
@@ -58,10 +61,61 @@ class AmenityController extends Controller
         return response()->json(['success' => true, 'message' => 'Amenity deleted successfully'], 200);
     }
 
+    public function importFrom(Request $request)
+    {
+        abort_unless(auth()->user()->hasRole('super_admin'), 403);
+
+        $request->validate(['source_location_id' => 'required|integer|exists:locations,id']);
+
+        $targetLocationId = session('selected_location_id');
+        abort_if(!$targetLocationId, 422, 'No location selected.');
+        abort_if($request->source_location_id == $targetLocationId, 422, 'Source and target location are the same.');
+
+        $source = Amenity::withoutGlobalScopes()
+            ->where('location_id', $request->source_location_id)
+            ->get();
+
+        $existingNames = Amenity::withoutGlobalScopes()
+            ->where('location_id', $targetLocationId)
+            ->pluck('name')
+            ->map(fn($n) => strtolower($n))
+            ->all();
+
+        $imported = 0;
+        foreach ($source as $amenity) {
+            if (in_array(strtolower($amenity->name), $existingNames)) {
+                continue;
+            }
+            Amenity::withoutGlobalScopes()->create([
+                'name'        => $amenity->name,
+                'icon'        => $amenity->icon,
+                'category'    => $amenity->category instanceof \App\Enums\AmenityCategory
+                    ? $amenity->category->value
+                    : $amenity->category,
+                'description' => $amenity->description,
+                'is_active'   => $amenity->is_active,
+                'sort_order'  => $amenity->sort_order,
+                'location_id' => $targetLocationId,
+            ]);
+            $imported++;
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => "Imported {$imported} amenities successfully." . ($source->count() - $imported > 0 ? ' ' . ($source->count() - $imported) . ' skipped (already exist).' : ''),
+        ]);
+    }
+
     public function page()
     {
         $amenities = $this->amenityRepository->all();
 
-        return view('admin.amenities', compact('amenities'));
+        $currentLocationId = session('selected_location_id');
+        $otherLocations = Location::where('is_active', true)
+            ->when($currentLocationId, fn($q) => $q->where('id', '!=', $currentLocationId))
+            ->orderBy('name')
+            ->get();
+
+        return view('admin.amenities', compact('amenities', 'otherLocations'));
     }
 }

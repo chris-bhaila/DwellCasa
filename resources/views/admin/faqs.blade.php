@@ -25,7 +25,7 @@
             class="w-full pl-9 pr-4 py-2 text-sm rounded-xl border border-slate-200 focus:ring-primary focus:border-primary transition-colors">
     </div>
     <select id="filter-status"
-        class="text-sm rounded-xl border border-slate-200 px-3 py-2 focus:ring-primary focus:border-primary transition-colors min-w-[120px]">
+        class="text-sm rounded-xl border border-slate-200 px-3 py-2 focus:ring-primary cursor-pointer focus:border-primary transition-colors min-w-[120px]">
         <option value="">All Status</option>
         <option value="active">Active</option>
         <option value="inactive">Inactive</option>
@@ -144,7 +144,7 @@
                 </div>
                 <div class="flex items-center gap-3 pb-1">
                     <input type="checkbox" name="is_active" id="is_active"
-                        class="rounded text-primary focus:ring-primary w-5 h-5 border-slate-300" checked>
+                        class="rounded text-primary cursor-pointer focus:ring-primary w-5 h-5 border-slate-300" checked>
                     <label for="is_active" class="text-sm font-medium text-slate-700">Active (Visible)</label>
                 </div>
             </div>
