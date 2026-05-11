@@ -96,74 +96,72 @@ $amenities = collect([
 
 {{-- Amenities Table --}}
 <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-    <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse">
-            <thead>
-                <tr class="bg-slate-50/50 text-slate-500 text-sm border-b border-slate-100">
-                    <th class="px-5 py-3 font-medium">Name</th>
-                    <th class="px-5 py-3 font-medium">Category</th>
-                    <th class="px-5 py-3 font-medium">Status</th>
-                    <th class="px-5 py-3 font-medium text-right">Actions</th>
-                </tr>
-            </thead>
-            <tbody class="text-sm divide-y divide-slate-100" id="amenities-tbody">
-                @forelse($amenities as $amenity)
-                <tr class="hover:bg-slate-50/50 transition-colors"
-                    data-row-category="{{ $amenity->category instanceof \App\Enums\AmenityCategory ? $amenity->category->value : strtolower($amenity->category ?: '') }}"
-                    data-row-status="{{ $amenity->is_active ? 'active' : 'inactive' }}">
-                    <td class="px-5 py-3.5">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-xl shadow-sm border border-slate-100 flex-shrink-0">
-                                {!! $amenity->icon ?: '✨' !!}
-                            </div>
-                            <p class="font-bold text-slate-900">{{ $amenity->name }}</p>
+    <table class="w-full text-left border-collapse">
+        <thead>
+            <tr class="bg-slate-50/50 text-slate-500 text-sm border-b border-slate-100">
+                <th class="px-5 py-3 font-medium">Name</th>
+                <th class="px-5 py-3 font-medium">Category</th>
+                <th class="px-5 py-3 font-medium">Status</th>
+                <th class="px-5 py-3 font-medium text-right">Actions</th>
+            </tr>
+        </thead>
+        <tbody class="text-sm divide-y divide-slate-100" id="amenities-tbody">
+            @forelse($amenities as $amenity)
+            <tr class="hover:bg-slate-50/50 transition-colors"
+                data-row-category="{{ $amenity->category instanceof \App\Enums\AmenityCategory ? $amenity->category->value : strtolower($amenity->category ?: '') }}"
+                data-row-status="{{ $amenity->is_active ? 'active' : 'inactive' }}">
+                <td class="px-5 py-3.5">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-xl shadow-sm border border-slate-100 flex-shrink-0">
+                            {!! $amenity->icon ?: '✨' !!}
                         </div>
-                    </td>
-                    <td class="px-5 py-3.5 text-slate-600 capitalize">
-                        <span class="bg-slate-100 text-slate-600 px-2.5 py-1 rounded-lg text-sm font-medium">
-                            {{ $amenity->category instanceof \App\Enums\AmenityCategory ? $amenity->category->label() : ucfirst($amenity->category ?: 'General') }}
-                        </span>
-                    </td>
-                    <td class="px-5 py-3.5">
-                        @if($amenity->is_active)
-                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-sm font-medium bg-green-50 text-green-700 border border-green-200">Active</span>
-                        @else
-                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-sm font-medium bg-slate-50 text-slate-700 border border-slate-200">Inactive</span>
-                        @endif
-                    </td>
-                    <td class="px-5 py-3.5 text-right">
-                        <div class="flex items-center justify-end gap-2">
-                            <button type="button" class="edit-amenity-btn relative cursor-pointer inline-flex items-center justify-center p-2 text-[#A89070] hover:bg-slate-50 hover:text-[#8E795E] rounded-lg transition-colors group"
-                                data-id="{{ $amenity->id }}"
-                                data-name="{{ $amenity->name }}"
-                                data-category="{{ $amenity->category }}"
-                                data-icon="{{ $amenity->icon }}"
-                                data-description="{{ $amenity->description }}"
-                                data-sort_order="{{ $amenity->sort_order }}"
-                                data-is_active="{{ $amenity->is_active ? 1 : 0 }}">
-                                <i class="bi bi-pencil text-lg"></i>
-                                <span class="absolute -bottom-8 right-0 w-max px-2 py-1 bg-slate-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 font-normal shadow-sm">Edit</span>
-                            </button>
-                            <button type="button" class="delete-amenity-btn cursor-pointer relative inline-flex items-center justify-center p-2 text-red-400 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors group"
-                                data-id="{{ $amenity->id }}">
-                                <i class="bi bi-trash text-lg"></i>
-                                <span class="absolute -bottom-8 right-0 w-max px-2 py-1 bg-slate-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 font-normal shadow-sm">Delete</span>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="4" class="px-5 py-10 text-center text-slate-400 text-sm italic">
-                        No amenities found. Add your first amenity using the button above.
-                    </td>
-                </tr>
-                @endforelse
-            </tbody>
-        </table>
-        <div id="no-results-row" class="hidden px-5 py-10 text-center text-slate-400 text-sm italic">
-            No amenities match the current filters.
-        </div>
+                        <p class="font-bold text-slate-900">{{ $amenity->name }}</p>
+                    </div>
+                </td>
+                <td class="px-5 py-3.5 text-slate-600 capitalize">
+                    <span class="bg-slate-100 text-slate-600 px-2.5 py-1 rounded-lg text-sm font-medium">
+                        {{ $amenity->category instanceof \App\Enums\AmenityCategory ? $amenity->category->label() : ucfirst($amenity->category ?: 'General') }}
+                    </span>
+                </td>
+                <td class="px-5 py-3.5">
+                    @if($amenity->is_active)
+                    <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-sm font-medium bg-green-50 text-green-700 border border-green-200">Active</span>
+                    @else
+                    <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-sm font-medium bg-slate-50 text-slate-700 border border-slate-200">Inactive</span>
+                    @endif
+                </td>
+                <td class="px-5 py-3.5 text-right">
+                    <div class="flex items-center justify-end gap-2">
+                        <button type="button" class="edit-amenity-btn relative cursor-pointer inline-flex items-center justify-center p-2 text-[#A89070] hover:bg-slate-50 hover:text-[#8E795E] rounded-lg transition-colors group"
+                            data-id="{{ $amenity->id }}"
+                            data-name="{{ $amenity->name }}"
+                            data-category="{{ $amenity->category }}"
+                            data-icon="{{ $amenity->icon }}"
+                            data-description="{{ $amenity->description }}"
+                            data-sort_order="{{ $amenity->sort_order }}"
+                            data-is_active="{{ $amenity->is_active ? 1 : 0 }}">
+                            <i class="bi bi-pencil text-lg"></i>
+                            <span class="absolute -bottom-8 right-0 w-max px-2 py-1 bg-slate-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 font-normal shadow-sm">Edit</span>
+                        </button>
+                        <button type="button" class="delete-amenity-btn cursor-pointer relative inline-flex items-center justify-center p-2 text-red-400 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors group"
+                            data-id="{{ $amenity->id }}">
+                            <i class="bi bi-trash text-lg"></i>
+                            <span class="absolute -bottom-8 right-0 w-max px-2 py-1 bg-slate-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 font-normal shadow-sm">Delete</span>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+            @empty
+            <tr>
+                <td colspan="4" class="px-5 py-10 text-center text-slate-400 text-sm italic">
+                    No amenities found. Add your first amenity using the button above.
+                </td>
+            </tr>
+            @endforelse
+        </tbody>
+    </table>
+    <div id="no-results-row" class="hidden px-5 py-10 text-center text-slate-400 text-sm italic">
+        No amenities match the current filters.
     </div>
 </div>
 
