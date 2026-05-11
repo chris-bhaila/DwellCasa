@@ -11,10 +11,54 @@
         <h1 class="text-3xl font-serif font-bold text-slate-900 italic lg:hidden">FAQs</h1>
         <p class="text-slate-500 mt-1">Manage frequently asked questions displayed on your website.</p>
     </div>
-    <button type="button" id="open-add-modal"
-        class="inline-flex items-center gap-2 bg-primary text-white px-5 py-2.5 rounded-xl font-medium hover:bg-[#8E795E] transition-all shadow-sm text-sm flex-shrink-0 cursor-pointer">
-        <i class="bi bi-plus-lg"></i> Add FAQ
-    </button>
+    <div class="flex items-center gap-3 flex-wrap">
+        @role('super_admin')
+        @if(isset($otherLocations) && $otherLocations->isNotEmpty())
+        <div x-data="{ open: false, loading: false }" class="relative">
+            <button
+                @click="open = !open"
+                :disabled="loading"
+                class="inline-flex items-center gap-2 cursor-pointer border border-slate-200 bg-white text-slate-700 px-4 py-2.5 rounded-xl font-medium hover:bg-slate-50 transition-all shadow-sm text-sm disabled:opacity-60">
+                <template x-if="!loading">
+                    <i class="bi bi-download"></i>
+                </template>
+                <template x-if="loading">
+                    <i class="bi bi-hourglass-split animate-spin"></i>
+                </template>
+                <span x-text="loading ? 'Importing...' : 'Import FAQs From'"></span>
+                <i class="bi bi-chevron-down text-sm transition-transform duration-200" :class="open ? 'rotate-180' : ''"></i>
+            </button>
+
+            <div
+                x-show="open"
+                x-transition:enter="transition ease-out duration-150"
+                x-transition:enter-start="opacity-0 scale-95"
+                x-transition:enter-end="opacity-100 scale-100"
+                x-transition:leave="transition ease-in duration-100"
+                x-transition:leave-start="opacity-100 scale-100"
+                x-transition:leave-end="opacity-0 scale-95"
+                @click.outside="open = false"
+                class="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-slate-100 py-1 z-50"
+                x-cloak>
+                @foreach($otherLocations as $loc)
+                <button
+                    type="button"
+                    @click="loading = true; open = false; importFaqsFrom({{ $loc->id }}, '{{ addslashes($loc->name) }}').finally(() => loading = false)"
+                    class="w-full text-left px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2 transition-colors">
+                    <i class="bi bi-geo-alt text-slate-400"></i>
+                    {{ $loc->name }}
+                </button>
+                @endforeach
+            </div>
+        </div>
+        @endif
+        @endrole
+
+        <button type="button" id="open-add-modal"
+            class="inline-flex items-center gap-2 bg-primary text-white px-5 py-2.5 rounded-xl font-medium hover:bg-[#8E795E] transition-all shadow-sm text-sm flex-shrink-0 cursor-pointer">
+            <i class="bi bi-plus-lg"></i> Add FAQ
+        </button>
+    </div>
 </div>
 
 {{-- Filter Row --}}
@@ -332,5 +376,41 @@
 
     searchInput.addEventListener('input', applyFilters);
     statusSelect.addEventListener('change', applyFilters);
+
+    // ─── Import FAQs from another location ────────────────────────────────────
+    window.importFaqsFrom = async function(locationId, locationName) {
+        const confirmed = await adminConfirm(
+            `This will completely replace all FAQs for this location with those from "${locationName}". This cannot be undone.`, {
+                confirmLabel: 'Replace & Import',
+                type: 'danger'
+            }
+        );
+
+        if (!confirmed) return;
+
+        try {
+            const response = await fetch('/api/faqs/import', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({
+                    source_location_id: locationId
+                })
+            });
+
+            const result = await response.json();
+            if (response.ok) {
+                adminToast(result.message, 'success');
+                window.location.reload();
+            } else {
+                adminToast('Import failed: ' + (result.message || 'Unknown error'));
+            }
+        } catch (err) {
+            adminToast('An error occurred during import.');
+        }
+    };
 </script>
 @endpush

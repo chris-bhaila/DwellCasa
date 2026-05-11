@@ -32,7 +32,7 @@
                     </div>
                     <div class="mb-6">
                         <label class="block text-sm font-medium text-slate-700 mb-2">Inquiry Type:</label>
-                        <select name="inquiry_type" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" required>
+                        <select name="inquiry_type" class="w-full px-4 py-3 cursor-pointer border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" required>
                             <option value="general">General Inquiry</option>
                             <option value="booking">Booking & Reservation</option>
                             <option value="amenities">Amenities & Facilities</option>

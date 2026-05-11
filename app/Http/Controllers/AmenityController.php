@@ -75,17 +75,16 @@ class AmenityController extends Controller
             ->where('location_id', $request->source_location_id)
             ->get();
 
-        $existingNames = Amenity::withoutGlobalScopes()
+        $existing = Amenity::withoutGlobalScopes()
             ->where('location_id', $targetLocationId)
-            ->pluck('name')
-            ->map(fn($n) => strtolower($n))
-            ->all();
+            ->get();
 
-        $imported = 0;
+        foreach ($existing as $amenity) {
+            $amenity->roomTypes()->detach();
+            $amenity->delete();
+        }
+
         foreach ($source as $amenity) {
-            if (in_array(strtolower($amenity->name), $existingNames)) {
-                continue;
-            }
             Amenity::withoutGlobalScopes()->create([
                 'name'        => $amenity->name,
                 'icon'        => $amenity->icon,
@@ -97,12 +96,11 @@ class AmenityController extends Controller
                 'sort_order'  => $amenity->sort_order,
                 'location_id' => $targetLocationId,
             ]);
-            $imported++;
         }
 
         return response()->json([
             'success' => true,
-            'message' => "Imported {$imported} amenities successfully." . ($source->count() - $imported > 0 ? ' ' . ($source->count() - $imported) . ' skipped (already exist).' : ''),
+            'message' => "Imported {$source->count()} amenities successfully. Previous amenities and room type assignments have been replaced.",
         ]);
     }
 

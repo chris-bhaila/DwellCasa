@@ -66,7 +66,14 @@ class WebsiteInfoController extends Controller
     public function faqsPage()
     {
         $faqs = \App\Models\Faq::orderBy('sort_order')->orderBy('created_at')->get();
-        return view('admin.faqs', compact('faqs'));
+
+        $currentLocationId = session('selected_location_id');
+        $otherLocations = \App\Models\Location::where('is_active', true)
+            ->when($currentLocationId, fn($q) => $q->where('id', '!=', $currentLocationId))
+            ->orderBy('name')
+            ->get();
+
+        return view('admin.faqs', compact('faqs', 'otherLocations'));
     }
 
     public function pageGlobal()

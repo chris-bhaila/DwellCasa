@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Contracts\FaqRepositoryInterface;
 use App\Http\Requests\StoreFaqRequest;
 use App\Http\Requests\UpdateFaqRequest;
+use App\Models\Faq;
+use Illuminate\Http\Request;
 
 class FaqController extends Controller
 {
@@ -64,6 +66,45 @@ class FaqController extends Controller
             'success' => true,
             'message' => 'FAQ updated successfully',
             'data'    => $faq,
+        ]);
+    }
+
+    public function importFrom(Request $request)
+    {
+        abort_unless(auth()->user()->hasRole('super_admin'), 403);
+
+        $request->validate(['source_location_id' => 'required|integer|exists:locations,id']);
+
+        $targetLocationId = session('selected_location_id');
+        abort_if(!$targetLocationId, 422, 'No location selected.');
+        abort_if($request->source_location_id == $targetLocationId, 422, 'Source and target location are the same.');
+
+        $source = Faq::withoutGlobalScopes()
+            ->where('location_id', $request->source_location_id)
+            ->get();
+
+        Faq::withoutGlobalScopes()
+            ->where('location_id', $targetLocationId)
+            ->delete();
+
+        foreach ($source as $faq) {
+            Faq::withoutGlobalScopes()->create([
+                'question'    => $faq->question,
+                'answer'      => $faq->answer,
+                'sort_order'  => $faq->sort_order,
+                'is_active'   => $faq->is_active,
+                'location_id' => $targetLocationId,
+            ]);
+        }
+
+        activity()
+            ->causedBy(auth()->user())
+            ->withProperties(['location_id' => $targetLocationId, 'source_location_id' => $request->source_location_id])
+            ->log('FAQs replaced by import');
+
+        return response()->json([
+            'success' => true,
+            'message' => "Imported {$source->count()} FAQ(s) successfully. Previous FAQs have been replaced.",
         ]);
     }
 

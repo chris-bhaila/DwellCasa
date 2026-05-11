@@ -36,7 +36,7 @@ $image3 = $imagesForLightbox[2]['url'] ?? $imagesForLightbox[0]['url'];
     </div>
 
     <div class="relative z-10 text-center text-white px-6 mt-16" data-aos="fade-up">
-        <span class="font-serif uppercase tracking-[0.2em] text-sm mb-4 block font-medium">DwellCasa Signature</span>
+        <span class="font-serif uppercase tracking-[0.2em] text-sm mb-4 block font-medium">DwellCasa {{ $location->name }}</span>
         <h1 class="font-serif text-5xl md:text-7xl font-bold italic mb-4">{{ $roomType->name ?? 'Executive Suite' }}</h1>
         <div class="flex items-center justify-center gap-4 text-sm font-light tracking-widest uppercase">
             <span>{{ $roomType->size_sqft ?? '450' }} sq ft</span>
@@ -83,21 +83,66 @@ $image3 = $imagesForLightbox[2]['url'] ?? $imagesForLightbox[0]['url'];
                 </div>
 
                 <!-- Amenities -->
+                @php
+                    $activeAmenities = ($roomType->amenities ?? collect())->filter(fn($a) => $a->is_active == 1)->values();
+                    $previewAmenities = $activeAmenities->take(9);
+                @endphp
                 <div data-aos="fade-up">
                     <h2 class="text-3xl font-serif italic font-bold text-slate-900 mb-6">What this room offers</h2>
                     <div class="grid grid-cols-2 sm:grid-cols-3 gap-6">
-                        @forelse($roomType->amenities ?? [] as $amenity)
-                        @if ($amenity->is_active == 1)
+                        @forelse($previewAmenities as $amenity)
                         <div class="flex items-center gap-3 text-slate-700">
                             <span class="text-2xl text-black">{!! $amenity->icon ?: '✨' !!}</span>
                             <span class="font-medium">{{ $amenity->name }}</span>
                         </div>
-                        @endif
                         @empty
                         <p class="text-slate-500 italic col-span-full">No specific amenities listed for this room.</p>
                         @endforelse
                     </div>
+                    @if($activeAmenities->count() > 9)
+                    <button onclick="document.getElementById('amenities-modal').classList.remove('hidden')"
+                        class="mt-6 inline-flex items-center gap-2 border border-slate-800 text-slate-800 font-semibold px-6 py-3 rounded-full hover:bg-slate-800 hover:text-white transition-colors duration-200">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7" />
+                        </svg>
+                        Show all {{ $activeAmenities->count() }} amenities
+                    </button>
+                    @endif
                 </div>
+
+                <!-- Amenities Modal -->
+                @if($activeAmenities->count() > 9)
+                <div id="amenities-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+                    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="document.getElementById('amenities-modal').classList.add('hidden')"></div>
+                    <div class="relative bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[85vh] overflow-y-auto p-8">
+                        <div class="flex items-center justify-between mb-8">
+                            <h3 class="text-2xl font-serif italic font-bold text-slate-900">All Amenities</h3>
+                            <button onclick="document.getElementById('amenities-modal').classList.add('hidden')"
+                                class="p-2 rounded-full hover:bg-slate-100 transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+                        @php
+                            $grouped = $activeAmenities->groupBy(fn($a) => optional($a->category)->label() ?? 'General');
+                        @endphp
+                        @foreach($grouped as $categoryLabel => $items)
+                        <div class="mb-8 last:mb-0">
+                            <h4 class="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4 border-b border-slate-100 pb-2">{{ $categoryLabel }}</h4>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                @foreach($items as $amenity)
+                                <div class="flex items-center gap-3 text-slate-700">
+                                    <span class="text-xl text-black">{!! $amenity->icon ?: '✨' !!}</span>
+                                    <span class="font-medium">{{ $amenity->name }}</span>
+                                </div>
+                                @endforeach
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+                @endif
             </div>
 
             <!-- Sidebar / Sticky Booking Card -->
@@ -248,14 +293,14 @@ $reviews = \App\Models\Review::where('type', 'room_type')
     <!-- Controls -->
     <div class="absolute top-0 left-0 w-full p-4 flex justify-between items-center z-10 bg-gradient-to-b from-black/50 to-transparent">
         <div id="lightbox-counter" class="text-white font-medium text-sm">1 / 3</div>
-        <button type="button" onclick="closeLightbox()" class="text-black bg-white/80 hover:bg-white transition-colors w-10 h-10 flex items-center justify-center rounded-full shadow-sm">
+        <button type="button" onclick="closeLightbox()" class="text-black bg-white/80 cursor-pointer hover:bg-white transition-colors w-10 h-10 flex items-center justify-center rounded-full shadow-sm">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
             </svg>
         </button>
     </div>
 
-    <button type="button" onclick="prevImage(event)" class="absolute left-4 top-1/2 -translate-y-1/2 z-20 text-black bg-white/80 hover:bg-white transition-colors w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full focus:outline-none shadow-sm">
+    <button type="button" onclick="prevImage(event)" class="absolute cursor-pointer left-4 top-1/2 -translate-y-1/2 z-20 text-black bg-white/80 hover:bg-white transition-colors w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full focus:outline-none shadow-sm">
         <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
         </svg>
@@ -266,7 +311,7 @@ $reviews = \App\Models\Review::where('type', 'room_type')
         <img id="lightbox-img" src="" alt="" class="max-h-full min-w-0 object-contain select-none transition-transform duration-300 shadow-2xl">
     </div>
 
-    <button type="button" onclick="nextImage(event)" class="absolute right-4 top-1/2 -translate-y-1/2 z-20 text-black bg-white/80 hover:bg-white transition-colors w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full focus:outline-none shadow-sm">
+    <button type="button" onclick="nextImage(event)" class="absolute cursor-pointer right-4 top-1/2 -translate-y-1/2 z-20 text-black bg-white/80 hover:bg-white transition-colors w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full focus:outline-none shadow-sm">
         <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
         </svg>

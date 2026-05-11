@@ -18,14 +18,6 @@
         <p class="text-slate-500 mt-1">Update details, pricing, and availability for this room category.</p>
         </div>
     </div>
-    <div>
-        <a href="{{ url('/rooms') }}" target="_blank" class="inline-flex items-center text-sm font-medium text-[#A89070] hover:text-[#8E795E] transition-colors">
-            View on Website
-            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
-            </svg>
-        </a>
-    </div>
 </div>
 
 <form id="edit-room-type-form" action="#" method="POST" enctype="multipart/form-data">

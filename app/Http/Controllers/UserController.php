@@ -43,13 +43,8 @@ class UserController extends AdminController
 
     public function store(Request $request)
     {
-        $locationId = $this->resolveLocationId();
-        abort_if(!$locationId, 422, 'No location selected.');
-
         $isSuperAdmin = auth()->user()->hasRole('super_admin');
 
-        // Super admin can assign any role except super_admin via this form
-        // Admin can only assign roles that are not super_admin or admin
         $request->validate([
             'name'          => 'required|string|max:255',
             'email'         => 'required|string|email|max:255|unique:users',
@@ -57,7 +52,14 @@ class UserController extends AdminController
             'role'          => 'required|exists:roles,name',
             'permissions'   => 'nullable|array',
             'permissions.*' => 'exists:permissions,name',
+            'location_id'   => $isSuperAdmin ? 'required|integer|exists:locations,id' : 'nullable',
         ]);
+
+        $locationId = $isSuperAdmin
+            ? (int) $request->location_id
+            : auth()->user()->location_id;
+
+        abort_if(!$locationId, 422, 'No location selected.');
 
         // Enforce role assignment rules
         $requestedRole = $request->role;

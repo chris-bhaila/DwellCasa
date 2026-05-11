@@ -178,6 +178,7 @@ Route::middleware(['web', 'auth'])->group(function () {
         Route::post('website-info', [WebsiteInfoController::class, 'update']);
         Route::post('home-info', [WebsiteInfoController::class, 'updateGlobal']);
         Route::apiResource('property-settings', PropertySettingController::class);
+        Route::post('faqs/import', [FaqController::class, 'importFrom']);
         Route::apiResource('faqs', FaqController::class)->except(['show', 'create', 'edit']);
     });
 

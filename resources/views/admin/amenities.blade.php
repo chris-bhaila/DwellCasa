@@ -616,9 +616,9 @@ $amenities = collect([
     // ─── Import amenities from another location ────────────────────────────────
     window.importAmenitiesFrom = async function(locationId, locationName) {
         const confirmed = await adminConfirm(
-            `Import all amenities from "${locationName}" into this location? Amenities that already exist here will be skipped.`, {
-                confirmLabel: 'Import',
-                type: 'primary'
+            `This will completely replace all amenities for this location with those from "${locationName}". All currently assigned amenities for room types will also be removed. This cannot be undone.`, {
+                confirmLabel: 'Replace & Import',
+                type: 'danger'
             }
         );
 
