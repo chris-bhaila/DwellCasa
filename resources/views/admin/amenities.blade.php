@@ -241,7 +241,7 @@ $amenities = collect([
                     // Bathroom & personal care
                     'bi-droplet', 'bi-brush', 'bi-scissors',
 
-                    // Food & drink (BI)
+                    // Food & drink
                     'bi-cup-hot', 'bi-cup-straw', 'bi-cup', 'bi-egg-fried',
                     'bi-basket', 'bi-water',
 
@@ -265,26 +265,24 @@ $amenities = collect([
 
                     // Wellness & spa
                     'bi-droplet-half', 'bi-steam', 'bi-heart', 'bi-emoji-smile',
-                    'bi-person-arms-up', 'bi-moon-stars', 'bi-peace',
+                    'bi-moon-stars', 'bi-peace',
 
                     // Sports & fitness
-                    'bi-trophy', 'bi-stopwatch', 'bi-activity', 'bi-person-walking',
-                    'bi-person-standing', 'bi-bullseye',
+                    'bi-trophy', 'bi-stopwatch', 'bi-activity', 'bi-bullseye',
 
                     // Business facilities
                     'bi-easel', 'bi-easel2', 'bi-display', 'bi-calendar-check',
                     'bi-clipboard', 'bi-journals', 'bi-diagram-3', 'bi-headset',
 
                     // Accessibility
-                    'bi-wheelchair', 'bi-elevator', 'bi-sign-intersection-y',
+                    'bi-sign-intersection-y',
 
                     // Outdoor & recreation
                     'bi-geo-alt', 'bi-map', 'bi-signpost', 'bi-binoculars',
                     'bi-compass', 'bi-sunrise', 'bi-sunset', 'bi-snow2',
-                    'bi-water', 'bi-waves',
 
                     // Cleaning & housekeeping
-                    'bi-bucket', 'bi-trash', 'bi-stars', // stars = cleanliness rating feel
+                    'bi-bucket', 'bi-trash',
                     ];
 
                     $lucideIcons = [
@@ -335,12 +333,10 @@ $amenities = collect([
                     'plug-zap', 'thermometer', 'clock-3',
 
                     // Wellness & spa
-                    'dumbbell', 'brain',
-                    'eye', 'hand', 'feather',
+                    'dumbbell', 'brain', 'eye', 'hand', 'feather',
 
                     // Sports & fitness
-                    'bike', 'volleyball',
-                    'dumbbell', 'mountain', 'PersonStanding', 'activity',
+                    'bike', 'volleyball', 'mountain', 'person-standing', 'activity',
 
                     // Business facilities
                     'monitor', 'presentation', 'projector', 'layout-dashboard',
@@ -351,10 +347,10 @@ $amenities = collect([
 
                     // Outdoor & recreation
                     'tent', 'mountain-snow', 'waves', 'sailboat', 'map-pin',
-                    'map', 'compass', 'sunset', 'sunrise', 'trees',
+                    'map', 'compass', 'trees',
 
                     // Cleaning & housekeeping
-                    'sparkles', 'wind', 'trash-2', 'brush',
+                    'sparkles', 'trash-2', 'washing-machine',
                     ];
                     @endphp
 
@@ -622,8 +618,10 @@ $amenities = collect([
     // ─── Import amenities from another location ────────────────────────────────
     window.importAmenitiesFrom = async function(locationId, locationName) {
         const confirmed = await adminConfirm(
-            `Import all amenities from "${locationName}" into this location? Amenities that already exist here will be skipped.`,
-            { confirmLabel: 'Import', type: 'primary' }
+            `Import all amenities from "${locationName}" into this location? Amenities that already exist here will be skipped.`, {
+                confirmLabel: 'Import',
+                type: 'primary'
+            }
         );
 
         if (!confirmed) return;
@@ -636,7 +634,9 @@ $amenities = collect([
                     'Accept': 'application/json',
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                 },
-                body: JSON.stringify({ source_location_id: locationId })
+                body: JSON.stringify({
+                    source_location_id: locationId
+                })
             });
 
             const result = await response.json();
