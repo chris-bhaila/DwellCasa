@@ -15,39 +15,67 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
             <!-- Contact Form -->
             <div class="bg-white p-10 rounded-2xl shadow-lg border border-slate-100">
-                <h2 class="text-3xl !font-sans font-bold text-slate-900 mb-8">Send us a Message</h2>
-                <form id="contact-form" action="#" method="POST">
-                    @csrf
-                    <div class="mb-6">
-                        <label class="block text-sm font-medium text-slate-700 mb-2">Full Name</label>
-                        <input type="text" name="name" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" required>
+                <!-- Success state (hidden until form is submitted successfully) -->
+                <div id="contact-success" class="hidden flex flex-col items-center justify-center text-center h-full py-10">
+                    <div class="w-20 h-20 rounded-full flex items-center justify-center mb-6" style="background-color:#A89070/10;background-color:rgba(168,144,112,0.12);">
+                        <svg class="w-10 h-10" style="color:#A89070" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                        </svg>
                     </div>
-                    <div class="mb-6">
-                        <label class="block text-sm font-medium text-slate-700 mb-2">Email</label>
-                        <input type="email" name="email" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" required>
-                    </div>
-                    <div class="mb-6">
-                        <label class="block text-sm font-medium text-slate-700 mb-2">Phone</label>
-                        <input type="tel" name="phone" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
-                    </div>
-                    <div class="mb-6">
-                        <label class="block text-sm font-medium text-slate-700 mb-2">Inquiry Type:</label>
-                        <select name="inquiry_type" class="w-full px-4 py-3 cursor-pointer border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" required>
-                            <option value="general">General Inquiry</option>
-                            <option value="booking">Booking & Reservation</option>
-                            <option value="amenities">Amenities & Facilities</option>
-                            <option value="pricing">Pricing & Rates</option>
-                            <option value="other">Other</option>
-                        </select>
-                    </div>
-                    <div class="mb-6">
-                        <label class="block text-sm font-medium text-slate-700 mb-2">Message</label>
-                        <textarea name="message" rows="5" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" required></textarea>
-                    </div>
-                    <button type="submit" class="w-full cursor-pointer bg-primary text-white px-6 py-4 rounded-lg font-semibold hover:shadow-lg hover:bg-primary-dark transition-all">
-                        Send Message
+                    <h2 class="text-3xl !font-sans font-bold text-slate-900 mb-3">Message Sent!</h2>
+                    <p class="text-slate-600 text-lg mb-2">Thank you for reaching out to us.</p>
+                    <p class="text-slate-500 text-sm mb-8">We'll get back to you as soon as possible.</p>
+                    <button onclick="document.getElementById('contact-success').classList.add('hidden');document.getElementById('contact-form-wrap').classList.remove('hidden');"
+                        class="text-sm font-medium underline underline-offset-2 cursor-pointer" style="color:#A89070">
+                        Send another message
                     </button>
-                </form>
+                </div>
+
+                <!-- Form -->
+                <div id="contact-form-wrap">
+                    <h2 class="text-3xl !font-sans font-bold text-slate-900 mb-8">Send us a Message</h2>
+
+                    <!-- Error banner -->
+                    <div id="contact-error" class="hidden mb-6 flex items-start gap-3 bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-sm text-red-700">
+                        <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <span id="contact-error-text"></span>
+                    </div>
+
+                    <form id="contact-form" action="#" method="POST">
+                        @csrf
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Full Name</label>
+                            <input type="text" name="name" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" required>
+                        </div>
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Email</label>
+                            <input type="email" name="email" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" required>
+                        </div>
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Phone</label>
+                            <input type="tel" name="phone" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
+                        </div>
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Inquiry Type:</label>
+                            <select name="inquiry_type" class="w-full px-4 py-3 cursor-pointer border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" required>
+                                <option value="general">General Inquiry</option>
+                                <option value="booking">Booking & Reservation</option>
+                                <option value="amenities">Amenities & Facilities</option>
+                                <option value="pricing">Pricing & Rates</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Message</label>
+                            <textarea name="message" rows="5" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" required></textarea>
+                        </div>
+                        <button type="submit" id="contact-submit-btn" class="w-full cursor-pointer bg-primary text-white px-6 py-4 rounded-lg font-semibold hover:shadow-lg hover:bg-primary-dark transition-all">
+                            Send Message
+                        </button>
+                    </form>
+                </div>
             </div>
 
             <!-- Contact Information -->
@@ -167,17 +195,29 @@
 
 @push('scripts')
 <script>
-    document.getElementById('contact-form').addEventListener('submit', async function(e) {
+    const contactForm    = document.getElementById('contact-form');
+    const contactWrap    = document.getElementById('contact-form-wrap');
+    const contactSuccess = document.getElementById('contact-success');
+    const contactError   = document.getElementById('contact-error');
+    const contactErrorTxt = document.getElementById('contact-error-text');
+    const submitBtn      = document.getElementById('contact-submit-btn');
+
+    function showError(message) {
+        contactErrorTxt.textContent = message;
+        contactError.classList.remove('hidden');
+        contactError.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    contactForm.addEventListener('submit', async function(e) {
         e.preventDefault();
-        
-        const form = this;
-        const formData = new FormData(form);
+        contactError.classList.add('hidden');
+
+        const formData = new FormData(this);
         const data = Object.fromEntries(formData.entries());
-        const submitBtn = form.querySelector('button[type="submit"]');
-        
+
         try {
             submitBtn.disabled = true;
-            submitBtn.innerHTML = 'Sending...';
+            submitBtn.textContent = 'Sending...';
 
             const response = await fetch('/api/inquiries', {
                 method: 'POST',
@@ -190,22 +230,24 @@
             });
 
             if (response.ok) {
-                alert('Thank you! Your message has been sent successfully.');
-                form.reset();
+                contactForm.reset();
+                contactWrap.classList.add('hidden');
+                contactSuccess.classList.remove('hidden');
+                contactSuccess.classList.add('flex');
             } else {
                 const error = await response.json();
-                let errorMessage = 'Error sending message: ' + (error.message || 'Unknown error');
+                let msg = error.message || 'Something went wrong. Please try again.';
                 if (error.errors) {
-                    errorMessage += '\n' + Object.values(error.errors).flat().join('\n');
+                    msg = Object.values(error.errors).flat().join(' ');
                 }
-                alert(errorMessage);
+                showError(msg);
             }
-        } catch (error) {
-            console.error('Error:', error);
-            alert('An error occurred while sending your message.');
+        } catch (err) {
+            console.error(err);
+            showError('An error occurred while sending your message. Please try again.');
         } finally {
             submitBtn.disabled = false;
-            submitBtn.innerHTML = 'Send Message';
+            submitBtn.textContent = 'Send Message';
         }
     });
 </script>

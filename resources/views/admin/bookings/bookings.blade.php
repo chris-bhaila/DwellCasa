@@ -4,12 +4,6 @@
 @section('header_title', 'Bookings')
 
 @section('content')
-@if(session('info'))
-<div class="mb-6 flex items-center gap-3 bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 text-sm text-blue-700">
-    <i class="bi bi-info-circle flex-shrink-0"></i>
-    {{ session('info') }}
-</div>
-@endif
 <!-- Header -->
 <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
     <div>
@@ -274,9 +268,9 @@ async function restoreBooking(id, ref) {
     .then(r => r.json())
     .then(data => {
         if (data.success) window.location.reload();
-        else adminToast(data.message ?? 'Restore failed.');
+        else adminToast(data.message ?? 'Restore failed.', 'error');
     })
-    .catch(() => adminToast('Restore failed.'));
+    .catch(() => adminToast('Restore failed.', 'error'));
 }
 
 async function forceDeleteBooking(id, ref) {
@@ -292,9 +286,9 @@ async function forceDeleteBooking(id, ref) {
     .then(r => r.json())
     .then(data => {
         if (data.success) window.location.reload();
-        else adminToast(data.message ?? 'Delete failed.');
+        else adminToast(data.message ?? 'Delete failed.', 'error');
     })
-    .catch(() => adminToast('Delete failed.'));
+    .catch(() => adminToast('Delete failed.', 'error'));
 }
 </script>
 @endif

@@ -188,7 +188,7 @@ $superAdminOnlyPerms = ['manage users', 'manage locations', 'manage logs'];
         <div class="bg-white rounded-3xl shadow-2xl border border-slate-100 w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden transform scale-95 transition-transform duration-300">
             <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
                 <h2 id="modal-title" class="text-xl font-serif font-bold text-slate-900 italic">Add User</h2>
-                <button type="button" onclick="closeModal()" class="text-slate-400 hover:text-slate-600 transition-colors">
+                <button type="button" onclick="closeModal()" class="cursor-pointer text-slate-400 hover:text-slate-600 transition-colors">
                     <i class="bi bi-x-lg text-xl"></i>
                 </button>
             </div>

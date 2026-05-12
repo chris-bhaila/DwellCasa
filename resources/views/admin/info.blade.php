@@ -19,6 +19,7 @@
         <p class="text-slate-500 mt-1">Manage global content, headings, and settings for the public website.</p>
     </div>
 
+    @role('super_admin')
     @if($otherLocations->isNotEmpty())
     <div x-data="{ open: false, loading: false }" class="relative self-start md:self-auto">
         <button
@@ -58,6 +59,7 @@
         </div>
     </div>
     @endif
+    @endrole
 </div>
 
 <form id="website-info-form" action="#" method="POST" class="space-y-8" enctype="multipart/form-data">

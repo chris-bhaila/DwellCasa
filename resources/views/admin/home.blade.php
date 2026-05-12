@@ -120,7 +120,7 @@
     @endcan
 
     @can('manage rooms')
-    <div class="bg-white rounded-xl border border-slate-100 shadow-sm px-5 py-4 flex items-center gap-4">
+    <a href="{{ route('admin.room_type.index') }}" class="bg-white rounded-xl border border-slate-100 shadow-sm px-5 py-4 flex items-center gap-4 hover:shadow-md hover:border-slate-200 transition-all">
         <div class="w-9 h-9 rounded-lg bg-teal-50 flex items-center justify-center text-teal-500 flex-shrink-0">
             <i class="bi bi-door-open"></i>
         </div>
@@ -128,7 +128,7 @@
             <p class="text-sm text-slate-500 font-medium">Rooms Available</p>
             <p class="text-xl font-bold text-slate-900">{{ $availableRooms }} <span class="text-sm font-normal text-slate-400">/ {{ $totalRooms }}</span></p>
         </div>
-    </div>
+    </a>
     @endcan
 
     @can('manage reviews')

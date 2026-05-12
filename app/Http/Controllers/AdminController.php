@@ -58,7 +58,12 @@ class AdminController extends Controller
         // Top KPI cards
         $todayArrivals      = Booking::whereDate('check_in_date', $today)->whereIn('status', ['confirmed', 'pending'])->count();
         $inHouseCount       = Booking::where('status', 'checked_in')->count();
-        $monthlyRevenue     = Booking::whereBetween('check_in_date', [$monthStart, $monthEnd])->sum('amount_paid');
+        $monthlyRevenue     = Booking::whereBetween('check_in_date', [$monthStart, $monthEnd])
+                                ->selectRaw('SUM(LEAST(
+                                    COALESCE(amount_paid, 0) + COALESCE(deposit_amount, 0),
+                                    GREATEST(0, COALESCE(total_amount, 0) - COALESCE(discount, 0))
+                                )) as total')
+                                ->value('total') ?? 0;
         $unrepliedInquiries = Inquiry::where('status', 'unreplied')->count();
 
         // Secondary stats
@@ -127,7 +132,10 @@ class AdminController extends Controller
 
         // Summary stats are always computed from all bookings — filters only affect the table
         $billed            = $allBookings->sum('total_amount');
-        $collected         = $allBookings->sum(fn($b) => ($b->amount_paid ?? 0) + ($b->deposit_amount ?? 0));
+        $collected         = $allBookings->sum(fn($b) => min(
+                                ($b->amount_paid ?? 0) + ($b->deposit_amount ?? 0),
+                                max(0, ($b->total_amount ?? 0) - ($b->discount ?? 0))
+                            ));
         $totalDiscount     = $allBookings->sum('discount');
         $totalRefunds      = $allBookings->sum('refund_amount');
         $totalExtra        = $allBookings->sum(fn($b) => $b->checkOut->extra_charges ?? 0);
@@ -158,7 +166,10 @@ class AdminController extends Controller
             ->map(fn($group) => [
                 'count'       => $group->count(),
                 'billed'      => $group->sum('total_amount'),
-                'collected'   => $group->sum(fn($b) => ($b->amount_paid ?? 0) + ($b->deposit_amount ?? 0)),
+                'collected'   => $group->sum(fn($b) => min(
+                                    ($b->amount_paid ?? 0) + ($b->deposit_amount ?? 0),
+                                    max(0, ($b->total_amount ?? 0) - ($b->discount ?? 0))
+                                )),
                 'discount'    => $group->sum('discount'),
                 'extra'       => $group->sum(fn($b) => $b->checkOut->extra_charges ?? 0),
                 'refunds'     => $group->sum('refund_amount'),
@@ -166,7 +177,10 @@ class AdminController extends Controller
                     $group->where('status', '!=', 'cancelled')->sum('total_amount')
                     - $group->where('status', '!=', 'cancelled')->sum(fn($b) => $b->discount ?? 0)
                     + $group->where('status', '!=', 'cancelled')->sum(fn($b) => $b->checkOut->extra_charges ?? 0)
-                    - $group->sum(fn($b) => ($b->amount_paid ?? 0) + ($b->deposit_amount ?? 0))
+                    - $group->sum(fn($b) => min(
+                        ($b->amount_paid ?? 0) + ($b->deposit_amount ?? 0),
+                        max(0, ($b->total_amount ?? 0) - ($b->discount ?? 0))
+                    ))
                 ),
             ]);
 

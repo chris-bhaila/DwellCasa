@@ -9,6 +9,9 @@
         text-decoration: line-through;
         color: #cbd5e1 !important;
     }
+    /* Hide native scrollbar in amenities modal while keeping scroll */
+    .amenities-scroll::-webkit-scrollbar { display: none; }
+    .amenities-scroll { scrollbar-width: none; -ms-overflow-style: none; }
 </style>
 @endpush
 
@@ -114,8 +117,9 @@ $image3 = $imagesForLightbox[2]['url'] ?? $imagesForLightbox[0]['url'];
                 @if($activeAmenities->count() > 9)
                 <div id="amenities-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
                     <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="document.getElementById('amenities-modal').classList.add('hidden')"></div>
-                    <div class="relative bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[85vh] overflow-y-auto p-8">
-                        <div class="flex items-center justify-between mb-8">
+                    <div class="relative bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden">
+                        <!-- Pinned header -->
+                        <div class="flex items-center justify-between px-8 pt-8 pb-5 flex-shrink-0 border-b border-slate-100">
                             <h3 class="text-2xl font-serif italic font-bold text-slate-900">All Amenities</h3>
                             <button onclick="document.getElementById('amenities-modal').classList.add('hidden')"
                                 class="p-2 rounded-full hover:bg-slate-100 transition-colors">
@@ -124,22 +128,29 @@ $image3 = $imagesForLightbox[2]['url'] ?? $imagesForLightbox[0]['url'];
                                 </svg>
                             </button>
                         </div>
-                        @php
-                            $grouped = $activeAmenities->groupBy(fn($a) => optional($a->category)->label() ?? 'General');
-                        @endphp
-                        @foreach($grouped as $categoryLabel => $items)
-                        <div class="mb-8 last:mb-0">
-                            <h4 class="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4 border-b border-slate-100 pb-2">{{ $categoryLabel }}</h4>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                @foreach($items as $amenity)
-                                <div class="flex items-center gap-3 text-slate-700">
-                                    <span class="text-xl text-black">{!! $amenity->icon ?: '✨' !!}</span>
-                                    <span class="font-medium">{{ $amenity->name }}</span>
+                        <!-- Scrollable body — no visible scrollbar, bottom fade hints at more content -->
+                        <div class="relative flex-1 min-h-0">
+                            <div class="amenities-scroll overflow-y-auto h-full px-8 py-6">
+                                @php
+                                    $grouped = $activeAmenities->groupBy(fn($a) => optional($a->category)->label() ?? 'General');
+                                @endphp
+                                @foreach($grouped as $categoryLabel => $items)
+                                <div class="mb-8 last:mb-0">
+                                    <h4 class="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4 border-b border-slate-100 pb-2">{{ $categoryLabel }}</h4>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                        @foreach($items as $amenity)
+                                        <div class="flex items-center gap-3 text-slate-700">
+                                            <span class="text-xl text-black">{!! $amenity->icon ?: '✨' !!}</span>
+                                            <span class="font-medium">{{ $amenity->name }}</span>
+                                        </div>
+                                        @endforeach
+                                    </div>
                                 </div>
                                 @endforeach
                             </div>
+                            <!-- Bottom fade to signal more content below -->
+                            <div class="pointer-events-none absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-white to-transparent rounded-b-3xl"></div>
                         </div>
-                        @endforeach
                     </div>
                 </div>
                 @endif
@@ -288,10 +299,12 @@ $reviews = \App\Models\Review::where('type', 'room_type')
 </section>
 @endif
 
-<!-- Lightbox Modal -->
-<div id="lightbox" class="fixed inset-0 z-[100] hidden flex-col items-center justify-center bg-black/95 backdrop-blur-sm opacity-0 transition-opacity duration-300">
-    <!-- Controls -->
-    <div class="absolute top-0 left-0 w-full p-4 flex justify-between items-center z-10 bg-gradient-to-b from-black/50 to-transparent">
+@push('modals')
+<!-- Lightbox Modal — rendered as direct body child so fixed positioning is always viewport-relative -->
+<div id="lightbox" class="hidden flex-col bg-black/95 opacity-0 transition-opacity duration-300"
+     style="position:fixed;top:0;left:0;right:0;bottom:0;z-index:9999;overflow:hidden;">
+    <!-- Top bar: counter + close -->
+    <div style="position:relative;z-index:10;flex-shrink:0;" class="w-full p-4 flex justify-between items-center bg-gradient-to-b from-black/50 to-transparent">
         <div id="lightbox-counter" class="text-white font-medium text-sm">1 / 3</div>
         <button type="button" onclick="closeLightbox()" class="text-black bg-white/80 cursor-pointer hover:bg-white transition-colors w-10 h-10 flex items-center justify-center rounded-full shadow-sm">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -300,28 +313,37 @@ $reviews = \App\Models\Review::where('type', 'room_type')
         </button>
     </div>
 
-    <button type="button" onclick="prevImage(event)" class="absolute cursor-pointer left-4 top-1/2 -translate-y-1/2 z-20 text-black bg-white/80 hover:bg-white transition-colors w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full focus:outline-none shadow-sm">
-        <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-        </svg>
-    </button>
+    <!-- Image row with prev/next overlaid -->
+    <div style="position:relative;flex:1;min-height:0;overflow:hidden;display:flex;align-items:center;">
+        <button type="button" onclick="prevImage(event)"
+                style="position:absolute;left:8px;z-index:10;flex-shrink:0;"
+                class="cursor-pointer text-black bg-white/80 hover:bg-white transition-colors w-10 h-10 flex items-center justify-center rounded-full focus:outline-none shadow-sm">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+            </svg>
+        </button>
 
-    <!-- Image Container -->
-    <div id="lightbox-img-container" class="relative w-full h-full flex items-center justify-center px-16 md:px-20 py-4 overflow-hidden touch-pan-y">
-        <img id="lightbox-img" src="" alt="" class="max-h-full min-w-0 object-contain select-none transition-transform duration-300 shadow-2xl">
+        <div id="lightbox-img-container"
+             style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;padding:0 56px;overflow:hidden;touch-action:pan-y;box-sizing:border-box;">
+            <img id="lightbox-img" src="" alt=""
+                 style="max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;display:block;user-select:none;transition:transform 0.3s,opacity 0.3s;">
+        </div>
+
+        <button type="button" onclick="nextImage(event)"
+                style="position:absolute;right:8px;z-index:10;flex-shrink:0;"
+                class="cursor-pointer text-black bg-white/80 hover:bg-white transition-colors w-10 h-10 flex items-center justify-center rounded-full focus:outline-none shadow-sm">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+        </button>
     </div>
 
-    <button type="button" onclick="nextImage(event)" class="absolute cursor-pointer right-4 top-1/2 -translate-y-1/2 z-20 text-black bg-white/80 hover:bg-white transition-colors w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full focus:outline-none shadow-sm">
-        <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-        </svg>
-    </button>
-
     <!-- Caption -->
-    <div class="absolute bottom-0 left-0 w-full p-6 text-center z-10 bg-gradient-to-t from-black/80 to-transparent">
+    <div style="position:relative;z-index:10;flex-shrink:0;" class="w-full px-6 py-4 text-center bg-gradient-to-t from-black/80 to-transparent">
         <h3 id="lightbox-caption" class="text-white text-lg font-serif italic mb-1"></h3>
     </div>
 </div>
+@endpush
 @push('scripts')
 <script>
     (function() {
@@ -332,24 +354,22 @@ $reviews = \App\Models\Review::where('type', 'room_type')
         const galleryImagesData = @json($imagesForLightbox);
         let currentLightboxIndex = 0;
 
-        const lightbox = document.getElementById('lightbox');
-        const lightboxImg = document.getElementById('lightbox-img');
+        const lightbox      = document.getElementById('lightbox');
+        const lightboxImg   = document.getElementById('lightbox-img');
         const lightboxCaption = document.getElementById('lightbox-caption');
         const lightboxCounter = document.getElementById('lightbox-counter');
+        const imgContainer  = document.getElementById('lightbox-img-container');
 
         window.openLightbox = function(index) {
             currentLightboxIndex = index;
-            if (currentLightboxIndex >= galleryImagesData.length) {
-                currentLightboxIndex = 0;
-            }
+            if (currentLightboxIndex >= galleryImagesData.length) currentLightboxIndex = 0;
             updateLightbox();
             if (lightbox) {
                 lightbox.classList.remove('hidden');
                 lightbox.classList.add('flex');
-                setTimeout(() => {
-                    lightbox.classList.remove('opacity-0');
-                }, 10);
+                setTimeout(() => { lightbox.classList.remove('opacity-0'); }, 10);
                 document.body.style.overflow = 'hidden';
+                document.documentElement.style.overflow = 'hidden';
             }
         };
 
@@ -360,6 +380,7 @@ $reviews = \App\Models\Review::where('type', 'room_type')
                     lightbox.classList.add('hidden');
                     lightbox.classList.remove('flex');
                     document.body.style.overflow = '';
+                    document.documentElement.style.overflow = '';
                 }, 300);
             }
         };
@@ -381,24 +402,15 @@ $reviews = \App\Models\Review::where('type', 'room_type')
         function updateLightbox() {
             if (!galleryImagesData || galleryImagesData.length === 0) return;
             const img = galleryImagesData[currentLightboxIndex];
-
-            if (lightboxImg) {
-                lightboxImg.src = img.url;
-                lightboxImg.alt = img.alt || 'Gallery Image';
-            }
-            if (lightboxCaption) {
-                lightboxCaption.textContent = img.caption || img.alt || '';
-            }
-            if (lightboxCounter) {
-                lightboxCounter.textContent = `${currentLightboxIndex + 1} / ${galleryImagesData.length}`;
-            }
+            if (lightboxImg) { lightboxImg.src = img.url; lightboxImg.alt = img.alt || 'Gallery Image'; }
+            if (lightboxCaption) lightboxCaption.textContent = img.caption || img.alt || '';
+            if (lightboxCounter) lightboxCounter.textContent = `${currentLightboxIndex + 1} / ${galleryImagesData.length}`;
         }
 
         function animateSlide(direction) {
             if (!lightboxImg) return;
             lightboxImg.style.transform = `translateX(${direction === 'right' ? '20px' : '-20px'}) scale(0.98)`;
             lightboxImg.style.opacity = '0.5';
-
             setTimeout(() => {
                 updateLightbox();
                 lightboxImg.style.transform = 'translateX(0) scale(1)';
@@ -417,27 +429,16 @@ $reviews = \App\Models\Review::where('type', 'room_type')
         // Touch Swipe Logic
         let touchStartX = 0;
         let touchEndX = 0;
-        const imgContainer = document.getElementById('lightbox-img-container');
-
-        if (imgContainer) {
-            imgContainer.addEventListener('touchstart', e => {
-                touchStartX = e.changedTouches[0].screenX;
-            }, {
-                passive: true
-            });
-
-            imgContainer.addEventListener('touchend', e => {
-                touchEndX = e.changedTouches[0].screenX;
-                handleSwipe();
-            }, {
-                passive: true
-            });
-        }
 
         function handleSwipe() {
             const threshold = 50;
             if (touchEndX < touchStartX - threshold) nextImage();
             if (touchEndX > touchStartX + threshold) prevImage();
+        }
+
+        if (imgContainer) {
+            imgContainer.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, { passive: true });
+            imgContainer.addEventListener('touchend',   e => { touchEndX   = e.changedTouches[0].screenX; handleSwipe(); }, { passive: true });
         }
 
         let checkInDate = null;

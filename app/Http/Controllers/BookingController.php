@@ -221,7 +221,7 @@ class BookingController extends Controller
     public function refund(\Illuminate\Http\Request $request, int $id): JsonResponse
     {
         $request->validate([
-            'refund_amount' => 'required|numeric|min:0.01',
+            'refund_amount' => 'required|numeric|min:0',
             'notes'         => 'nullable|string|max:500',
         ]);
 

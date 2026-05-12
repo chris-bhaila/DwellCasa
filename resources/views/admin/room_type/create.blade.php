@@ -167,14 +167,15 @@
             });
 
             if (response.ok) {
+                flashToast('Room type created successfully.', 'success');
                 window.location.href = "{{ route('admin.room_type.index') }}";
             } else {
                 const error = await response.json();
-                adminToast('Error creating room type: ' + (error.message || 'Unknown error'));
+                adminToast('Error creating room type: ' + (error.message || 'Unknown error'), 'error');
             }
         } catch (error) {
             console.error('Error:', error);
-            adminToast('An error occurred creating the room type.');
+            adminToast('An error occurred creating the room type.', 'error');
         }
     });
 

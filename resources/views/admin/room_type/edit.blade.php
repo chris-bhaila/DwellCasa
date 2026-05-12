@@ -224,14 +224,15 @@
             });
 
             if (response.ok) {
+                flashToast('Room type updated successfully.', 'success');
                 window.location.reload();
             } else {
                 const error = await response.json();
-                adminToast('Error updating room type: ' + (error.message || 'Unknown error'));
+                adminToast('Error updating room type: ' + (error.message || 'Unknown error'), 'error');
             }
         } catch (error) {
             console.error('Error:', error);
-            adminToast('An error occurred updating the room type.');
+            adminToast('An error occurred updating the room type.', 'error');
         }
     });
 
@@ -248,14 +249,15 @@
             });
 
             if (response.ok) {
+                flashToast('Image deleted successfully.', 'success');
                 window.location.reload();
             } else {
                 const error = await response.json();
-                adminToast('Error deleting image: ' + (error.message || 'Unknown error'));
+                adminToast('Error deleting image: ' + (error.message || 'Unknown error'), 'error');
             }
         } catch (error) {
             console.error('Error:', error);
-            adminToast('An error occurred deleting the image.');
+            adminToast('An error occurred deleting the image.', 'error');
         }
     };
 

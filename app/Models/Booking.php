@@ -45,6 +45,7 @@ class Booking extends Model
         'checked_out_at',
         'special_requests',
         'admin_notes',
+        'review_token',
         'location_id',
     ];
 

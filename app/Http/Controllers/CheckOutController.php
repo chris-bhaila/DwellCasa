@@ -62,23 +62,10 @@ class CheckOutController extends Controller
                     $room->save();
                 }
 
-                if ($booking->guest && $booking->room_type_id && !Review::where('booking_id', $booking->id)->exists()) {
+                if ($booking->guest && $booking->room_type_id && !$booking->review_token) {
                     $token = Str::uuid()->toString();
-
-                    Review::create([
-                        'name'         => $booking->guest->full_name,
-                        'email'        => $booking->guest->email,
-                        'booking_id'   => $booking->id,
-                        'room_type_id' => $booking->room_type_id,
-                        'guest_id'     => $booking->guest_id,
-                        'location_id'  => $booking->roomType->location_id,
-                        'type'         => 'room_type',
-                        'status'       => 'pending',
-                        'review_token' => $token,
-                        'token_used'   => false,
-                        'rating'       => 0,
-                        'body'         => '',
-                    ]);
+                    $booking->review_token = $token;
+                    $booking->save();
 
                     // Capture for dispatch after the transaction commits
                     $emailData = ['booking' => $booking, 'token' => $token];

@@ -162,11 +162,11 @@
                 window.location.href = "{{ route('admin.bookings') }}";
             } else {
                 const error = await response.json();
-                adminToast('Error adding booking: ' + (error.message || 'Unknown error'));
+                adminToast('Error adding booking: ' + (error.message || 'Unknown error'), 'error');
             }
         } catch (error) {
             console.error('Error:', error);
-            adminToast('An error occurred.');
+            adminToast('An error occurred.', 'error');
         }
     });
 

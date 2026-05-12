@@ -10,11 +10,13 @@
         <h1 class="text-3xl font-serif font-bold text-slate-900 italic lg:hidden">Locations Management</h1>
         <p class="text-slate-500 mt-1">Manage physical property locations, addresses, and details.</p>
     </div>
+    @role('super_admin')
     <div>
         <button onclick="openModal()" title="Add New Location" class="bg-primary cursor-pointer text-white px-5 py-2.5 rounded-xl font-medium hover:bg-[#8E795E] transition-all shadow-sm flex items-center gap-2">
             <i class="bi bi-geo-alt"></i> Add Location
         </button>
     </div>
+    @endrole
 </div>
 
 <!-- List Section -->
@@ -138,6 +140,23 @@
         </form>
     </div>
 </div>
+<!-- Delete Error Modal -->
+<div id="delete-error-modal" class="fixed inset-0 z-[200] hidden items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm opacity-0 transition-opacity duration-300">
+    <div class="bg-white rounded-2xl shadow-2xl border border-slate-100 w-full max-w-md transform scale-95 transition-transform duration-300">
+        <div class="p-6 border-b border-slate-100 flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center flex-shrink-0">
+                <i class="bi bi-exclamation-triangle text-red-500 text-lg"></i>
+            </div>
+            <h3 class="text-lg font-bold text-slate-900">Cannot Delete Location</h3>
+        </div>
+        <div class="p-6">
+            <p id="delete-error-message" class="text-slate-700 text-sm leading-relaxed"></p>
+        </div>
+        <div class="p-6 border-t border-slate-100 flex justify-end">
+            <button onclick="closeDeleteErrorModal()" class="px-5 py-2.5 rounded-xl cursor-pointer font-medium bg-slate-900 text-white hover:bg-slate-700 transition-colors">OK</button>
+        </div>
+    </div>
+</div>
 @endsection
 
 @push('scripts')
@@ -258,9 +277,30 @@
         }
     });
 
+    window.openDeleteErrorModal = function(message) {
+        document.getElementById('delete-error-message').textContent = message;
+        const modal = document.getElementById('delete-error-modal');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        setTimeout(() => {
+            modal.classList.remove('opacity-0');
+            modal.querySelector('div').classList.remove('scale-95');
+        }, 10);
+    };
+
+    window.closeDeleteErrorModal = function() {
+        const modal = document.getElementById('delete-error-modal');
+        modal.classList.add('opacity-0');
+        modal.querySelector('div').classList.add('scale-95');
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }, 300);
+    };
+
     window.deleteLocation = async function(id) {
         if (!await adminConfirm('Are you sure you want to delete this location? This action cannot be undone.', { confirmLabel: 'Delete', type: 'danger' })) return;
-        
+
         try {
             const response = await fetch(`/api/locations/${id}`, {
                 method: 'DELETE',
@@ -274,11 +314,11 @@
                 window.location.reload();
             } else {
                 const error = await response.json();
-                adminToast('Error deleting location: ' + (error.message || 'Unknown error'));
+                openDeleteErrorModal(error.message || 'Error deleting location.');
             }
         } catch (error) {
             console.error('Error:', error);
-            adminToast('An error occurred while attempting to delete.');
+            openDeleteErrorModal('An error occurred while attempting to delete.');
         }
     };
 </script>

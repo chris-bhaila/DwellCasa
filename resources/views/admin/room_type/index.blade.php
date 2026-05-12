@@ -409,10 +409,10 @@ async function restoreRoomType(id, name) {
     })
     .then(r => r.json())
     .then(data => {
-        if (data.success) window.location.reload();
-        else adminToast(data.message ?? 'Restore failed.');
+        if (data.success) { flashToast('Room type restored successfully.', 'success'); window.location.reload(); }
+        else adminToast(data.message ?? 'Restore failed.', 'error');
     })
-    .catch(() => adminToast('Restore failed.'));
+    .catch(() => adminToast('Restore failed.', 'error'));
 }
 
 async function forceDeleteRoomType(id, name) {
@@ -427,10 +427,10 @@ async function forceDeleteRoomType(id, name) {
     })
     .then(r => r.json())
     .then(data => {
-        if (data.success) window.location.reload();
-        else adminToast(data.message ?? 'Delete failed.');
+        if (data.success) { flashToast('Room type permanently deleted.', 'warning'); window.location.reload(); }
+        else adminToast(data.message ?? 'Delete failed.', 'error');
     })
-    .catch(() => adminToast('Delete failed.'));
+    .catch(() => adminToast('Delete failed.', 'error'));
 }
 
 async function restoreRoom(id, number) {
@@ -445,10 +445,10 @@ async function restoreRoom(id, number) {
     })
     .then(r => r.json())
     .then(data => {
-        if (data.success) window.location.reload();
-        else adminToast(data.message ?? 'Restore failed.');
+        if (data.success) { flashToast('Room restored successfully.', 'success'); window.location.reload(); }
+        else adminToast(data.message ?? 'Restore failed.', 'error');
     })
-    .catch(() => adminToast('Restore failed.'));
+    .catch(() => adminToast('Restore failed.', 'error'));
 }
 
 async function forceDeleteRoom(id, number) {
@@ -463,10 +463,10 @@ async function forceDeleteRoom(id, number) {
     })
     .then(r => r.json())
     .then(data => {
-        if (data.success) window.location.reload();
-        else adminToast(data.message ?? 'Delete failed.');
+        if (data.success) { flashToast('Room permanently deleted.', 'warning'); window.location.reload(); }
+        else adminToast(data.message ?? 'Delete failed.', 'error');
     })
-    .catch(() => adminToast('Delete failed.'));
+    .catch(() => adminToast('Delete failed.', 'error'));
 }
 </script>
 @endif

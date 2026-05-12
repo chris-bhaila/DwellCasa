@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
+use App\Models\Booking;
 use App\Models\Review;
 use Illuminate\Http\Request;
 use Laravel\Socialite\Facades\Socialite;
@@ -59,8 +60,9 @@ class ReviewController extends Controller
 
     public function showTokenForm(string $token)
     {
-        $review = Review::where('review_token', $token)
-            ->where('token_used', false)
+        $booking = Booking::with(['guest', 'roomType'])
+            ->where('review_token', $token)
+            ->whereNull('deleted_at')
             ->firstOrFail();
 
         // If no avatar in session yet, gate with Google OAuth
@@ -71,7 +73,7 @@ class ReviewController extends Controller
 
         $googleAvatar = session('google_avatar');
 
-        return view('web.review', compact('review', 'googleAvatar', 'token'));
+        return view('web.review', compact('booking', 'googleAvatar', 'token'));
     }
 
     public function storeTokenReview(Request $request, string $token)
@@ -81,19 +83,30 @@ class ReviewController extends Controller
             'body'   => 'required|string',
         ]);
 
-        $review = Review::where('review_token', $token)
-            ->where('token_used', false)
+        $booking = Booking::with(['guest', 'roomType'])
+            ->where('review_token', $token)
             ->firstOrFail();
 
         $avatar = session()->pull('google_avatar');
         session()->forget('google_name');
 
-        $review->update([
-            'rating'     => $request->input('rating'),
-            'body'       => $request->input('body'),
-            'token_used' => true,
-            'avatar'     => $avatar,
+        Review::create([
+            'name'         => $booking->guest->full_name,
+            'email'        => $booking->guest->email,
+            'booking_id'   => $booking->id,
+            'room_type_id' => $booking->room_type_id,
+            'guest_id'     => $booking->guest_id,
+            'location_id'  => $booking->roomType->location_id,
+            'type'         => 'room_type',
+            'status'       => 'pending',
+            'rating'       => $request->input('rating'),
+            'body'         => $request->input('body'),
+            'token_used'   => true,
+            'avatar'       => $avatar,
         ]);
+
+        $booking->review_token = null;
+        $booking->save();
 
         return redirect()->route('home')->with('success', 'Thank you for your review!');
     }

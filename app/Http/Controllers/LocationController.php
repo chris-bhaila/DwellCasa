@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Contracts\LocationRepositoryInterface;
 use App\Http\Requests\StoreLocationRequest;
 use App\Http\Requests\UpdateLocationRequest;
+use App\Models\Booking;
+use App\Models\User;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -82,6 +84,27 @@ class LocationController extends Controller
     public function destroy($id)
     {
         $id = $id instanceof \App\Models\Location ? $id->getKey() : $id;
+
+        $activeBookings = Booking::where('location_id', $id)
+            ->whereIn('status', ['pending', 'confirmed', 'checked_in'])
+            ->count();
+
+        if ($activeBookings > 0) {
+            return response()->json([
+                'success' => false,
+                'message' => "Cannot delete: this location has {$activeBookings} active booking(s). Cancel or complete them first.",
+            ], 422);
+        }
+
+        $assignedUsers = User::where('location_id', $id)->count();
+
+        if ($assignedUsers > 0) {
+            return response()->json([
+                'success' => false,
+                'message' => "Cannot delete: {$assignedUsers} user(s) are assigned to this location. Reassign them first.",
+            ], 422);
+        }
+
         $this->locationRepository->delete($id);
         return response()->json([
             'success' => true,
@@ -91,7 +114,13 @@ class LocationController extends Controller
 
     public function page()
     {
-        $locations = $this->locationRepository->all();
+        $user = auth()->user();
+
+        if ($user->hasRole('super_admin')) {
+            $locations = $this->locationRepository->all();
+        } else {
+            $locations = \App\Models\Location::where('id', $user->location_id)->get();
+        }
 
         return view('admin.location', compact('locations'));
     }

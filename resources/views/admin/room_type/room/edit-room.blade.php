@@ -103,14 +103,15 @@
             });
 
             if (response.ok) {
+                flashToast('Room deleted.', 'warning');
                 window.location.href = "{{ route('admin.room_type.index') }}#inventory";
             } else {
                 const errorData = await response.json();
-                adminToast('Error deleting room: ' + (errorData.message || 'Unknown error'));
+                adminToast('Error deleting room: ' + (errorData.message || 'Unknown error'), 'error');
             }
         } catch (error) {
             console.error('Error:', error);
-            adminToast('An error occurred while deleting the room.');
+            adminToast('An error occurred while deleting the room.', 'error');
         }
     };
 
@@ -131,6 +132,7 @@
             });
 
             if (response.ok) {
+                flashToast('Room updated successfully.', 'success');
                 window.location.href = "{{ route('admin.room_type.index') }}#inventory";
             } else {
                 const errorData = await response.json();
@@ -138,11 +140,11 @@
                 if (errorData.errors) {
                     errorMessage += '\n' + Object.values(errorData.errors).flat().join('\n');
                 }
-                adminToast(errorMessage);
+                adminToast(errorMessage, 'error');
             }
         } catch (error) {
             console.error('Error:', error);
-            adminToast('An error occurred while updating the room.');
+            adminToast('An error occurred while updating the room.', 'error');
         }
     });
 </script>

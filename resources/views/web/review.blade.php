@@ -49,27 +49,27 @@
         <div class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden mb-8">
             <div class="flex items-center gap-6 p-6">
                 @php
-                $imageUrl = $review->roomType->thumbnail
-                    ? asset('storage/' . $review->roomType->thumbnail)
+                $imageUrl = $booking->roomType->thumbnail
+                    ? asset('storage/' . $booking->roomType->thumbnail)
                     : 'https://images.unsplash.com/photo-1618773928121-c32242e63f39?auto=format&fit=crop&q=80&w=400';
                 @endphp
                 <div class="w-24 h-24 rounded-2xl overflow-hidden flex-shrink-0">
-                    <img src="{{ $imageUrl }}" alt="{{ $review->roomType->name }}" class="w-full h-full object-cover">
+                    <img src="{{ $imageUrl }}" alt="{{ $booking->roomType->name }}" class="w-full h-full object-cover">
                 </div>
                 <div class="flex-1 min-w-0">
                     <p class="text-[9px] font-bold tracking-widest uppercase text-slate-400 mb-1">You stayed in</p>
-                    <h2 class="text-xl font-serif font-bold text-slate-900 italic mb-1">{{ $review->roomType->name }}</h2>
+                    <h2 class="text-xl font-serif font-bold text-slate-900 italic mb-1">{{ $booking->roomType->name }}</h2>
                     <div class="flex items-center gap-3 text-sm text-slate-500">
-                        <span>{{ \Carbon\Carbon::parse($review->booking->check_in_date)->format('M d') }}</span>
+                        <span>{{ \Carbon\Carbon::parse($booking->check_in_date)->format('M d') }}</span>
                         <span class="text-slate-300">→</span>
-                        <span>{{ \Carbon\Carbon::parse($review->booking->check_out_date)->format('M d, Y') }}</span>
+                        <span>{{ \Carbon\Carbon::parse($booking->check_out_date)->format('M d, Y') }}</span>
                         <span class="text-slate-300">·</span>
-                        <span>{{ $review->booking->num_guests }} {{ Str::plural('guest', $review->booking->num_guests) }}</span>
+                        <span>{{ $booking->num_guests }} {{ Str::plural('guest', $booking->num_guests) }}</span>
                     </div>
                 </div>
                 <div class="flex-shrink-0 text-right">
                     <p class="text-[9px] font-bold tracking-widest uppercase text-slate-400 mb-1">Ref</p>
-                    <p class="text-xs font-mono font-bold text-slate-600">{{ $review->booking->booking_ref }}</p>
+                    <p class="text-xs font-mono font-bold text-slate-600">{{ $booking->booking_ref }}</p>
                 </div>
             </div>
         </div>
@@ -80,7 +80,7 @@
                  alt="Your profile"
                  class="w-10 h-10 rounded-full object-cover border-2 border-slate-100">
             <p class="text-sm text-slate-500">
-                Reviewing as <span class="font-semibold text-slate-800">{{ $review->name }}</span>
+                Reviewing as <span class="font-semibold text-slate-800">{{ $booking->guest->full_name }}</span>
             </p>
         </div>
 
@@ -121,12 +121,12 @@
                 <div class="grid grid-cols-2 gap-4 pt-4 border-t border-slate-100">
                     <div>
                         <label class="block text-[10px] font-bold tracking-widest uppercase text-slate-400 mb-2">Name</label>
-                        <input type="text" value="{{ $review->name }}" readonly
+                        <input type="text" value="{{ $booking->guest->full_name }}" readonly
                             class="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-slate-500 cursor-not-allowed text-sm">
                     </div>
                     <div>
                         <label class="block text-[10px] font-bold tracking-widest uppercase text-slate-400 mb-2">Email</label>
-                        <input type="email" value="{{ $review->email }}" readonly
+                        <input type="email" value="{{ $booking->guest->email }}" readonly
                             class="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-slate-500 cursor-not-allowed text-sm">
                     </div>
                 </div>

@@ -306,11 +306,13 @@
             success: 'bg-green-50 border-green-400 text-green-800',
             error:   'bg-red-50 border-red-400 text-red-800',
             warning: 'bg-amber-50 border-amber-400 text-amber-800',
+            info:    'bg-blue-50 border-blue-400 text-blue-800',
         };
         var icons = {
             success: 'bi-check-circle-fill text-green-500',
             error:   'bi-exclamation-circle-fill text-red-500',
             warning: 'bi-exclamation-triangle-fill text-amber-500',
+            info:    'bi-info-circle-fill text-blue-500',
         };
         var cls  = colors[type]  || colors.error;
         var icon = icons[type]   || icons.error;
@@ -331,6 +333,37 @@
             setTimeout(function() { toast.remove(); }, 300);
         }, 4500);
     };
+
+    // Store a toast to fire after the next page load/reload, then navigate
+    window.flashToast = function(message, type) {
+        sessionStorage.setItem('pendingToast', JSON.stringify({ message: message, type: type }));
+    };
+
+    // Auto-fire toasts for any server-side session flash messages
+    // Also reads client-side pending toasts stored before a redirect/reload
+    document.addEventListener('DOMContentLoaded', function() {
+        @if(session('success'))
+        adminToast(@json(session('success')), 'success');
+        @endif
+        @if(session('error'))
+        adminToast(@json(session('error')), 'error');
+        @endif
+        @if(session('warning'))
+        adminToast(@json(session('warning')), 'warning');
+        @endif
+        @if(session('info'))
+        adminToast(@json(session('info')), 'info');
+        @endif
+
+        var pending = sessionStorage.getItem('pendingToast');
+        if (pending) {
+            sessionStorage.removeItem('pendingToast');
+            try {
+                var p = JSON.parse(pending);
+                adminToast(p.message, p.type);
+            } catch(e) {}
+        }
+    });
     </script>
     @if(auth()->user()->hasRole('super_admin'))
     <script>

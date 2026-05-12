@@ -335,7 +335,7 @@
 
         @if($booking->isEditableBy(auth()->user()))
         <a href="{{ route('admin.bookings.edit', $booking->id) }}"
-           class="w-full inline-flex items-center justify-center gap-2 px-4 py-3
+           class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 cursor-pointer
                   bg-[#A89070] hover:bg-[#8E795E] text-white rounded-xl
                   font-medium transition-colors shadow-sm">
             <i class="bi bi-pencil-square"></i> Edit Booking
@@ -354,7 +354,7 @@
         )
         @can('edit bookings')
         <button onclick="openRefundModal()"
-            class="w-full inline-flex items-center justify-center gap-2 px-4 py-3
+            class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 cursor-pointer
                    bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200
                    rounded-xl font-medium transition-colors mt-2">
             <i class="bi bi-arrow-counterclockwise"></i> Process Refund

@@ -5,13 +5,6 @@
 
 @section('content')
 
-@if(session('info'))
-<div class="mb-6 flex items-center gap-3 bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 text-sm text-blue-700">
-    <i class="bi bi-info-circle flex-shrink-0"></i>
-    {{ session('info') }}
-</div>
-@endif
-
 <!-- Header -->
 <div class="flex items-center justify-between mb-8">
     <div class="flex items-center gap-4">
@@ -130,8 +123,8 @@
                     </div>
                 </div>
                 <div class="pt-6 border-t border-slate-100 flex justify-end gap-4 p-6">
-                    <a href="{{ route('admin.bookings') }}" class="text-sm font-medium text-slate-600 hover:text-slate-900 px-6 py-3">Cancel</a>
-                    <button type="submit" class="bg-primary text-white px-8 py-3 rounded-xl font-medium hover:bg-[#8E795E] transition-all shadow-sm">
+                    <a href="{{ route('admin.bookings') }}" class="text-sm cursor-pointer font-medium text-slate-600 hover:text-slate-900 px-6 py-3">Cancel</a>
+                    <button type="submit" class="bg-primary cursor-pointer text-white px-8 py-3 rounded-xl font-medium hover:bg-[#8E795E] transition-all shadow-sm">
                         Save Changes
                     </button>
                 </div>
@@ -179,21 +172,21 @@
             {{-- Sidebar action buttons --}}
             @if($booking->status === 'pending')
             <div class="mt-4">
-                <button type="button" onclick="confirmBooking()" class="w-full bg-blue-600 text-white px-4 py-3 rounded-xl font-medium hover:bg-blue-700 transition-all shadow-sm">
+                <button type="button" onclick="confirmBooking()" class="w-full cursor-pointer bg-blue-600 text-white px-4 py-3 rounded-xl font-medium hover:bg-blue-700 transition-all shadow-sm">
                     Confirm Booking
                 </button>
             </div>
             @endif
             @if($booking->status === 'confirmed')
             <div class="mt-4">
-                <button type="button" onclick="openCheckInModal()" class="w-full bg-green-700 text-white px-4 py-3 rounded-xl font-medium hover:bg-green-800 transition-all shadow-sm">
+                <button type="button" onclick="openCheckInModal()" class="w-full cursor-pointer bg-green-700 text-white px-4 py-3 rounded-xl font-medium hover:bg-green-800 transition-all shadow-sm">
                     Check In Guest
                 </button>
             </div>
             @endif
             @if($booking->status === 'checked_in')
             <div class="mt-4">
-                <button type="button" onclick="openCheckOutModal()" class="w-full bg-slate-700 text-white px-4 py-3 rounded-xl font-medium hover:bg-slate-800 transition-all shadow-sm">
+                <button type="button" onclick="openCheckOutModal()" class="w-full cursor-pointer bg-slate-700 text-white px-4 py-3 rounded-xl font-medium hover:bg-slate-800 transition-all shadow-sm">
                     Check Out Guest
                 </button>
             </div>
@@ -206,7 +199,7 @@
             @can('edit bookings')
             <div class="mt-4">
                 <button type="button" onclick="openRefundModal()"
-                    class="w-full inline-flex items-center justify-center gap-2 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 px-4 py-3 rounded-xl font-medium transition-colors">
+                    class="w-full cursor-pointer inline-flex items-center justify-center gap-2 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 px-4 py-3 rounded-xl font-medium transition-colors">
                     <i class="bi bi-arrow-counterclockwise"></i> Process Refund
                 </button>
             </div>
@@ -215,7 +208,7 @@
             @if(!in_array($booking->status, ['cancelled', 'checked_out']))
             <div class="mt-4">
                 <button type="button" onclick="cancelBooking()"
-                    class="w-full bg-red-50 text-red-600 border border-red-200 px-4 py-3 rounded-xl font-medium hover:bg-red-100 transition-all">
+                    class="w-full cursor-pointer bg-red-50 text-red-600 border border-red-200 px-4 py-3 rounded-xl font-medium hover:bg-red-100 transition-all">
                     Cancel Booking
                 </button>
             </div>
@@ -229,7 +222,7 @@
     <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden transform scale-95 transition-transform duration-300">
         <div class="p-6 border-b border-slate-100 flex justify-between items-center">
             <h2 class="text-xl font-serif font-bold text-slate-900 italic">Check In Guest</h2>
-            <button type="button" onclick="closeCheckInModal()" class="text-slate-400 hover:text-slate-600 transition-colors">
+            <button type="button" onclick="closeCheckInModal()" class="text-slate-400 cursor-pointer hover:text-slate-600 transition-colors">
                 <i class="bi bi-x-lg text-xl"></i>
             </button>
         </div>
@@ -241,7 +234,7 @@
             </div>
             <div>
                 <label class="block text-sm font-medium text-slate-700 mb-2">Assign Room <span class="text-red-500">*</span></label>
-                <select name="room_id" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors" required>
+                <select name="room_id" class="w-full rounded-xl cursor-pointer border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors" required>
                     <option value="">Select a room...</option>
                     @foreach($rooms ?? [] as $room)
                     <option value="{{ $room->id }}">Room {{ $room->room_number }} ({{ ucfirst($room->status) }})</option>
@@ -255,11 +248,11 @@
             </div>
             <div class="flex items-center gap-6 pt-2">
                 <label class="flex items-center gap-2 cursor-pointer">
-                    <input type="checkbox" name="early_check_in" value="1" class="rounded text-primary focus:ring-primary w-5 h-5 border-slate-300">
+                    <input type="checkbox" name="early_check_in" value="1" class="rounded cursor-pointer text-primary focus:ring-primary w-5 h-5 border-slate-300">
                     <span class="text-sm font-medium text-slate-700">Early Check-in</span>
                 </label>
                 <label class="flex items-center gap-2 cursor-pointer">
-                    <input type="checkbox" name="id_verified" value="1" class="rounded text-primary focus:ring-primary w-5 h-5 border-slate-300">
+                    <input type="checkbox" name="id_verified" value="1" class="rounded cursor-pointer text-primary focus:ring-primary w-5 h-5 border-slate-300">
                     <span class="text-sm font-medium text-slate-700">ID Verified</span>
                 </label>
             </div>
@@ -268,8 +261,8 @@
                 <textarea name="notes" rows="3" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors" placeholder="Append check-in notes...">{{ $booking->admin_notes }}</textarea>
             </div>
             <div class="pt-4 flex justify-end gap-3 border-t border-slate-100 mt-4">
-                <button type="button" onclick="closeCheckInModal()" class="px-6 py-2.5 rounded-xl font-medium text-slate-600 hover:bg-slate-50 transition-colors">Cancel</button>
-                <button type="submit" class="px-6 py-2.5 rounded-xl font-medium bg-primary text-white hover:bg-[#8E795E] transition-colors shadow-sm">Confirm Check In</button>
+                <button type="button" onclick="closeCheckInModal()" class="px-6 py-2.5 cursor-pointer rounded-xl font-medium text-slate-600 hover:bg-slate-50 transition-colors">Cancel</button>
+                <button type="submit" class="px-6 py-2.5 rounded-xl cursor-pointer font-medium bg-primary text-white hover:bg-[#8E795E] transition-colors shadow-sm">Confirm Check In</button>
             </div>
         </form>
     </div>
@@ -279,7 +272,7 @@
     <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden transform scale-95 transition-transform duration-300">
         <div class="p-6 border-b border-slate-100 flex justify-between items-center">
             <h2 class="text-xl font-serif font-bold text-slate-900 italic">Check Out Guest</h2>
-            <button type="button" onclick="closeCheckOutModal()" class="text-slate-400 hover:text-slate-600 transition-colors">
+            <button type="button" onclick="closeCheckOutModal()" class="text-slate-400 cursor-pointer hover:text-slate-600 transition-colors">
                 <i class="bi bi-x-lg text-xl"></i>
             </button>
         </div>
@@ -297,7 +290,7 @@
             </div>
             <div>
                 <label class="block text-sm font-medium text-slate-700 mb-2">Room Condition <span class="text-red-500">*</span></label>
-                <select name="room_condition" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors" required>
+                <select name="room_condition" class="w-full cursor-pointer rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors" required>
                     <option value="good">Good</option>
                     <option value="needs_cleaning">Needs Cleaning</option>
                     <option value="damaged">Damaged</option>
@@ -313,15 +306,15 @@
             </div>
             <div class="flex items-center gap-2 pt-2">
                 <input type="checkbox" name="late_check_out" value="1" id="late_check_out" class="rounded text-primary focus:ring-primary w-5 h-5 border-slate-300">
-                <label for="late_check_out" class="text-sm font-medium text-slate-700 cursor-pointer">Late Check-out</label>
+                <label for="late_check_out" class="text-sm cursor-pointer font-medium text-slate-700 cursor-pointer">Late Check-out</label>
             </div>
             <div>
                 <label class="block text-sm font-medium text-slate-700 mb-2">Notes</label>
                 <textarea name="notes" rows="3" class="w-full rounded-xl border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors" placeholder="Any checkout notes..."></textarea>
             </div>
             <div class="pt-4 flex justify-end gap-3 border-t border-slate-100 mt-4">
-                <button type="button" onclick="closeCheckOutModal()" class="px-6 py-2.5 rounded-xl font-medium text-slate-600 hover:bg-slate-50 transition-colors">Cancel</button>
-                <button type="submit" class="px-6 py-2.5 rounded-xl font-medium bg-slate-700 text-white hover:bg-slate-800 transition-colors shadow-sm">Confirm Check Out</button>
+                <button type="button" onclick="closeCheckOutModal()" class="px-6 py-2.5 cursor-pointer rounded-xl font-medium text-slate-600 hover:bg-slate-50 transition-colors">Cancel</button>
+                <button type="submit" class="px-6 py-2.5 rounded-xl cursor-pointer font-medium bg-slate-700 text-white hover:bg-slate-800 transition-colors shadow-sm">Confirm Check Out</button>
             </div>
         </form>
     </div>
@@ -331,7 +324,7 @@
     <div class="bg-white rounded-2xl shadow-2xl border border-slate-100 w-full max-w-md transform scale-95 transition-transform duration-300">
         <div class="p-6 border-b border-slate-100 flex justify-between items-center">
             <h2 class="text-xl font-serif font-bold text-slate-900 italic">Process Refund</h2>
-            <button onclick="closeRefundModal()" class="text-slate-400 hover:text-slate-600 transition-colors">
+            <button onclick="closeRefundModal()" class="text-slate-400 cursor-pointer hover:text-slate-600 transition-colors">
                 <i class="bi bi-x-lg text-xl"></i>
             </button>
         </div>
@@ -353,7 +346,7 @@
             <div>
                 <label class="block text-sm font-medium text-slate-700 mb-2">Refund Amount (Rs.) <span class="text-red-500">*</span></label>
                 <input type="number" id="refund-amount"
-                       max="{{ ($booking->amount_paid ?? 0) + ($booking->deposit_amount ?? 0) }}" min="1" step="1"
+                       max="{{ ($booking->amount_paid ?? 0) + ($booking->deposit_amount ?? 0) }}" min="0" step="1"
                        class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors"
                        placeholder="Enter refund amount">
             </div>
@@ -365,8 +358,8 @@
             </div>
         </div>
         <div class="p-6 border-t border-slate-100 flex justify-end gap-3">
-            <button onclick="closeRefundModal()" class="px-5 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 transition-colors">Cancel</button>
-            <button onclick="submitRefund()" class="px-5 py-2.5 rounded-xl text-sm font-medium bg-rose-600 hover:bg-rose-700 text-white transition-colors shadow-sm">Confirm Refund</button>
+            <button onclick="closeRefundModal()" class="px-5 py-2.5 cursor-pointer rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 transition-colors">Cancel</button>
+            <button onclick="submitRefund()" class="px-5 py-2.5 cursor-pointer rounded-xl text-sm font-medium bg-rose-600 hover:bg-rose-700 text-white transition-colors shadow-sm">Confirm Refund</button>
         </div>
     </div>
 </div>
@@ -394,6 +387,7 @@
             });
 
             if (response.ok) {
+                flashToast('Booking saved successfully.', 'success');
                 window.location.href = "{{ route('admin.bookings') }}";
             } else {
                 const error = await response.json();
@@ -401,11 +395,11 @@
                 if (error.errors) {
                     errorMessage += '\n' + Object.values(error.errors).flat().join('\n');
                 }
-                adminToast(errorMessage);
+                adminToast(errorMessage, 'error');
             }
         } catch (error) {
             console.error('Error:', error);
-            adminToast('An error occurred while updating the booking.');
+            adminToast('An error occurred while updating the booking.', 'error');
         }
     });
 
@@ -451,7 +445,7 @@
             });
 
             if (!saveResponse.ok) {
-                adminToast('Error saving booking details before check-in.');
+                adminToast('Error saving booking details before check-in.', 'error');
                 return;
             }
 
@@ -462,6 +456,7 @@
             });
 
             if (response.ok) {
+                flashToast('Guest checked in successfully.', 'success');
                 window.location.reload();
             } else {
                 const error = await response.json();
@@ -469,11 +464,11 @@
                 if (error.errors) {
                     errorMessage += '\n' + Object.values(error.errors).flat().join('\n');
                 }
-                adminToast(errorMessage);
+                adminToast(errorMessage, 'error');
             }
         } catch (error) {
             console.error('Error:', error);
-            adminToast('An error occurred during check-in.');
+            adminToast('An error occurred during check-in.', 'error');
         }
     });
 
@@ -530,7 +525,7 @@
             });
 
             if (!saveResponse.ok) {
-                adminToast('Error saving booking details before check-out.');
+                adminToast('Error saving booking details before check-out.', 'error');
                 return;
             }
 
@@ -541,6 +536,7 @@
             });
 
             if (response.ok) {
+                flashToast('Guest checked out successfully.', 'success');
                 window.location.reload();
             } else {
                 const error = await response.json();
@@ -548,11 +544,11 @@
                 if (error.errors) {
                     errorMessage += '\n' + Object.values(error.errors).flat().join('\n');
                 }
-                adminToast(errorMessage);
+                adminToast(errorMessage, 'error');
             }
         } catch (error) {
             console.error('Error:', error);
-            adminToast('An error occurred during check-out.');
+            adminToast('An error occurred during check-out.', 'error');
         }
     });
 
@@ -579,12 +575,13 @@
             });
 
             if (response.ok) {
+                flashToast('Booking confirmed successfully.', 'success');
                 window.location.reload();
             } else {
-                adminToast('Error confirming booking.');
+                adminToast('Error confirming booking.', 'error');
             }
         } catch (error) {
-            adminToast('An error occurred.');
+            adminToast('An error occurred.', 'error');
         }
     }
 
@@ -603,12 +600,13 @@
             });
 
             if (response.ok) {
+                flashToast('Booking cancelled.', 'warning');
                 window.location.href = "{{ route('admin.bookings') }}";
             } else {
-                adminToast('Error cancelling booking.');
+                adminToast('Error cancelling booking.', 'error');
             }
         } catch (error) {
-            adminToast('An error occurred.');
+            adminToast('An error occurred.', 'error');
         }
     }
 
@@ -675,7 +673,7 @@
         const amount = document.getElementById('refund-amount').value;
         const notes  = document.getElementById('refund-notes').value;
 
-        if (!amount || parseFloat(amount) <= 0) {
+        if (amount === '' || amount === null || isNaN(parseFloat(amount)) || parseFloat(amount) < 0) {
             adminToast('Please enter a valid refund amount.', 'error');
             return;
         }
