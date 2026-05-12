@@ -142,7 +142,7 @@
                                 </div>
                             </div>
 
-                            <button type="submit" class="w-full bg-primary text-white px-6 py-4 rounded-xl font-bold tracking-wide uppercase text-sm hover:bg-primary-dark transition-all transform hover:-translate-y-1 shadow-lg opacity-50 cursor-not-allowed" disabled>
+                            <button type="submit" class="w-full cursor-pointer bg-primary text-white px-6 py-4 rounded-xl font-bold tracking-wide uppercase text-sm hover:bg-primary-dark transition-all transform hover:-translate-y-1 shadow-lg opacity-50 cursor-not-allowed" disabled>
                                 Confirm Booking
                             </button>
                         </div>
