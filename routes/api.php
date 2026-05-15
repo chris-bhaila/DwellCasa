@@ -24,6 +24,7 @@ use App\Http\Controllers\InventoryEquipmentController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\FaqController;
+use App\Http\Controllers\GuestDocumentController;
 
 // ── Public API routes (no auth required) ─────────────────────────
 Route::get('room-types/{id}/availability', [RoomTypeController::class, 'availability']);
@@ -73,6 +74,9 @@ Route::middleware(['web', 'auth'])->group(function () {
     // ── Check-in / Check-out ──────────────────────────────────────────
     Route::middleware('permission:check-in guests')->group(function () {
         Route::apiResource('check-ins', CheckInController::class)->only(['store', 'update', 'destroy']);
+        Route::post('guest-documents', [GuestDocumentController::class, 'store']);
+        Route::get('guest-documents/{guestId}', [GuestDocumentController::class, 'show']);
+        Route::delete('guest-documents/{guestDocument}', [GuestDocumentController::class, 'destroy']);
     });
 
     Route::middleware('permission:check-out guests')->group(function () {

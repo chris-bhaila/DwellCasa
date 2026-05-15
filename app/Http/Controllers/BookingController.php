@@ -354,7 +354,9 @@ class BookingController extends Controller
             'payments',
         ])->findOrFail($id);
 
-        return view('admin.bookings.view-booking', compact('booking'));
+        $guestDocument = $booking->guest?->documents()->latest()->first();
+
+        return view('admin.bookings.view-booking', compact('booking', 'guestDocument'));
     }
 
     public function editPage(int $id, RoomTypeRepositoryInterface $roomTypeRepository)
@@ -365,8 +367,8 @@ class BookingController extends Controller
             return redirect()->route('admin.bookings.view', $booking->id)
                 ->with('info', 'This booking is no longer editable — the edit window has expired.');
         }
-        $roomTypes = $roomTypeRepository->all();
-        $rooms     = Room::where('room_type_id', $booking->room_type_id)
+        $roomTypes     = $roomTypeRepository->all();
+        $rooms         = Room::where('room_type_id', $booking->room_type_id)
             ->where('status', 'available')
             ->whereDoesntHave('bookings', function ($q) use ($booking) {
                 $q->whereIn('status', ['confirmed', 'checked_in'])
@@ -374,8 +376,9 @@ class BookingController extends Controller
                     ->where('check_in_date', '<', $booking->check_out_date)
                     ->where('check_out_date', '>', $booking->check_in_date);
             })->orderBy('room_number')->get();
-        $users = User::orderBy('name')->get();
+        $users         = User::orderBy('name')->get();
+        $guestDocument = $booking->guest?->documents()->latest()->first();
 
-        return view('admin.bookings.edit-booking', compact('booking', 'roomTypes', 'rooms', 'users'));
+        return view('admin.bookings.edit-booking', compact('booking', 'roomTypes', 'rooms', 'users', 'guestDocument'));
     }
 }

@@ -252,23 +252,47 @@
                     <p class="text-xs font-medium text-slate-400 uppercase tracking-wide mb-1">Room Assigned</p>
                     <p class="text-slate-800 font-medium">{{ $checkIn->room_id ? 'Room ' . ($booking->room->room_number ?? $checkIn->room_id) : '—' }}</p>
                 </div>
-                <div class="flex gap-4">
-                    <div>
-                        <p class="text-xs font-medium text-slate-400 uppercase tracking-wide mb-1">Early Check-in</p>
-                        @if($checkIn->early_check_in)
-                        <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200">Yes</span>
-                        @else
-                        <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-slate-50 text-slate-500 border border-slate-200">No</span>
+                <div>
+                    <p class="text-xs font-medium text-slate-400 uppercase tracking-wide mb-1">Early Check-in</p>
+                    @if($checkIn->early_check_in)
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200">Yes</span>
+                    @else
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-slate-50 text-slate-500 border border-slate-200">No</span>
+                    @endif
+                </div>
+
+                {{-- ID Document --}}
+                <div>
+                    <p class="text-xs font-medium text-slate-400 uppercase tracking-wide mb-2">ID Document</p>
+                    @if($guestDocument)
+                    <div class="flex gap-3 items-start">
+                        @if($guestDocument->photo)
+                        <a href="{{ asset('storage/' . $guestDocument->photo) }}" target="_blank">
+                            <img src="{{ asset('storage/' . $guestDocument->photo) }}" alt="ID Photo"
+                                 class="h-16 w-24 object-cover rounded-lg border border-slate-200 hover:opacity-80 transition-opacity">
+                        </a>
                         @endif
+                        <div class="space-y-0.5 text-sm">
+                            @if($guestDocument->document_type)
+                            <p class="text-slate-700 font-medium capitalize">{{ str_replace('_', ' ', $guestDocument->document_type) }}</p>
+                            @endif
+                            @if($guestDocument->id_number)
+                            <p class="text-slate-500">{{ $guestDocument->id_number }}</p>
+                            @endif
+                            @if($guestDocument->nationality)
+                            <p class="text-slate-500">{{ $guestDocument->nationality }}</p>
+                            @endif
+                            @if($guestDocument->date_of_birth)
+                            <p class="text-slate-500">DOB: {{ $guestDocument->date_of_birth->format('M d, Y') }}</p>
+                            @endif
+                        </div>
                     </div>
-                    <div>
-                        <p class="text-xs font-medium text-slate-400 uppercase tracking-wide mb-1">ID Verified</p>
-                        @if($checkIn->id_verified)
-                        <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-green-50 text-green-700 border border-green-200">Yes</span>
-                        @else
-                        <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-red-50 text-red-600 border border-red-200">No</span>
-                        @endif
-                    </div>
+                    <span class="inline-flex items-center mt-2 px-2 py-0.5 rounded-md text-xs font-medium bg-green-50 text-green-700 border border-green-200">
+                        <i class="bi bi-patch-check-fill mr-1"></i> Verified
+                    </span>
+                    @else
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-red-50 text-red-600 border border-red-200">Not Verified</span>
+                    @endif
                 </div>
                 @if($checkIn->notes)
                 <div>

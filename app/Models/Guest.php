@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\MassPrunable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\GuestDocument;
 use App\Models\Scopes\LocationScope;
 
 class Guest extends Model
@@ -33,6 +34,11 @@ class Guest extends Model
     public function bookings(): HasMany
     {
         return $this->hasMany(Booking::class);
+    }
+
+    public function documents(): HasMany
+    {
+        return $this->hasMany(GuestDocument::class);
     }
 
     public function payments(): HasMany

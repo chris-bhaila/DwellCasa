@@ -251,10 +251,13 @@
                     <input type="checkbox" name="early_check_in" value="1" class="rounded cursor-pointer text-primary focus:ring-primary w-5 h-5 border-slate-300">
                     <span class="text-sm font-medium text-slate-700">Early Check-in</span>
                 </label>
-                <label class="flex items-center gap-2 cursor-pointer">
-                    <input type="checkbox" name="id_verified" value="1" class="rounded cursor-pointer text-primary focus:ring-primary w-5 h-5 border-slate-300">
-                    <span class="text-sm font-medium text-slate-700">ID Verified</span>
-                </label>
+                <input type="hidden" name="id_verified" id="id_verified_input" value="{{ $guestDocument ? '1' : '0' }}">
+                <button type="button" id="verify-id-btn" onclick="openVerifyIdModal()"
+                    class="flex items-center gap-2 px-4 py-2 rounded-xl border text-sm font-medium transition-colors
+                           {{ $guestDocument ? 'bg-green-50 border-green-200 text-green-700' : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100' }}">
+                    <i class="bi bi-person-badge"></i>
+                    <span id="verify-id-label">{{ $guestDocument ? 'ID Verified ✓' : 'Verify ID' }}</span>
+                </button>
             </div>
             <div>
                 <label class="block text-sm font-medium text-slate-700 mb-2">Notes</label>
@@ -267,6 +270,79 @@
         </form>
     </div>
 </div>
+<!-- Verify ID Modal -->
+<div id="verify-id-modal" class="fixed inset-0 z-[110] hidden items-center justify-center bg-black/50 backdrop-blur-sm opacity-0 transition-opacity duration-300">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden transform scale-95 transition-transform duration-300">
+        <div class="p-6 border-b border-slate-100 flex justify-between items-center">
+            <h2 class="text-xl font-serif font-bold text-slate-900 italic">Verify Guest ID</h2>
+            <button type="button" onclick="closeVerifyIdModal()" class="text-slate-400 cursor-pointer hover:text-slate-600 transition-colors">
+                <i class="bi bi-x-lg text-xl"></i>
+            </button>
+        </div>
+        <form id="verify-id-form" class="p-6 space-y-4" enctype="multipart/form-data">
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Document Type</label>
+                    <select name="document_type" class="w-full rounded-xl cursor-pointer border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors">
+                        <option value="">Select type...</option>
+                        <option value="passport" {{ optional($guestDocument)->document_type === 'passport' ? 'selected' : (($booking->guest->id_type ?? '') === 'passport' ? 'selected' : '') }}>Passport</option>
+                        <option value="citizenship" {{ optional($guestDocument)->document_type === 'citizenship' ? 'selected' : (($booking->guest->id_type ?? '') === 'citizenship' ? 'selected' : '') }}>Citizenship</option>
+                        <option value="driving_license" {{ optional($guestDocument)->document_type === 'driving_license' ? 'selected' : (($booking->guest->id_type ?? '') === 'driving_license' ? 'selected' : '') }}>Driving License</option>
+                        <option value="national_id" {{ optional($guestDocument)->document_type === 'national_id' ? 'selected' : (($booking->guest->id_type ?? '') === 'national_id' ? 'selected' : '') }}>National ID</option>
+                        <option value="voter_id" {{ optional($guestDocument)->document_type === 'voter_id' ? 'selected' : (($booking->guest->id_type ?? '') === 'voter_id' ? 'selected' : '') }}>Voter ID</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">ID Number</label>
+                    <input type="text" name="id_number" value="{{ optional($guestDocument)->id_number ?? $booking->guest->id_number }}"
+                        class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors"
+                        placeholder="e.g. PA1234567">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Nationality</label>
+                    <input type="text" name="nationality" value="{{ optional($guestDocument)->nationality ?? $booking->guest->nationality }}"
+                        class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors"
+                        placeholder="e.g. Nepali">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Date of Birth</label>
+                    <input type="date" name="date_of_birth" value="{{ optional($guestDocument)->date_of_birth?->format('Y-m-d') }}"
+                        class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors">
+                </div>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-2">ID Photo</label>
+                @if(optional($guestDocument)->photo)
+                <div class="mb-3 flex items-center gap-3">
+                    <img src="{{ asset('storage/' . $guestDocument->photo) }}" alt="ID Photo"
+                         class="h-20 w-32 object-cover rounded-lg border border-slate-200">
+                    <p class="text-xs text-slate-400">Existing photo — upload a new one to replace it.</p>
+                </div>
+                @endif
+                <input type="file" name="photo" accept="image/*"
+                    class="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm text-slate-600
+                           file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0
+                           file:text-sm file:font-medium file:bg-primary/10 file:text-primary
+                           hover:file:bg-primary/20 transition-colors cursor-pointer">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-2">Notes</label>
+                <textarea name="notes" rows="2"
+                    class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors resize-none"
+                    placeholder="Any observations about the document...">{{ optional($guestDocument)->notes }}</textarea>
+            </div>
+            <div class="pt-4 flex justify-end gap-3 border-t border-slate-100">
+                <button type="button" onclick="closeVerifyIdModal()"
+                    class="px-6 py-2.5 cursor-pointer rounded-xl font-medium text-slate-600 hover:bg-slate-50 transition-colors">Cancel</button>
+                <button type="submit"
+                    class="px-6 py-2.5 rounded-xl cursor-pointer font-medium bg-primary text-white hover:bg-[#8E795E] transition-colors shadow-sm">
+                    Save &amp; Verify
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <!-- Check Out Modal -->
 <div id="check-out-modal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/50 backdrop-blur-sm opacity-0 transition-opacity duration-300">
     <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden transform scale-95 transition-transform duration-300">
@@ -403,6 +479,67 @@
         }
     });
 
+    function openVerifyIdModal() {
+        const modal = document.getElementById('verify-id-modal');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        setTimeout(() => {
+            modal.classList.remove('opacity-0');
+            modal.querySelector('div').classList.remove('scale-95');
+            modal.querySelector('div').classList.add('scale-100');
+        }, 10);
+    }
+
+    function closeVerifyIdModal() {
+        const modal = document.getElementById('verify-id-modal');
+        modal.classList.add('opacity-0');
+        modal.querySelector('div').classList.remove('scale-100');
+        modal.querySelector('div').classList.add('scale-95');
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }, 300);
+    }
+
+    document.getElementById('verify-id-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const formData = new FormData(this);
+        formData.append('guest_id', '{{ $booking->guest->id }}');
+
+        try {
+            const response = await fetch('/api/guest-documents', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                },
+                body: formData,
+            });
+
+            const result = await response.json();
+
+            if (response.ok && result.success) {
+                document.getElementById('id_verified_input').value = '1';
+                const btn = document.getElementById('verify-id-btn');
+                btn.className = btn.className
+                    .replace('bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100', '')
+                    + ' bg-green-50 border-green-200 text-green-700';
+                document.getElementById('verify-id-label').textContent = 'ID Verified ✓';
+                closeVerifyIdModal();
+                adminToast('ID document saved successfully.', 'success');
+            } else {
+                adminToast(result.message ?? 'Failed to save document.', 'error');
+            }
+        } catch (err) {
+            adminToast('An error occurred while saving the document.', 'error');
+        }
+    });
+
+    document.getElementById('verify-id-modal').addEventListener('click', function(e) {
+        if (e.target === this) closeVerifyIdModal();
+    });
+
     function openCheckInModal() {
         const modal = document.getElementById('check-in-modal');
         modal.classList.remove('hidden');
@@ -432,7 +569,7 @@
         const data = Object.fromEntries(formData.entries());
 
         data.early_check_in = formData.get('early_check_in') ? 1 : 0;
-        data.id_verified = formData.get('id_verified') ? 1 : 0;
+        data.id_verified = parseInt(document.getElementById('id_verified_input').value, 10);
         data.checked_in_at = new Date().toISOString().slice(0, 19).replace('T', ' ');
 
         const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
