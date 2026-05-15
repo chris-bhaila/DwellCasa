@@ -76,8 +76,11 @@ Route::middleware(['web', 'auth'])->group(function () {
         Route::apiResource('check-ins', CheckInController::class)->only(['store', 'update', 'destroy']);
         Route::post('guest-documents', [GuestDocumentController::class, 'store']);
         Route::post('guest-documents/{guestDocument}', [GuestDocumentController::class, 'update']);
-        Route::get('guest-documents/{guestId}', [GuestDocumentController::class, 'show']);
         Route::delete('guest-documents/{guestDocument}', [GuestDocumentController::class, 'destroy']);
+    });
+
+    Route::middleware('permission:check-in guests|manage guests')->group(function () {
+        Route::get('guest-documents/{guestId}', [GuestDocumentController::class, 'show']);
     });
 
     Route::middleware('permission:check-out guests')->group(function () {

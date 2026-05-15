@@ -270,18 +270,27 @@
                     <div class="flex items-center justify-between mb-2">
                         <p class="text-xs font-medium text-slate-400 uppercase tracking-wide">ID Document</p>
                         @if($canEditDocument)
-                        <button onclick="openVerifyIdModal()"
-                            class="text-xs font-medium text-primary hover:underline flex items-center gap-1">
-                            <i class="bi bi-pencil text-xs"></i>
-                            {{ $guestDocument ? 'Edit' : 'Add' }}
-                        </button>
+                        <div class="flex items-center gap-3">
+                            <button onclick="openVerifyIdModal()"
+                                class="text-xs cursor-pointer font-medium text-primary hover:underline flex items-center gap-1">
+                                <i class="bi bi-pencil text-xs"></i>
+                                {{ $guestDocument ? 'Edit' : 'Add' }}
+                            </button>
+                            @if($guestDocument)
+                            <button onclick="removeDocument()"
+                                class="text-xs cursor-pointer font-medium text-red-400 hover:underline flex items-center gap-1">
+                                <i class="bi bi-x-circle text-xs"></i>
+                                Revert
+                            </button>
+                            @endif
+                        </div>
                         @endif
                     </div>
                     @if($guestDocument)
                     <div class="flex gap-3 items-start">
                         @if($guestDocument->photo)
                         <button type="button" onclick="openLightbox('{{ route('admin.guest-documents.photo', $guestDocument->id) }}')"
-                            class="flex-shrink-0 group relative">
+                            class="cursor-pointer flex-shrink-0 group relative">
                             <img src="{{ route('admin.guest-documents.photo', $guestDocument->id) }}" alt="ID Photo"
                                  class="h-16 w-24 object-cover rounded-lg border border-slate-200 group-hover:opacity-70 transition-opacity">
                             <span class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
@@ -301,6 +310,9 @@
                             @endif
                             @if($guestDocument->date_of_birth)
                             <p class="text-slate-500">DOB: {{ $guestDocument->date_of_birth->format('M d, Y') }}</p>
+                            @endif
+                            @if($guestDocument->notes)
+                            <p class="text-slate-400 italic text-xs mt-1">{{ $guestDocument->notes }}</p>
                             @endif
                         </div>
                     </div>
@@ -409,7 +421,7 @@
 <!-- Photo Lightbox -->
 <div id="lightbox-modal" class="fixed inset-0 z-[200] hidden items-center justify-center bg-black/80 backdrop-blur-sm"
      onclick="if(event.target===this) closeLightbox()">
-    <button onclick="closeLightbox()" class="absolute top-4 right-4 text-white/70 hover:text-white transition-colors">
+    <button onclick="closeLightbox()" class="absolute cursor-pointer top-4 right-4 text-white/70 hover:text-white transition-colors">
         <i class="bi bi-x-lg text-2xl"></i>
     </button>
     <img id="lightbox-img" src="" alt="ID Document"
@@ -464,7 +476,7 @@
                 @if(optional($guestDocument)->photo)
                 <div class="mb-3 flex items-center gap-3">
                     <button type="button" onclick="openLightbox('{{ route('admin.guest-documents.photo', $guestDocument->id) }}')"
-                        class="group relative flex-shrink-0">
+                        class="cursor-pointer group relative flex-shrink-0">
                         <img src="{{ route('admin.guest-documents.photo', $guestDocument->id) }}" alt="ID Photo"
                              class="h-20 w-32 object-cover rounded-lg border border-slate-200 group-hover:opacity-70 transition-opacity">
                         <span class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
@@ -645,6 +657,30 @@ document.getElementById('verify-id-form').addEventListener('submit', async funct
 document.getElementById('verify-id-modal').addEventListener('click', function(e) {
     if (e.target === this) closeVerifyIdModal();
 });
+
+@if($guestDocument)
+async function removeDocument() {
+    if (!await adminConfirm('Remove the ID document record? This will revert the guest to unverified.', { confirmLabel: 'Remove', type: 'danger' })) return;
+    try {
+        const res = await fetch('/api/guest-documents/{{ $guestDocument->id }}', {
+            method: 'DELETE',
+            headers: {
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            },
+        });
+        const data = await res.json();
+        if (data.success) {
+            adminToast('ID record removed.', 'success');
+            setTimeout(() => window.location.reload(), 800);
+        } else {
+            adminToast(data.message ?? 'Failed to remove record.', 'error');
+        }
+    } catch (e) {
+        adminToast('An error occurred.', 'error');
+    }
+}
+@endif
 @endif
 </script>
 <script>

@@ -260,9 +260,13 @@
                         <span id="verify-id-label">{{ $guestDocument ? 'ID Verified ✓' : 'Verify ID' }}</span>
                     </button>
                     @if($guestDocument)
-                    <span class="text-xs text-blue-600 flex items-center gap-1 pl-1">
-                        <i class="bi bi-clock-history text-xs"></i>
-                        Previous record on file
+                    <span id="prev-record-note" class="text-xs text-blue-600 flex items-center gap-2 pl-1">
+                        <span class="flex items-center gap-1">
+                            <i class="bi bi-clock-history text-xs"></i>
+                            Previous record on file
+                        </span>
+                        <button type="button" onclick="removeVerification()"
+                            class="text-red-400 hover:underline cursor-pointer">Revert</button>
                     </span>
                     @endif
                 </div>
@@ -546,6 +550,34 @@
             modal.classList.remove('flex');
         }, 300);
     }
+
+    @if($guestDocument)
+    async function removeVerification() {
+        if (!await adminConfirm('Remove this ID record? The guest will be marked as unverified.', { confirmLabel: 'Remove', type: 'danger' })) return;
+        try {
+            const res = await fetch('/api/guest-documents/{{ $guestDocument->id }}', {
+                method: 'DELETE',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                },
+            });
+            const data = await res.json();
+            if (data.success) {
+                document.getElementById('id_verified_input').value = '0';
+                const btn = document.getElementById('verify-id-btn');
+                btn.className = 'flex items-center gap-2 px-4 py-2 rounded-xl border text-sm font-medium transition-colors bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100';
+                document.getElementById('verify-id-label').textContent = 'Verify ID';
+                document.getElementById('prev-record-note').classList.add('hidden');
+                adminToast('ID record removed.', 'success');
+            } else {
+                adminToast(data.message ?? 'Failed to remove record.', 'error');
+            }
+        } catch (e) {
+            adminToast('An error occurred.', 'error');
+        }
+    }
+    @endif
 
     document.getElementById('verify-id-form').addEventListener('submit', async function(e) {
         e.preventDefault();

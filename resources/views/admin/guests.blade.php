@@ -359,7 +359,7 @@ window.openGuestModal = async function(id) {
         if (docData.data) {
             const doc = docData.data;
             const parts = [
-                doc.document_type ? doc.document_type.replace(/_/g, ' ') : null,
+                doc.document_type ? doc.document_type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()) : null,
                 doc.id_number,
                 doc.nationality,
                 doc.date_of_birth ? 'DOB: ' + doc.date_of_birth : null,
