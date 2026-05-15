@@ -280,10 +280,14 @@
                     @if($guestDocument)
                     <div class="flex gap-3 items-start">
                         @if($guestDocument->photo)
-                        <a href="{{ asset('storage/' . $guestDocument->photo) }}" target="_blank">
-                            <img src="{{ asset('storage/' . $guestDocument->photo) }}" alt="ID Photo"
-                                 class="h-16 w-24 object-cover rounded-lg border border-slate-200 hover:opacity-80 transition-opacity">
-                        </a>
+                        <button type="button" onclick="openLightbox('{{ route('admin.guest-documents.photo', $guestDocument->id) }}')"
+                            class="flex-shrink-0 group relative">
+                            <img src="{{ route('admin.guest-documents.photo', $guestDocument->id) }}" alt="ID Photo"
+                                 class="h-16 w-24 object-cover rounded-lg border border-slate-200 group-hover:opacity-70 transition-opacity">
+                            <span class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                <i class="bi bi-zoom-in text-white text-xl drop-shadow"></i>
+                            </span>
+                        </button>
                         @endif
                         <div class="space-y-0.5 text-sm">
                             @if($guestDocument->document_type)
@@ -402,6 +406,16 @@
     </div>
 </div>
 
+<!-- Photo Lightbox -->
+<div id="lightbox-modal" class="fixed inset-0 z-[200] hidden items-center justify-center bg-black/80 backdrop-blur-sm"
+     onclick="if(event.target===this) closeLightbox()">
+    <button onclick="closeLightbox()" class="absolute top-4 right-4 text-white/70 hover:text-white transition-colors">
+        <i class="bi bi-x-lg text-2xl"></i>
+    </button>
+    <img id="lightbox-img" src="" alt="ID Document"
+         class="max-w-[90vw] max-h-[90vh] object-contain rounded-xl shadow-2xl">
+</div>
+
 @if($canEditDocument)
 <div id="verify-id-modal" class="fixed inset-0 z-[110] hidden items-center justify-center bg-black/50 backdrop-blur-sm opacity-0 transition-opacity duration-300">
     <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden transform scale-95 transition-transform duration-300">
@@ -449,8 +463,14 @@
                 <label class="block text-sm font-medium text-slate-700 mb-2">ID Photo</label>
                 @if(optional($guestDocument)->photo)
                 <div class="mb-3 flex items-center gap-3">
-                    <img src="{{ asset('storage/' . $guestDocument->photo) }}" alt="ID Photo"
-                         class="h-20 w-32 object-cover rounded-lg border border-slate-200">
+                    <button type="button" onclick="openLightbox('{{ route('admin.guest-documents.photo', $guestDocument->id) }}')"
+                        class="group relative flex-shrink-0">
+                        <img src="{{ route('admin.guest-documents.photo', $guestDocument->id) }}" alt="ID Photo"
+                             class="h-20 w-32 object-cover rounded-lg border border-slate-200 group-hover:opacity-70 transition-opacity">
+                        <span class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                            <i class="bi bi-zoom-in text-white text-xl drop-shadow"></i>
+                        </span>
+                    </button>
                     <p class="text-xs text-slate-400">Existing photo — upload a new one to replace it.</p>
                 </div>
                 @endif
@@ -549,6 +569,24 @@
 
 @push('scripts')
 <script>
+function openLightbox(url) {
+    const modal = document.getElementById('lightbox-modal');
+    document.getElementById('lightbox-img').src = url;
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+}
+
+function closeLightbox() {
+    const modal = document.getElementById('lightbox-modal');
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+    document.getElementById('lightbox-img').src = '';
+}
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeLightbox();
+});
+
 @if($canEditDocument)
 function openVerifyIdModal() {
     const modal = document.getElementById('verify-id-modal');

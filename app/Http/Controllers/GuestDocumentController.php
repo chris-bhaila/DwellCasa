@@ -21,7 +21,7 @@ class GuestDocumentController extends Controller
         ]);
 
         if ($request->hasFile('photo')) {
-            $validated['photo'] = $request->file('photo')->store('guest-documents', 'public');
+            $validated['photo'] = $request->file('photo')->store('guest-documents', 'local');
         }
 
         $validated['uploaded_by'] = auth()->id();
@@ -35,6 +35,15 @@ class GuestDocumentController extends Controller
         ], 201);
     }
 
+    public function photo(GuestDocument $guestDocument)
+    {
+        if (!$guestDocument->photo || !Storage::disk('local')->exists($guestDocument->photo)) {
+            abort(404);
+        }
+
+        return Storage::disk('local')->response($guestDocument->photo);
+    }
+
     public function show(int $guestId)
     {
         $document = GuestDocument::where('guest_id', $guestId)->latest()->first();
@@ -45,7 +54,9 @@ class GuestDocumentController extends Controller
 
         return response()->json([
             'data' => array_merge($document->toArray(), [
-                'photo_url' => $document->photo ? asset('storage/' . $document->photo) : null,
+                'photo_url' => $document->photo
+                    ? route('admin.guest-documents.photo', $document->id)
+                    : null,
             ]),
         ], 200);
     }
@@ -53,7 +64,7 @@ class GuestDocumentController extends Controller
     public function destroy(GuestDocument $guestDocument)
     {
         if ($guestDocument->photo) {
-            Storage::disk('public')->delete($guestDocument->photo);
+            Storage::disk('local')->delete($guestDocument->photo);
         }
 
         $guestDocument->delete();

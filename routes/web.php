@@ -158,4 +158,7 @@ Route::middleware('auth')->prefix('admin')->group(function () {
     Route::get('/profile', [AdminController::class, 'profile'])->name('admin.profile');
     Route::put('/profile', [AdminController::class, 'updateProfile'])->name('admin.profile.update');
     Route::put('/password', [AdminController::class, 'updatePassword'])->name('password.update');
+
+    Route::get('/guest-documents/{guestDocument}/photo', [\App\Http\Controllers\GuestDocumentController::class, 'photo'])
+        ->name('admin.guest-documents.photo');
 });
