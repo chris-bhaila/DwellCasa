@@ -17,6 +17,8 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             PropertySettingSeeder::class,
+            InventorySeederLocation2::class,
+            InventorySeederLocation3::class,
         ]);
 
         // User::factory(10)->create();
