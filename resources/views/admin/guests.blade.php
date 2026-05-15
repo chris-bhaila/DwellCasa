@@ -182,6 +182,29 @@
             </div>
         </div>
 
+        <!-- ID Document Section -->
+        <div id="modal-id-document" class="hidden px-6 py-4 border-b border-slate-100">
+            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">ID Document</p>
+            <div class="flex items-center gap-4">
+                <div id="modal-doc-photo-wrap" class="hidden flex-shrink-0">
+                    <button type="button" id="modal-doc-photo-btn" class="group relative">
+                        <img id="modal-doc-photo" src="" alt="ID Photo"
+                             class="h-16 w-24 object-cover rounded-lg border border-slate-200 group-hover:opacity-70 transition-opacity">
+                        <span class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                            <i class="bi bi-zoom-in text-white text-xl drop-shadow"></i>
+                        </span>
+                    </button>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm text-slate-700" id="modal-doc-details"></p>
+                    <p class="text-xs text-slate-400 mt-0.5" id="modal-doc-date"></p>
+                </div>
+                <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-green-50 text-green-700 border border-green-200 flex-shrink-0">
+                    <i class="bi bi-patch-check-fill mr-1"></i> Verified
+                </span>
+            </div>
+        </div>
+
         <!-- Bookings Table -->
         <div class="overflow-y-auto flex-1">
             <div class="px-6 pt-5 pb-2">
@@ -213,6 +236,14 @@
         </div>
     </div>
 </div>
+<!-- Lightbox Modal -->
+<div id="lightbox-modal" class="fixed inset-0 z-[200] hidden items-center justify-center bg-black/90" onclick="closeLightbox()">
+    <button type="button" onclick="closeLightbox()" class="absolute top-4 right-4 text-white/70 hover:text-white transition-colors">
+        <i class="bi bi-x-lg text-2xl"></i>
+    </button>
+    <img id="lightbox-img" src="" alt="ID Photo" class="max-h-[90vh] max-w-[90vw] object-contain rounded-lg shadow-2xl" onclick="event.stopPropagation()">
+</div>
+
 @endsection
 
 @push('scripts')
@@ -247,7 +278,25 @@ const statusBadge = {
     no_show:    '<span class="inline-flex items-center px-2 py-0.5 rounded-md text-sm font-medium bg-orange-50 text-orange-700 border border-orange-200">No Show</span>',
 };
 
-window.openGuestModal = function(id) {
+function openLightbox(url) {
+    const modal = document.getElementById('lightbox-modal');
+    document.getElementById('lightbox-img').src = url;
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+}
+
+function closeLightbox() {
+    const modal = document.getElementById('lightbox-modal');
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+    document.getElementById('lightbox-img').src = '';
+}
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeLightbox();
+});
+
+window.openGuestModal = async function(id) {
     const guest = guestData[id];
     if (!guest) return;
 
@@ -295,6 +344,41 @@ window.openGuestModal = function(id) {
             </tr>
         `).join('');
     }
+
+    // Fetch ID document
+    const docSection = document.getElementById('modal-id-document');
+    docSection.classList.add('hidden');
+    try {
+        const docRes = await fetch(`/api/guest-documents/${id}`, {
+            headers: {
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            },
+        });
+        const docData = await docRes.json();
+        if (docData.data) {
+            const doc = docData.data;
+            const parts = [
+                doc.document_type ? doc.document_type.replace(/_/g, ' ') : null,
+                doc.id_number,
+                doc.nationality,
+                doc.date_of_birth ? 'DOB: ' + doc.date_of_birth : null,
+            ].filter(Boolean);
+            document.getElementById('modal-doc-details').textContent = parts.join(' · ');
+            document.getElementById('modal-doc-date').textContent = doc.created_at ? 'Recorded ' + new Date(doc.created_at).toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'}) : '';
+
+            const photoWrap = document.getElementById('modal-doc-photo-wrap');
+            if (doc.photo_url) {
+                document.getElementById('modal-doc-photo').src = doc.photo_url;
+                document.getElementById('modal-doc-photo-btn').onclick = () => openLightbox(doc.photo_url);
+                photoWrap.classList.remove('hidden');
+            } else {
+                photoWrap.classList.add('hidden');
+            }
+
+            docSection.classList.remove('hidden');
+        }
+    } catch (e) {}
 
     const modal = document.getElementById('guest-modal');
     modal.classList.remove('hidden');
