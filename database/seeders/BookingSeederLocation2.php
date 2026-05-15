@@ -86,8 +86,8 @@ class BookingSeederLocation2 extends Seeder
                 'amount_paid'    => 35000.00,
                 'status'         => 'checked_out',
                 'payment_status' => 'fully_paid',
-                'checked_in_at'  => now()->subDays(45),
-                'checked_out_at' => now()->subDays(40),
+                'checked_in_at'  => now()->subDays(45)->setTime(14, 0),
+                'checked_out_at' => now()->subDays(40)->setTime(11, 0),
             ],
             // Room 6 (101) — Junior Suite — currently checked in (long term)
             [
@@ -106,7 +106,8 @@ class BookingSeederLocation2 extends Seeder
                 'amount_paid'    => 28000.00,
                 'status'         => 'checked_in',
                 'payment_status' => 'deposit_paid',
-                'checked_in_at'  => now()->subDays(6),
+                'checked_in_at'  => now()->subDays(6)->setTime(14, 0),
+                'checked_out_at' => now()->addDays(24)->setTime(11, 0),
             ],
             // Room 7 (301) — Junior Suite — past stay
             [
@@ -125,8 +126,8 @@ class BookingSeederLocation2 extends Seeder
                 'amount_paid'    => 49000.00,
                 'status'         => 'checked_out',
                 'payment_status' => 'fully_paid',
-                'checked_in_at'  => now()->subDays(14),
-                'checked_out_at' => now()->subDays(7),
+                'checked_in_at'  => now()->subDays(14)->setTime(14, 0),
+                'checked_out_at' => now()->subDays(7)->setTime(11, 0),
             ],
             // Room 7 (301) — Junior Suite — future confirmed
             [
@@ -163,8 +164,8 @@ class BookingSeederLocation2 extends Seeder
                 'amount_paid'    => 75000.00,
                 'status'         => 'checked_out',
                 'payment_status' => 'fully_paid',
-                'checked_in_at'  => now()->subDays(50),
-                'checked_out_at' => now()->subDays(45),
+                'checked_in_at'  => now()->subDays(50)->setTime(14, 0),
+                'checked_out_at' => now()->subDays(45)->setTime(11, 0),
             ],
             // Room 8 (501) — Penthouse Suite — future pending
             [

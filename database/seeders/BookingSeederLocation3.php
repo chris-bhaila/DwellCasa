@@ -86,8 +86,8 @@ class BookingSeederLocation3 extends Seeder
                 'amount_paid'    => 21000.00,
                 'status'         => 'checked_out',
                 'payment_status' => 'fully_paid',
-                'checked_in_at'  => now()->subDays(50),
-                'checked_out_at' => now()->subDays(44),
+                'checked_in_at'  => now()->subDays(50)->setTime(14, 0),
+                'checked_out_at' => now()->subDays(44)->setTime(11, 0),
             ],
             // Room 9 (101) — Studio Room — currently checked in
             [
@@ -106,7 +106,8 @@ class BookingSeederLocation3 extends Seeder
                 'amount_paid'    => 24500.00,
                 'status'         => 'checked_in',
                 'payment_status' => 'partially_paid',
-                'checked_in_at'  => now()->subDays(7),
+                'checked_in_at'  => now()->subDays(7)->setTime(14, 0),
+                'checked_out_at' => now()->addDays(3)->setTime(11, 0),
             ],
             // Room 10 (102) — Studio Room — currently checked in (long term)
             [
@@ -125,7 +126,8 @@ class BookingSeederLocation3 extends Seeder
                 'amount_paid'    => 14000.00,
                 'status'         => 'checked_in',
                 'payment_status' => 'deposit_paid',
-                'checked_in_at'  => now()->subDays(3),
+                'checked_in_at'  => now()->subDays(3)->setTime(14, 0),
+                'checked_out_at' => now()->addDays(27)->setTime(11, 0),
             ],
             // Room 11 (201) — Studio Room — past cancelled
             [
@@ -182,8 +184,8 @@ class BookingSeederLocation3 extends Seeder
                 'amount_paid'    => 18000.00,
                 'status'         => 'checked_out',
                 'payment_status' => 'fully_paid',
-                'checked_in_at'  => now()->subDays(22),
-                'checked_out_at' => now()->subDays(20),
+                'checked_in_at'  => now()->subDays(22)->setTime(14, 0),
+                'checked_out_at' => now()->subDays(20)->setTime(11, 0),
             ],
             // Room 12 (301) — Family Room — future confirmed
             [

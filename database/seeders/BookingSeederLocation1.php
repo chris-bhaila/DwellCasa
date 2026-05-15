@@ -87,8 +87,8 @@ class BookingSeederLocation1 extends Seeder
                 'amount_paid'    => 56000.00,
                 'status'         => 'checked_out',
                 'payment_status' => 'fully_paid',
-                'checked_in_at'  => now()->subDays(60),
-                'checked_out_at' => now()->subDays(53),
+                'checked_in_at'  => now()->subDays(60)->setTime(14, 0),
+                'checked_out_at' => now()->subDays(53)->setTime(11, 0),
             ],
             // Room 1 (101) — Luxury Suite — currently checked in
             [
@@ -107,7 +107,8 @@ class BookingSeederLocation1 extends Seeder
                 'amount_paid'    => 32000.00,
                 'status'         => 'checked_in',
                 'payment_status' => 'partially_paid',
-                'checked_in_at'  => now()->subDays(4),
+                'checked_in_at'  => now()->subDays(4)->setTime(14, 0),
+                'checked_out_at' => now()->addDays(10)->setTime(11, 0),
             ],
             // Room 2 (102) — Luxury Suite — future confirmed
             [
@@ -144,8 +145,8 @@ class BookingSeederLocation1 extends Seeder
                 'amount_paid'    => 42000.00,
                 'status'         => 'checked_out',
                 'payment_status' => 'fully_paid',
-                'checked_in_at'  => now()->subDays(30),
-                'checked_out_at' => now()->subDays(23),
+                'checked_in_at'  => now()->subDays(30)->setTime(14, 0),
+                'checked_out_at' => now()->subDays(23)->setTime(11, 0),
             ],
             // Room 3 (201) — Deluxe King — currently checked in (long term)
             [
@@ -164,7 +165,8 @@ class BookingSeederLocation1 extends Seeder
                 'amount_paid'    => 24000.00,
                 'status'         => 'checked_in',
                 'payment_status' => 'deposit_paid',
-                'checked_in_at'  => now()->subDays(3),
+                'checked_in_at'  => now()->subDays(3)->setTime(14, 0),
+                'checked_out_at' => now()->addDays(27)->setTime(11, 0),
             ],
             // Room 4 (202) — Deluxe King — future pending
             [
