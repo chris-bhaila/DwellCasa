@@ -572,6 +572,14 @@
         data.id_verified = parseInt(document.getElementById('id_verified_input').value, 10);
         data.checked_in_at = new Date().toISOString().slice(0, 19).replace('T', ' ');
 
+        if (!data.id_verified) {
+            const confirmed = await adminConfirm(
+                'Guest ID has not been verified. Are you sure you want to proceed with check-in?',
+                { confirmLabel: 'Check In Anyway', type: 'warning' }
+            );
+            if (!confirmed) return;
+        }
+
         const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
         try {
