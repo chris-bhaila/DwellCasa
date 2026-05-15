@@ -3,6 +3,8 @@
 namespace Database\Seeders;
 
 use App\Models\Booking;
+use App\Models\CheckIn;
+use App\Models\CheckOut;
 use App\Models\Guest;
 use Illuminate\Database\Seeder;
 
@@ -68,127 +70,132 @@ class BookingSeederLocation2 extends Seeder
 
     private function createBookings(int $locationId, array $guests): void
     {
-        $bookings = [
-            // Room 6 (101) — Junior Suite — past stay
-            [
-                'booking_ref'    => 'DWELL-L2-0001',
-                'guest_id'       => $guests[0]->id,
-                'room_type_id'   => 4,
-                'room_id'        => 6,
-                'location_id'    => $locationId,
-                'check_in_date'  => now()->subDays(45)->toDateString(),
-                'check_out_date' => now()->subDays(40)->toDateString(),
-                'num_guests'     => 1,
-                'stay_type'      => 'short_term',
-                'rate_per_night' => 7000.00,
-                'total_amount'   => 35000.00,
-                'deposit_amount' => 14000.00,
-                'amount_paid'    => 35000.00,
-                'status'         => 'checked_out',
-                'payment_status' => 'fully_paid',
-                'checked_in_at'  => now()->subDays(45)->setTime(14, 0),
-                'checked_out_at' => now()->subDays(40)->setTime(11, 0),
-            ],
-            // Room 6 (101) — Junior Suite — currently checked in (long term)
-            [
-                'booking_ref'    => 'DWELL-L2-0002',
-                'guest_id'       => $guests[1]->id,
-                'room_type_id'   => 4,
-                'room_id'        => 6,
-                'location_id'    => $locationId,
-                'check_in_date'  => now()->subDays(6)->toDateString(),
-                'check_out_date' => now()->addDays(24)->toDateString(),
-                'num_guests'     => 2,
-                'stay_type'      => 'long_term',
-                'rate_per_month' => 140000.00,
-                'total_amount'   => 140000.00,
-                'deposit_amount' => 28000.00,
-                'amount_paid'    => 28000.00,
-                'status'         => 'checked_in',
-                'payment_status' => 'deposit_paid',
-                'checked_in_at'  => now()->subDays(6)->setTime(14, 0),
-                'checked_out_at' => now()->addDays(24)->setTime(11, 0),
-            ],
-            // Room 7 (301) — Junior Suite — past stay
-            [
-                'booking_ref'    => 'DWELL-L2-0003',
-                'guest_id'       => $guests[2]->id,
-                'room_type_id'   => 4,
-                'room_id'        => 7,
-                'location_id'    => $locationId,
-                'check_in_date'  => now()->subDays(14)->toDateString(),
-                'check_out_date' => now()->subDays(7)->toDateString(),
-                'num_guests'     => 2,
-                'stay_type'      => 'short_term',
-                'rate_per_night' => 7000.00,
-                'total_amount'   => 49000.00,
-                'deposit_amount' => 14000.00,
-                'amount_paid'    => 49000.00,
-                'status'         => 'checked_out',
-                'payment_status' => 'fully_paid',
-                'checked_in_at'  => now()->subDays(14)->setTime(14, 0),
-                'checked_out_at' => now()->subDays(7)->setTime(11, 0),
-            ],
-            // Room 7 (301) — Junior Suite — future confirmed
-            [
-                'booking_ref'    => 'DWELL-L2-0004',
-                'guest_id'       => $guests[3]->id,
-                'room_type_id'   => 4,
-                'room_id'        => 7,
-                'location_id'    => $locationId,
-                'check_in_date'  => now()->addDays(3)->toDateString(),
-                'check_out_date' => now()->addDays(8)->toDateString(),
-                'num_guests'     => 2,
-                'stay_type'      => 'short_term',
-                'rate_per_night' => 7000.00,
-                'total_amount'   => 35000.00,
-                'deposit_amount' => 14000.00,
-                'amount_paid'    => 14000.00,
-                'status'         => 'confirmed',
-                'payment_status' => 'deposit_paid',
-            ],
-            // Room 8 (501) — Penthouse Suite — past stay
-            [
-                'booking_ref'    => 'DWELL-L2-0005',
-                'guest_id'       => $guests[0]->id,
-                'room_type_id'   => 5,
-                'room_id'        => 8,
-                'location_id'    => $locationId,
-                'check_in_date'  => now()->subDays(50)->toDateString(),
-                'check_out_date' => now()->subDays(45)->toDateString(),
-                'num_guests'     => 2,
-                'stay_type'      => 'short_term',
-                'rate_per_night' => 15000.00,
-                'total_amount'   => 75000.00,
-                'deposit_amount' => 30000.00,
-                'amount_paid'    => 75000.00,
-                'status'         => 'checked_out',
-                'payment_status' => 'fully_paid',
-                'checked_in_at'  => now()->subDays(50)->setTime(14, 0),
-                'checked_out_at' => now()->subDays(45)->setTime(11, 0),
-            ],
-            // Room 8 (501) — Penthouse Suite — future pending
-            [
-                'booking_ref'    => 'DWELL-L2-0006',
-                'guest_id'       => $guests[2]->id,
-                'room_type_id'   => 5,
-                'room_id'        => 8,
-                'location_id'    => $locationId,
-                'check_in_date'  => now()->addDays(20)->toDateString(),
-                'check_out_date' => now()->addDays(25)->toDateString(),
-                'num_guests'     => 2,
-                'stay_type'      => 'short_term',
-                'rate_per_night' => 15000.00,
-                'total_amount'   => 75000.00,
-                'deposit_amount' => 30000.00,
-                'amount_paid'    => 0.00,
-                'status'         => 'pending',
-                'payment_status' => 'unpaid',
-            ],
-        ];
+        // Room 6 (101) — Junior Suite — past stay
+        $b1 = Booking::create([
+            'booking_ref'    => 'DWELL-L2-0001',
+            'guest_id'       => $guests[0]->id,
+            'room_type_id'   => 4,
+            'room_id'        => 6,
+            'location_id'    => $locationId,
+            'check_in_date'  => now()->subDays(45)->toDateString(),
+            'check_out_date' => now()->subDays(40)->toDateString(),
+            'num_guests'     => 1,
+            'stay_type'      => 'short_term',
+            'rate_per_night' => 7000.00,
+            'total_amount'   => 35000.00,
+            'deposit_amount' => 14000.00,
+            'amount_paid'    => 35000.00,
+            'status'         => 'checked_out',
+            'payment_status' => 'fully_paid',
+            'checked_in_at'  => now()->subDays(45)->setTime(14, 0),
+            'checked_out_at' => now()->subDays(40)->setTime(11, 0),
+        ]);
+        CheckIn::create(['booking_id' => $b1->id, 'room_id' => 6, 'checked_in_at' => now()->subDays(45)->setTime(14, 0), 'id_verified' => true]);
+        CheckOut::create(['booking_id' => $b1->id, 'room_id' => 6, 'checked_out_at' => now()->subDays(40)->setTime(11, 0), 'room_condition' => 'good']);
 
-        foreach ($bookings as $data) {
-            Booking::create($data);
-        }
+        // Room 6 (101) — Junior Suite — currently checked in (long term)
+        $b2 = Booking::create([
+            'booking_ref'    => 'DWELL-L2-0002',
+            'guest_id'       => $guests[1]->id,
+            'room_type_id'   => 4,
+            'room_id'        => 6,
+            'location_id'    => $locationId,
+            'check_in_date'  => now()->subDays(6)->toDateString(),
+            'check_out_date' => now()->addDays(24)->toDateString(),
+            'num_guests'     => 2,
+            'stay_type'      => 'long_term',
+            'rate_per_month' => 140000.00,
+            'total_amount'   => 140000.00,
+            'deposit_amount' => 28000.00,
+            'amount_paid'    => 28000.00,
+            'status'         => 'checked_in',
+            'payment_status' => 'deposit_paid',
+            'checked_in_at'  => now()->subDays(6)->setTime(14, 0),
+        ]);
+        CheckIn::create(['booking_id' => $b2->id, 'room_id' => 6, 'checked_in_at' => now()->subDays(6)->setTime(14, 0), 'id_verified' => true]);
+
+        // Room 7 (301) — Junior Suite — past stay
+        $b3 = Booking::create([
+            'booking_ref'    => 'DWELL-L2-0003',
+            'guest_id'       => $guests[2]->id,
+            'room_type_id'   => 4,
+            'room_id'        => 7,
+            'location_id'    => $locationId,
+            'check_in_date'  => now()->subDays(14)->toDateString(),
+            'check_out_date' => now()->subDays(7)->toDateString(),
+            'num_guests'     => 2,
+            'stay_type'      => 'short_term',
+            'rate_per_night' => 7000.00,
+            'total_amount'   => 49000.00,
+            'deposit_amount' => 14000.00,
+            'amount_paid'    => 49000.00,
+            'status'         => 'checked_out',
+            'payment_status' => 'fully_paid',
+            'checked_in_at'  => now()->subDays(14)->setTime(14, 0),
+            'checked_out_at' => now()->subDays(7)->setTime(11, 0),
+        ]);
+        CheckIn::create(['booking_id' => $b3->id, 'room_id' => 7, 'checked_in_at' => now()->subDays(14)->setTime(14, 0), 'id_verified' => true]);
+        CheckOut::create(['booking_id' => $b3->id, 'room_id' => 7, 'checked_out_at' => now()->subDays(7)->setTime(11, 0), 'room_condition' => 'good']);
+
+        // Room 7 (301) — Junior Suite — future confirmed
+        Booking::create([
+            'booking_ref'    => 'DWELL-L2-0004',
+            'guest_id'       => $guests[3]->id,
+            'room_type_id'   => 4,
+            'room_id'        => 7,
+            'location_id'    => $locationId,
+            'check_in_date'  => now()->addDays(3)->toDateString(),
+            'check_out_date' => now()->addDays(8)->toDateString(),
+            'num_guests'     => 2,
+            'stay_type'      => 'short_term',
+            'rate_per_night' => 7000.00,
+            'total_amount'   => 35000.00,
+            'deposit_amount' => 14000.00,
+            'amount_paid'    => 14000.00,
+            'status'         => 'confirmed',
+            'payment_status' => 'deposit_paid',
+        ]);
+
+        // Room 8 (501) — Penthouse Suite — past stay
+        $b5 = Booking::create([
+            'booking_ref'    => 'DWELL-L2-0005',
+            'guest_id'       => $guests[0]->id,
+            'room_type_id'   => 5,
+            'room_id'        => 8,
+            'location_id'    => $locationId,
+            'check_in_date'  => now()->subDays(50)->toDateString(),
+            'check_out_date' => now()->subDays(45)->toDateString(),
+            'num_guests'     => 2,
+            'stay_type'      => 'short_term',
+            'rate_per_night' => 15000.00,
+            'total_amount'   => 75000.00,
+            'deposit_amount' => 30000.00,
+            'amount_paid'    => 75000.00,
+            'status'         => 'checked_out',
+            'payment_status' => 'fully_paid',
+            'checked_in_at'  => now()->subDays(50)->setTime(14, 0),
+            'checked_out_at' => now()->subDays(45)->setTime(11, 0),
+        ]);
+        CheckIn::create(['booking_id' => $b5->id, 'room_id' => 8, 'checked_in_at' => now()->subDays(50)->setTime(14, 0), 'id_verified' => true]);
+        CheckOut::create(['booking_id' => $b5->id, 'room_id' => 8, 'checked_out_at' => now()->subDays(45)->setTime(11, 0), 'room_condition' => 'good']);
+
+        // Room 8 (501) — Penthouse Suite — future pending
+        Booking::create([
+            'booking_ref'    => 'DWELL-L2-0006',
+            'guest_id'       => $guests[2]->id,
+            'room_type_id'   => 5,
+            'room_id'        => 8,
+            'location_id'    => $locationId,
+            'check_in_date'  => now()->addDays(20)->toDateString(),
+            'check_out_date' => now()->addDays(25)->toDateString(),
+            'num_guests'     => 2,
+            'stay_type'      => 'short_term',
+            'rate_per_night' => 15000.00,
+            'total_amount'   => 75000.00,
+            'deposit_amount' => 30000.00,
+            'amount_paid'    => 0.00,
+            'status'         => 'pending',
+            'payment_status' => 'unpaid',
+        ]);
     }
 }
