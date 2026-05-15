@@ -61,6 +61,35 @@ class GuestDocumentController extends Controller
         ], 200);
     }
 
+    public function update(Request $request, GuestDocument $guestDocument)
+    {
+        $validated = $request->validate([
+            'document_type' => 'required|string|max:50',
+            'id_number'     => 'required|string|max:100',
+            'nationality'   => 'required|string|max:100',
+            'date_of_birth' => 'required|date',
+            'photo'         => 'nullable|image|max:5120',
+            'notes'         => 'nullable|string',
+        ]);
+
+        if ($request->hasFile('photo')) {
+            if ($guestDocument->photo) {
+                Storage::disk('local')->delete($guestDocument->photo);
+            }
+            $validated['photo'] = $request->file('photo')->store('guest-documents', 'local');
+        } else {
+            unset($validated['photo']);
+        }
+
+        $guestDocument->update($validated);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'ID document updated successfully.',
+            'data'    => $guestDocument->fresh(),
+        ]);
+    }
+
     public function destroy(GuestDocument $guestDocument)
     {
         if ($guestDocument->photo) {

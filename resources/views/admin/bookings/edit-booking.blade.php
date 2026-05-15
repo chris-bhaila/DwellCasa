@@ -537,10 +537,16 @@
         e.preventDefault();
 
         const formData = new FormData(this);
+
+        @if($guestDocument)
+        const verifyUrl = '/api/guest-documents/{{ $guestDocument->id }}';
+        @else
         formData.append('guest_id', '{{ $booking->guest->id }}');
+        const verifyUrl = '/api/guest-documents';
+        @endif
 
         try {
-            const response = await fetch('/api/guest-documents', {
+            const response = await fetch(verifyUrl, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',

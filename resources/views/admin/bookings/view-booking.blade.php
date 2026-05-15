@@ -613,10 +613,16 @@ function closeVerifyIdModal() {
 document.getElementById('verify-id-form').addEventListener('submit', async function(e) {
     e.preventDefault();
     const formData = new FormData(this);
+
+    @if($guestDocument)
+    const url = '/api/guest-documents/{{ $guestDocument->id }}';
+    @else
     formData.append('guest_id', '{{ $guest->id }}');
+    const url = '/api/guest-documents';
+    @endif
 
     try {
-        const response = await fetch('/api/guest-documents', {
+        const response = await fetch(url, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
