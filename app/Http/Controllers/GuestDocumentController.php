@@ -12,10 +12,10 @@ class GuestDocumentController extends Controller
     {
         $validated = $request->validate([
             'guest_id'      => 'required|exists:guests,id',
-            'document_type' => 'nullable|string|max:50',
-            'id_number'     => 'nullable|string|max:100',
-            'nationality'   => 'nullable|string|max:100',
-            'date_of_birth' => 'nullable|date',
+            'document_type' => 'required|string|max:50',
+            'id_number'     => 'required|string|max:100',
+            'nationality'   => 'required|string|max:100',
+            'date_of_birth' => 'required|date',
             'photo'         => 'nullable|image|max:5120',
             'notes'         => 'nullable|string',
         ]);

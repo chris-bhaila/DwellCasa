@@ -283,7 +283,7 @@
             <div class="grid grid-cols-2 gap-4">
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-2">Document Type</label>
-                    <select name="document_type" class="w-full rounded-xl cursor-pointer border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors">
+                    <select name="document_type" required class="w-full rounded-xl cursor-pointer border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors">
                         <option value="">Select type...</option>
                         <option value="passport" {{ optional($guestDocument)->document_type === 'passport' ? 'selected' : (($booking->guest->id_type ?? '') === 'passport' ? 'selected' : '') }}>Passport</option>
                         <option value="citizenship" {{ optional($guestDocument)->document_type === 'citizenship' ? 'selected' : (($booking->guest->id_type ?? '') === 'citizenship' ? 'selected' : '') }}>Citizenship</option>
@@ -294,19 +294,19 @@
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-2">ID Number</label>
-                    <input type="text" name="id_number" value="{{ optional($guestDocument)->id_number ?? $booking->guest->id_number }}"
+                    <input type="text" name="id_number" required value="{{ optional($guestDocument)->id_number ?? $booking->guest->id_number }}"
                         class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors"
                         placeholder="e.g. PA1234567">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-2">Nationality</label>
-                    <input type="text" name="nationality" value="{{ optional($guestDocument)->nationality ?? $booking->guest->nationality }}"
+                    <input type="text" name="nationality" required value="{{ optional($guestDocument)->nationality ?? $booking->guest->nationality }}"
                         class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors"
                         placeholder="e.g. Nepali">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-2">Date of Birth</label>
-                    <input type="date" name="date_of_birth" value="{{ optional($guestDocument)->date_of_birth?->format('Y-m-d') }}"
+                    <input type="date" name="date_of_birth" required value="{{ optional($guestDocument)->date_of_birth?->format('Y-m-d') }}"
                         class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors">
                 </div>
             </div>
