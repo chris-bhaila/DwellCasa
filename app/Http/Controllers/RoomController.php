@@ -6,6 +6,7 @@ use App\Contracts\AmenityRepositoryInterface;
 use App\Contracts\RoomRepositoryInterface;
 use App\Http\Requests\StoreRoomRequest;
 use App\Http\Requests\UpdateRoomRequest;
+use App\Models\Booking;
 use App\Models\Room;
 use App\Models\RoomType;
 class RoomController extends Controller
@@ -126,6 +127,14 @@ class RoomController extends Controller
         $room      = Room::findOrFail($id);
         $amenities = $amenityRepository->all();
         $roomTypes = RoomType::withCount('rooms')->where('is_active', true)->orderBy('name')->get();
+
+        $isOccupied = Booking::where('status', 'checked_in')
+            ->where('room_id', $room->id)
+            ->exists();
+
+        if ($isOccupied) {
+            $room->status = 'occupied';
+        }
 
         return view('admin.room_type.room.edit-room', compact('room', 'roomTypes', 'amenities'));
     }

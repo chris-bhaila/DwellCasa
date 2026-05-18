@@ -343,19 +343,9 @@ class RoomTypeController extends Controller
                 ->pluck('room_id')
                 ->all();
 
-            $reservedRoomIds = Booking::whereIn('status', ['confirmed', 'pending'])
-                ->whereNotNull('room_id')
-                ->whereIn('room_id', $roomIds)
-                ->whereDate('check_in_date', '<=', today())
-                ->whereDate('check_out_date', '>', today())
-                ->pluck('room_id')
-                ->all();
-
-            $rooms->each(function ($room) use ($occupiedRoomIds, $reservedRoomIds) {
+            $rooms->each(function ($room) use ($occupiedRoomIds) {
                 if (in_array($room->id, $occupiedRoomIds)) {
                     $room->status = 'occupied';
-                } elseif (in_array($room->id, $reservedRoomIds) && $room->status === 'available') {
-                    $room->status = 'reserved';
                 }
             });
         }
