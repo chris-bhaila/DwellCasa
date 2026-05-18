@@ -147,31 +147,32 @@
     window.__mapAddress = @json($webInfo->contact_address ?? '');
     window.__mapPhone   = @json($webInfo->contact_phone ?? '');
 
-    window.initPropertyMap = function() {
+    async function initPropertyMap() {
         const center = { lat: window.__mapLat, lng: window.__mapLng };
 
-        const map = new google.maps.Map(document.getElementById('property-map'), {
+        const { Map } = await google.maps.importLibrary("maps");
+        const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary("marker");
+
+        const map = new Map(document.getElementById('property-map'), {
             center,
             zoom: 15,
+            // mapId: "PASTE_YOUR_MAP_ID_HERE",
             disableDefaultUI: true,
             zoomControl: true,
             zoomControlOptions: { position: google.maps.ControlPosition.RIGHT_BOTTOM },
         });
 
-        const marker = new google.maps.Marker({
+        const pin = new PinElement({
+            background: "#A89070",
+            borderColor: "#8a7460",
+            glyphColor: "#ffffff",
+        });
+
+        const marker = new AdvancedMarkerElement({
             position: center,
             map,
             title: window.__mapName,
-            icon: {
-                url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(
-                    '<svg xmlns="http://www.w3.org/2000/svg" width="36" height="44" viewBox="0 0 36 44">' +
-                    '<path d="M18 0C8.06 0 0 8.06 0 18c0 13.5 18 26 18 26S36 31.5 36 18C36 8.06 27.94 0 18 0z" fill="#A89070"/>' +
-                    '<circle cx="18" cy="18" r="7" fill="#ffffff"/>' +
-                    '</svg>'
-                ),
-                scaledSize: new google.maps.Size(36, 44),
-                anchor: new google.maps.Point(18, 44),
-            },
+            content: pin.element,
         });
 
         const infoContent = `
@@ -185,11 +186,27 @@
 
         marker.addListener('click', () => infoWindow.open({ anchor: marker, map }));
         infoWindow.open({ anchor: marker, map });
-    };
+    }
 </script>
-<script
-    src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google_maps.key') }}&callback=initPropertyMap"
-    async defer></script>
+<script>
+    (g => {
+        var h, a, k, p = "The Google Maps JavaScript API", c = "google", l = "importLibrary", q = "__ib__", m = document, b = window;
+        b = b[c] || (b[c] = {});
+        var d = b.maps || (b.maps = {}), r = new Set, e = new URLSearchParams, u = () => h || (h = new Promise(async (f, n) => {
+            await (a = m.createElement("script"));
+            e.set("libraries", [...r] + "");
+            for (k in g) e.set(k.replace(/[A-Z]/g, t => "_" + t[0].toLowerCase()), g[k]);
+            e.set("language", "en");
+            a.src = `https://maps.${c}apis.com/maps/api/js?` + e;
+            a.onerror = () => h = n(Error(p + " could not load."));
+            a.nonce = m.querySelector("script[nonce]")?.nonce || "";
+            m.head.append(a);
+        }));
+        d[l] ? console.warn(p + " only loads once. Ignoring:", g) : d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n));
+    })({ key: "{{ config('services.google_maps.key') }}", v: "weekly" });
+
+    initPropertyMap();
+</script>
 @endif
 @endpush
 

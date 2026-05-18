@@ -400,6 +400,24 @@
         </div>
         @endif
 
+        @if($booking->status === 'checked_in' && $availableRooms->isNotEmpty())
+        @can('edit bookings')
+        <button onclick="openTransferRoomModal()"
+            class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 cursor-pointer
+                   bg-white hover:bg-slate-50 text-slate-700 border border-slate-200
+                   rounded-xl font-medium transition-colors shadow-sm">
+            <i class="bi bi-arrow-left-right text-slate-500"></i> Transfer Room
+        </button>
+        @endcan
+        @elseif($booking->status === 'checked_in' && $availableRooms->isEmpty())
+        @can('edit bookings')
+        <div class="px-4 py-3 bg-amber-50 border border-amber-200 rounded-xl
+                    text-center text-sm text-amber-700 italic">
+            No available rooms for transfer
+        </div>
+        @endcan
+        @endif
+
         @if(
             $booking->status !== 'checked_in' &&
             $booking->payment_status !== 'refunded' &&
@@ -417,6 +435,75 @@
 
     </div>
 </div>
+
+@if($booking->status === 'checked_in' && $availableRooms->isNotEmpty())
+@can('edit bookings')
+<!-- Transfer Room Modal -->
+<div id="transfer-room-modal"
+     class="fixed inset-0 z-[100] hidden items-center justify-center p-4
+            bg-slate-900/40 backdrop-blur-sm opacity-0 transition-opacity duration-300">
+    <div class="bg-white rounded-2xl shadow-2xl border border-slate-100
+                w-full max-w-md transform scale-95 transition-transform duration-300">
+        <div class="p-6 border-b border-slate-100 flex justify-between items-center">
+            <h2 class="text-xl font-serif font-bold text-slate-900 italic">Transfer Room</h2>
+            <button onclick="closeTransferRoomModal()"
+                    class="text-slate-400 hover:text-slate-600 transition-colors cursor-pointer">
+                <i class="bi bi-x-lg text-xl"></i>
+            </button>
+        </div>
+        <div class="p-6 space-y-4">
+            <div class="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 text-sm text-blue-800 flex gap-2">
+                <i class="bi bi-info-circle flex-shrink-0 mt-0.5"></i>
+                <span>
+                    Currently in <strong>Room {{ $booking->room->room_number ?? '—' }}</strong>.
+                    The old room will be freed and the new room marked occupied.
+                </span>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-2">
+                    New Room <span class="text-red-500">*</span>
+                </label>
+                <select id="transfer-room-select"
+                        class="w-full rounded-xl border border-slate-200 px-4 py-3
+                               focus:ring-[#A89070] focus:border-[#A89070] transition-colors
+                               text-slate-800 cursor-pointer">
+                    <option value="">Select a room…</option>
+                    @foreach($availableRooms as $room)
+                    <option value="{{ $room->id }}">
+                        Room {{ $room->room_number }}
+                        @if($room->roomType && $room->roomType->id !== $booking->room_type_id)
+                            ({{ $room->roomType->name }})
+                        @endif
+                        @if($room->floor) · Floor {{ $room->floor }} @endif
+                    </option>
+                    @endforeach
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-2">Reason <span class="text-slate-400 font-normal">(optional)</span></label>
+                <textarea id="transfer-room-reason" rows="3"
+                    class="w-full rounded-xl border border-slate-200 px-4 py-3
+                           focus:ring-[#A89070] focus:border-[#A89070] transition-colors resize-none"
+                    placeholder="e.g. Maintenance issue, guest request…"></textarea>
+            </div>
+        </div>
+        <div class="p-6 border-t border-slate-100 flex justify-end gap-3">
+            <button onclick="closeTransferRoomModal()"
+                    class="px-5 py-2.5 rounded-xl text-sm font-medium cursor-pointer
+                           text-slate-600 hover:bg-slate-100 transition-colors">
+                Cancel
+            </button>
+            <button onclick="submitTransferRoom()"
+                    class="px-5 py-2.5 rounded-xl text-sm font-medium cursor-pointer
+                           bg-[#A89070] hover:bg-[#8E795E] text-white
+                           transition-colors shadow-sm">
+                Confirm Transfer
+            </button>
+        </div>
+    </div>
+</div>
+@endcan
+@endif
 
 <!-- Photo Lightbox -->
 <div id="lightbox-modal" class="fixed inset-0 z-[200] hidden items-center justify-center bg-black/80 backdrop-blur-sm"
@@ -746,4 +833,74 @@ document.getElementById('refund-modal')
         if (e.target === this) closeRefundModal();
     });
 </script>
+
+@if($booking->status === 'checked_in' && $availableRooms->isNotEmpty())
+@can('edit bookings')
+<script>
+function openTransferRoomModal() {
+    const modal = document.getElementById('transfer-room-modal');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    setTimeout(() => {
+        modal.classList.remove('opacity-0');
+        modal.querySelector('div').classList.remove('scale-95');
+        modal.querySelector('div').classList.add('scale-100');
+    }, 10);
+}
+
+function closeTransferRoomModal() {
+    const modal = document.getElementById('transfer-room-modal');
+    modal.classList.add('opacity-0');
+    modal.querySelector('div').classList.remove('scale-100');
+    modal.querySelector('div').classList.add('scale-95');
+    setTimeout(() => {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }, 300);
+}
+
+document.getElementById('transfer-room-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeTransferRoomModal();
+});
+
+async function submitTransferRoom() {
+    const roomId = document.getElementById('transfer-room-select').value;
+    const reason = document.getElementById('transfer-room-reason').value.trim();
+
+    if (!roomId) {
+        adminToast('Please select a room to transfer to.', 'error');
+        return;
+    }
+
+    const roomText = document.getElementById('transfer-room-select').selectedOptions[0].text.trim();
+    if (!await adminConfirm(
+        `Transfer guest to ${roomText}? The current room will be freed.`,
+        { confirmLabel: 'Confirm Transfer', type: 'primary' }
+    )) return;
+
+    try {
+        const response = await fetch(`/api/bookings/{{ $booking->id }}/transfer-room`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            },
+            body: JSON.stringify({ new_room_id: roomId, reason }),
+        });
+
+        const data = await response.json();
+        if (data.success) {
+            adminToast(data.message, 'success');
+            setTimeout(() => window.location.reload(), 1000);
+        } else {
+            adminToast(data.message ?? 'Transfer failed.', 'error');
+        }
+    } catch (e) {
+        adminToast('An error occurred during the transfer.', 'error');
+    }
+}
+</script>
+@endcan
+@endif
 @endpush

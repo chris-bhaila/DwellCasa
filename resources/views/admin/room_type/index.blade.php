@@ -59,6 +59,7 @@
                 $totalRooms     = $rooms->count();
                 $availableCount = $rooms->where('status', 'available')->count();
                 $occupiedCount  = $rooms->where('status', 'occupied')->count();
+                $reservedCount  = $rooms->where('status', 'reserved')->count();
                 $maintenanceCount = $rooms->whereIn('status', ['maintenance', 'out_of_service'])->count();
                 $rtFilter = $rtFilter ?? null;
             @endphp
@@ -67,6 +68,7 @@
                 @if($filter !== 'trashed')
                 · <span class="text-green-600">{{ $availableCount }} available</span>
                 @if($occupiedCount > 0) · <span class="text-blue-600">{{ $occupiedCount }} occupied</span>@endif
+                @if($reservedCount > 0) · <span class="text-purple-600">{{ $reservedCount }} reserved</span>@endif
                 @if($maintenanceCount > 0) · <span class="text-amber-600">{{ $maintenanceCount }} maintenance</span>@endif
                 @endif
             </p>
@@ -119,6 +121,7 @@
                     @php
                         $numBg = match($room->status ?? '') {
                             'occupied'                    => 'bg-blue-50 text-blue-700',
+                            'reserved'                    => 'bg-purple-50 text-purple-700',
                             'maintenance','out_of_service'=> 'bg-amber-50 text-amber-700',
                             default                       => 'bg-slate-100 text-slate-600',
                         };

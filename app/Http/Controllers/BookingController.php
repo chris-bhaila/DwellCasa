@@ -343,6 +343,65 @@ class BookingController extends Controller
         return view('admin.bookings.add-booking', compact('roomTypes'));
     }
 
+    public function transferRoom(\Illuminate\Http\Request $request, int $id): JsonResponse
+    {
+        $request->validate([
+            'new_room_id' => 'required|integer|exists:rooms,id',
+            'reason'      => 'nullable|string|max:500',
+        ]);
+
+        $booking = Booking::with(['checkIn', 'room'])->findOrFail($id);
+
+        if ($booking->status !== 'checked_in') {
+            return response()->json(['message' => 'Room transfer is only allowed for checked-in bookings.'], 422);
+        }
+
+        $newRoom = Room::findOrFail($request->input('new_room_id'));
+
+        if ($newRoom->id === $booking->room_id) {
+            return response()->json(['message' => 'The selected room is already assigned to this booking.'], 422);
+        }
+
+        if ($newRoom->status !== 'available') {
+            return response()->json(['message' => "Room {$newRoom->room_number} is not available for transfer."], 422);
+        }
+
+        $oldRoom   = $booking->room;
+        $oldRoomNo = $oldRoom?->room_number ?? '—';
+
+        DB::transaction(function () use ($booking, $newRoom, $oldRoom, $request) {
+            if ($oldRoom) {
+                $oldRoom->update(['status' => 'available']);
+            }
+
+            $newRoom->update(['status' => 'occupied']);
+
+            $booking->update(['room_id' => $newRoom->id]);
+
+            if ($booking->checkIn) {
+                $booking->checkIn->update(['room_id' => $newRoom->id]);
+            }
+
+            if ($request->input('reason')) {
+                $note = '[Room Transfer] ' . $request->input('reason');
+                $booking->update([
+                    'admin_notes' => trim(($booking->admin_notes ?? '') . "\n" . $note),
+                ]);
+            }
+        });
+
+        activity()
+            ->causedBy(auth()->user())
+            ->performedOn($booking)
+            ->withProperties(['location_id' => $booking->location_id])
+            ->log("Transferred room for booking {$booking->booking_ref}: Room {$oldRoomNo} → Room {$newRoom->room_number}");
+
+        return response()->json([
+            'success' => true,
+            'message' => "Guest transferred from Room {$oldRoomNo} to Room {$newRoom->room_number} successfully.",
+        ], 200);
+    }
+
     public function viewPage(int $id)
     {
         $booking = Booking::with([
@@ -356,7 +415,16 @@ class BookingController extends Controller
 
         $guestDocument = $booking->guest?->documents()->latest()->first();
 
-        return view('admin.bookings.view-booking', compact('booking', 'guestDocument'));
+        $availableRooms = collect();
+        if ($booking->status === 'checked_in') {
+            $availableRooms = Room::with('roomType:id,name')
+                ->where('status', 'available')
+                ->where('id', '!=', $booking->room_id)
+                ->orderBy('room_number')
+                ->get(['id', 'room_number', 'floor', 'room_type_id']);
+        }
+
+        return view('admin.bookings.view-booking', compact('booking', 'guestDocument', 'availableRooms'));
     }
 
     public function editPage(int $id, RoomTypeRepositoryInterface $roomTypeRepository)

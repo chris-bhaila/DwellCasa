@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\PropertySetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Exception;
@@ -18,7 +17,7 @@ class MapController extends Controller
      */
     public function getMapSettings()
     {
-        $embedUrl = PropertySetting::where('key', 'google_maps_embed_url')->value('value');
+        $embedUrl = \App\Models\PropertySetting::where('key', 'google_maps_embed_url')->value('value');
 
         return response()->json([
             'data' => [
@@ -48,7 +47,7 @@ class MapController extends Controller
         ]);
 
         try {
-            $apiKey = PropertySetting::where('key', 'google_maps_api_key')->value('value');
+            $apiKey = config('services.google_maps.key');
 
             if (!$apiKey || $apiKey === 'YOUR_GOOGLE_MAPS_API_KEY_HERE') {
                 return response()->json([
