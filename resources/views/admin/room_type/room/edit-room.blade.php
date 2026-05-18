@@ -70,6 +70,43 @@
                     <textarea name="notes" rows="4" class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:ring-primary focus:border-primary transition-colors" placeholder="Any specific notes about this room...">{{ $room->notes }}</textarea>
                 </div>
 
+                @if($activeBooking)
+                @php
+                    $nights = \Carbon\Carbon::parse($activeBooking->check_in_date)->diffInDays($activeBooking->check_out_date);
+                    $stayLabel = $activeBooking->stay_type === 'long_term'
+                        ? $nights . ' ' . \Illuminate\Support\Str::plural('night', $nights) . ' (long term)'
+                        : $nights . ' ' . \Illuminate\Support\Str::plural('night', $nights);
+                @endphp
+                <div class="rounded-xl border border-blue-200 bg-blue-50 px-5 py-4">
+                    <p class="text-xs font-semibold text-blue-500 uppercase tracking-wide mb-3">Current Occupant</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
+                        <div>
+                            <p class="text-xs text-slate-400 mb-0.5">Guest</p>
+                            <p class="font-semibold text-slate-800">{{ $activeBooking->guest->full_name ?? '—' }}</p>
+                        </div>
+                        <div>
+                            <p class="text-xs text-slate-400 mb-0.5">Booking Ref</p>
+                            <p class="font-mono text-slate-700">{{ $activeBooking->booking_ref }}</p>
+                        </div>
+                        <div>
+                            <p class="text-xs text-slate-400 mb-0.5">Stay</p>
+                            <p class="text-slate-700">
+                                {{ \Carbon\Carbon::parse($activeBooking->check_in_date)->format('M d') }}
+                                –
+                                {{ \Carbon\Carbon::parse($activeBooking->check_out_date)->format('M d, Y') }}
+                                <span class="text-slate-400">({{ $stayLabel }})</span>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="mt-3 pt-3 border-t border-blue-200">
+                        <a href="{{ route('admin.bookings.view', $activeBooking->id) }}"
+                           class="inline-flex items-center gap-1.5 text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors">
+                            <i class="bi bi-box-arrow-up-right text-xs"></i>
+                            View Booking
+                        </a>
+                    </div>
+                </div>
+                @endif
 
             </div>
             <div class="p-6 bg-slate-50/50 border-t border-slate-100 flex items-center justify-between gap-4">

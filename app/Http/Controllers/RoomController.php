@@ -128,14 +128,15 @@ class RoomController extends Controller
         $amenities = $amenityRepository->all();
         $roomTypes = RoomType::withCount('rooms')->where('is_active', true)->orderBy('name')->get();
 
-        $isOccupied = Booking::where('status', 'checked_in')
+        $activeBooking = Booking::with('guest')
+            ->where('status', 'checked_in')
             ->where('room_id', $room->id)
-            ->exists();
+            ->first();
 
-        if ($isOccupied) {
+        if ($activeBooking) {
             $room->status = 'occupied';
         }
 
-        return view('admin.room_type.room.edit-room', compact('room', 'roomTypes', 'amenities'));
+        return view('admin.room_type.room.edit-room', compact('room', 'roomTypes', 'amenities', 'activeBooking'));
     }
 }
