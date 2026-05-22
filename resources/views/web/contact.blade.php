@@ -211,9 +211,10 @@
                 for (k in g) e.set(k.replace(/[A-Z]/g, t => "_" + t[0].toLowerCase()), g[k]);
                 e.set("language", "en");
                 a.src = `https://maps.${c}apis.com/maps/api/js?` + e;
-                a.onerror = () => h = n(Error(p + " could not load."));
                 a.nonce = m.querySelector("script[nonce]")?.nonce || "";
                 m.head.append(a);
+                a.addEventListener("load", f);
+                a.addEventListener("error", () => n(Error(p + " could not load.")));
             }));
         d[l] ? console.warn(p + " only loads once. Ignoring:", g) : d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n));
     })({
