@@ -148,25 +148,16 @@
     window.__mapPhone = @json(implode(', ', array_filter((array) ($webInfo->contact_phone ?? []))));
 
     async function initPropertyMap() {
-        const center = {
-            lat: window.__mapLat,
-            lng: window.__mapLng
-        };
-
-        const {
-            Map
-        } = await google.maps.importLibrary("maps");
-        const {
-            AdvancedMarkerElement,
-            PinElement
-        } = await google.maps.importLibrary("marker");
-
         const mapEl = document.getElementById('property-map');
+        if (!mapEl) return;
+
+        const center = { lat: window.__mapLat, lng: window.__mapLng };
+
+        const { Map } = await google.maps.importLibrary("maps");
 
         const map = new Map(mapEl, {
             center,
             zoom: 15,
-            mapId: mapEl.dataset.mapId,
             disableDefaultUI: true,
             zoomControl: true,
             zoomControlOptions: {
@@ -174,17 +165,10 @@
             },
         });
 
-        const pin = new PinElement({
-            background: "#A89070",
-            borderColor: "#8a7460",
-            glyphColor: "#ffffff",
-        });
-
-        const marker = new AdvancedMarkerElement({
+        const marker = new google.maps.Marker({
             position: center,
             map,
             title: window.__mapName,
-            content: pin.element,
         });
 
         const infoContent = `
@@ -194,18 +178,10 @@
                 ${window.__mapPhone   ? `<p style="color:#475569;font-size:13px;margin:0;">${window.__mapPhone}</p>` : ''}
             </div>`;
 
-        const infoWindow = new google.maps.InfoWindow({
-            content: infoContent
-        });
+        const infoWindow = new google.maps.InfoWindow({ content: infoContent });
 
-        marker.addListener('click', () => infoWindow.open({
-            anchor: marker,
-            map
-        }));
-        infoWindow.open({
-            anchor: marker,
-            map
-        });
+        marker.addListener('click', () => infoWindow.open({ anchor: marker, map }));
+        infoWindow.open({ anchor: marker, map });
     }
 </script>
 <script>
@@ -236,7 +212,7 @@
         v: "weekly"
     });
 
-    initPropertyMap();
+    document.addEventListener('DOMContentLoaded', initPropertyMap);
 </script>
 @endif
 @endpush
