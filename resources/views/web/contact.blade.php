@@ -154,10 +154,12 @@
         const center = { lat: window.__mapLat, lng: window.__mapLng };
 
         const { Map } = await google.maps.importLibrary("maps");
+        const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary("marker");
 
         const map = new Map(mapEl, {
             center,
             zoom: 15,
+            mapId: "{{ config('services.google_maps.map_id') }}",
             disableDefaultUI: true,
             zoomControl: true,
             zoomControlOptions: {
@@ -165,10 +167,17 @@
             },
         });
 
-        const marker = new google.maps.Marker({
+        const pin = new PinElement({
+            background: "#A89070",
+            borderColor: "#8a7460",
+            glyphColor: "#ffffff",
+        });
+
+        const marker = new AdvancedMarkerElement({
             position: center,
             map,
             title: window.__mapName,
+            content: pin.element,
         });
 
         const infoContent = `
