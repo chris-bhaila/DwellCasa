@@ -165,6 +165,7 @@
             zoomControlOptions: {
                 position: google.maps.ControlPosition.RIGHT_BOTTOM
             },
+            gestureHandling: "greedy",
         });
 
         const pin = new PinElement({
