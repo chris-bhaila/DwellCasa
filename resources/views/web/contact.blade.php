@@ -19,7 +19,7 @@
                 <div id="contact-success" class="hidden flex flex-col items-center justify-center text-center h-full py-10">
                     <div class="w-20 h-20 rounded-full flex items-center justify-center mb-6" style="background-color:#A89070/10;background-color:rgba(168,144,112,0.12);">
                         <svg class="w-10 h-10" style="color:#A89070" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                         </svg>
                     </div>
                     <h2 class="text-3xl !font-sans font-bold text-slate-900 mb-3">Message Sent!</h2>
@@ -38,7 +38,7 @@
                     <!-- Error banner -->
                     <div id="contact-error" class="hidden mb-6 flex items-start gap-3 bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-sm text-red-700">
                         <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                         <span id="contact-error-text"></span>
                     </div>
@@ -141,25 +141,45 @@
 @push('head')
 @if($webInfo->map_lat && $webInfo->map_lng)
 <script>
-    window.__mapLat     = {{ (float) $webInfo->map_lat }};
-    window.__mapLng     = {{ (float) $webInfo->map_lng }};
-    window.__mapName    = @json($location->name ?? 'DwellCasa');
-    window.__mapAddress = @json($webInfo->contact_address ?? '');
-    window.__mapPhone   = @json($webInfo->contact_phone ?? '');
+    window.__mapLat = {
+        {
+            (float) $webInfo - > map_lat
+        }
+    };
+    window.__mapLng = {
+        {
+            (float) $webInfo - > map_lng
+        }
+    };
+    window.__mapName = @json($location - > name ?? 'DwellCasa');
+    window.__mapAddress = @json($webInfo - > contact_address ?? '');
+    window.__mapPhone = @json($webInfo - > contact_phone ?? '');
 
     async function initPropertyMap() {
-        const center = { lat: window.__mapLat, lng: window.__mapLng };
+        const center = {
+            lat: window.__mapLat,
+            lng: window.__mapLng
+        };
 
-        const { Map } = await google.maps.importLibrary("maps");
-        const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary("marker");
+        const {
+            Map
+        } = await google.maps.importLibrary("maps");
+        const {
+            AdvancedMarkerElement,
+            PinElement
+        } = await google.maps.importLibrary("marker");
 
-        const map = new Map(document.getElementById('property-map'), {
+        const mapEl = document.getElementById('property-map');
+
+        const map = new Map(mapEl, {
             center,
             zoom: 15,
-            // mapId: "PASTE_YOUR_MAP_ID_HERE",
+            mapId: mapEl.dataset.mapId,
             disableDefaultUI: true,
             zoomControl: true,
-            zoomControlOptions: { position: google.maps.ControlPosition.RIGHT_BOTTOM },
+            zoomControlOptions: {
+                position: google.maps.ControlPosition.RIGHT_BOTTOM
+            },
         });
 
         const pin = new PinElement({
@@ -182,28 +202,47 @@
                 ${window.__mapPhone   ? `<p style="color:#475569;font-size:13px;margin:0;">${window.__mapPhone}</p>` : ''}
             </div>`;
 
-        const infoWindow = new google.maps.InfoWindow({ content: infoContent });
+        const infoWindow = new google.maps.InfoWindow({
+            content: infoContent
+        });
 
-        marker.addListener('click', () => infoWindow.open({ anchor: marker, map }));
-        infoWindow.open({ anchor: marker, map });
+        marker.addListener('click', () => infoWindow.open({
+            anchor: marker,
+            map
+        }));
+        infoWindow.open({
+            anchor: marker,
+            map
+        });
     }
 </script>
 <script>
     (g => {
-        var h, a, k, p = "The Google Maps JavaScript API", c = "google", l = "importLibrary", q = "__ib__", m = document, b = window;
+        var h, a, k, p = "The Google Maps JavaScript API",
+            c = "google",
+            l = "importLibrary",
+            q = "__ib__",
+            m = document,
+            b = window;
         b = b[c] || (b[c] = {});
-        var d = b.maps || (b.maps = {}), r = new Set, e = new URLSearchParams, u = () => h || (h = new Promise(async (f, n) => {
-            await (a = m.createElement("script"));
-            e.set("libraries", [...r] + "");
-            for (k in g) e.set(k.replace(/[A-Z]/g, t => "_" + t[0].toLowerCase()), g[k]);
-            e.set("language", "en");
-            a.src = `https://maps.${c}apis.com/maps/api/js?` + e;
-            a.onerror = () => h = n(Error(p + " could not load."));
-            a.nonce = m.querySelector("script[nonce]")?.nonce || "";
-            m.head.append(a);
-        }));
+        var d = b.maps || (b.maps = {}),
+            r = new Set,
+            e = new URLSearchParams,
+            u = () => h || (h = new Promise(async (f, n) => {
+                await (a = m.createElement("script"));
+                e.set("libraries", [...r] + "");
+                for (k in g) e.set(k.replace(/[A-Z]/g, t => "_" + t[0].toLowerCase()), g[k]);
+                e.set("language", "en");
+                a.src = `https://maps.${c}apis.com/maps/api/js?` + e;
+                a.onerror = () => h = n(Error(p + " could not load."));
+                a.nonce = m.querySelector("script[nonce]")?.nonce || "";
+                m.head.append(a);
+            }));
         d[l] ? console.warn(p + " only loads once. Ignoring:", g) : d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n));
-    })({ key: "{{ config('services.google_maps.key') }}", v: "weekly" });
+    })({
+        key: "{{ config('services.google_maps.key') }}",
+        v: "weekly"
+    });
 
     initPropertyMap();
 </script>
@@ -212,17 +251,20 @@
 
 @push('scripts')
 <script>
-    const contactForm    = document.getElementById('contact-form');
-    const contactWrap    = document.getElementById('contact-form-wrap');
+    const contactForm = document.getElementById('contact-form');
+    const contactWrap = document.getElementById('contact-form-wrap');
     const contactSuccess = document.getElementById('contact-success');
-    const contactError   = document.getElementById('contact-error');
+    const contactError = document.getElementById('contact-error');
     const contactErrorTxt = document.getElementById('contact-error-text');
-    const submitBtn      = document.getElementById('contact-submit-btn');
+    const submitBtn = document.getElementById('contact-submit-btn');
 
     function showError(message) {
         contactErrorTxt.textContent = message;
         contactError.classList.remove('hidden');
-        contactError.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        contactError.scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest'
+        });
     }
 
     contactForm.addEventListener('submit', async function(e) {
