@@ -141,19 +141,11 @@
 @push('head')
 @if($webInfo->map_lat && $webInfo->map_lng)
 <script>
-    window.__mapLat = {
-        {
-            (float) $webInfo - > map_lat
-        }
-    };
-    window.__mapLng = {
-        {
-            (float) $webInfo - > map_lng
-        }
-    };
-    window.__mapName = @json($location - > name ?? 'DwellCasa');
-    window.__mapAddress = @json($webInfo - > contact_address ?? '');
-    window.__mapPhone = @json($webInfo - > contact_phone ?? '');
+    window.__mapLat = {{ (float) $webInfo->map_lat }};
+    window.__mapLng = {{ (float) $webInfo->map_lng }};
+    window.__mapName = @json($location->name ?? 'DwellCasa');
+    window.__mapAddress = @json($webInfo->contact_address ?? '');
+    window.__mapPhone = @json(implode(', ', array_filter((array) ($webInfo->contact_phone ?? []))));
 
     async function initPropertyMap() {
         const center = {
