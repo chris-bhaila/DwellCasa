@@ -187,6 +187,15 @@
                 </div>
             </div>
             @endif
+            @if(session('info'))
+            <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 10000)"
+                class="glass-nav bg-blue-50/90 border-l-4 border-blue-500 p-4 rounded-xl shadow-xl animate-slide-in">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 text-blue-500">✉️</div>
+                    <div class="ml-3 font-medium text-blue-800">{{ session('info') }}</div>
+                </div>
+            </div>
+            @endif
         </div>
 
         <div class="{{ request()->routeIs('home', 'location.home') ? '' : 'pt-16' }}">

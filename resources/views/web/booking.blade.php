@@ -29,6 +29,18 @@
                 <!-- Left Column: Guest Details -->
                 <div class="lg:col-span-2 space-y-10">
 
+                    <!-- Info / pending verification -->
+                    @if(session('info'))
+                    <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-xl shadow-sm">
+                        <div class="flex">
+                            <div class="ml-3">
+                                <h3 class="text-sm font-medium text-blue-800">Verification email sent</h3>
+                                <p class="mt-1 text-sm text-blue-700">{{ session('info') }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
+
                     <!-- Validation Errors -->
                     @if ($errors->any())
                     <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-xl shadow-sm">

@@ -35,6 +35,35 @@
     </div>
 </div>
 
+<!-- Quick Actions -->
+<div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 mb-8">
+    <h2 class="text-lg font-serif font-bold text-slate-900 italic mb-4">Quick Actions</h2>
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        @can('create bookings')
+        <a href="{{ route('admin.bookings.create') }}" class="flex flex-col items-center justify-center gap-2 p-4 bg-slate-50 rounded-xl hover:bg-[#A89070] hover:text-white transition-colors text-slate-600 text-center">
+            <i class="bi bi-plus-circle text-xl"></i>
+            <span class="text-sm font-medium leading-tight">New Booking</span>
+        </a>
+        @endcan
+        @can('view bookings')
+        <a href="{{ route('admin.bookings') }}" class="flex flex-col items-center justify-center gap-2 p-4 bg-slate-50 rounded-xl hover:bg-[#A89070] hover:text-white transition-colors text-slate-600 text-center">
+            <i class="bi bi-calendar3 text-xl"></i>
+            <span class="text-sm font-medium leading-tight">All Bookings</span>
+        </a>
+        @endcan
+        @can('manage room types')
+        <a href="{{ route('admin.room_type.index') }}" class="flex flex-col items-center justify-center gap-2 p-4 bg-slate-50 rounded-xl hover:bg-[#A89070] hover:text-white transition-colors text-slate-600 text-center">
+            <i class="bi bi-building text-xl"></i>
+            <span class="text-sm font-medium leading-tight">Rooms</span>
+        </a>
+        @endcan
+        <a href="{{ route('admin.settings') }}" class="flex flex-col items-center justify-center gap-2 p-4 bg-slate-50 rounded-xl hover:bg-[#A89070] hover:text-white transition-colors text-slate-600 text-center">
+            <i class="bi bi-gear text-xl"></i>
+            <span class="text-sm font-medium leading-tight">Settings</span>
+        </a>
+    </div>
+</div>
+
 <!-- Primary KPI Cards -->
 <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
 
@@ -230,72 +259,39 @@
     </div>
     @endcan
 
-    <!-- Right Column -->
-    <div class="space-y-6">
-
-        <!-- Quick Actions -->
-        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
-            <h2 class="text-lg font-serif font-bold text-slate-900 italic mb-4">Quick Actions</h2>
-            <div class="grid grid-cols-2 gap-3">
-                @can('create bookings')
-                <a href="{{ route('admin.bookings.create') }}" class="flex flex-col items-center justify-center gap-2 p-4 bg-slate-50 rounded-xl hover:bg-[#A89070] hover:text-white transition-colors text-slate-600 text-center">
-                    <i class="bi bi-plus-circle text-xl"></i>
-                    <span class="text-sm font-medium leading-tight">New Booking</span>
-                </a>
-                @endcan
-                @can('view bookings')
-                <a href="{{ route('admin.bookings') }}" class="flex flex-col items-center justify-center gap-2 p-4 bg-slate-50 rounded-xl hover:bg-[#A89070] hover:text-white transition-colors text-slate-600 text-center">
-                    <i class="bi bi-calendar3 text-xl"></i>
-                    <span class="text-sm font-medium leading-tight">All Bookings</span>
-                </a>
-                @endcan
-                @can('manage room types')
-                <a href="{{ route('admin.room_type.index') }}" class="flex flex-col items-center justify-center gap-2 p-4 bg-slate-50 rounded-xl hover:bg-[#A89070] hover:text-white transition-colors text-slate-600 text-center">
-                    <i class="bi bi-building text-xl"></i>
-                    <span class="text-sm font-medium leading-tight">Rooms</span>
-                </a>
-                @endcan
-                <a href="{{ route('admin.settings') }}" class="flex flex-col items-center justify-center gap-2 p-4 bg-slate-50 rounded-xl hover:bg-[#A89070] hover:text-white transition-colors text-slate-600 text-center">
-                    <i class="bi bi-gear text-xl"></i>
-                    <span class="text-sm font-medium leading-tight">Settings</span>
-                </a>
+    @can('manage room types')
+    <!-- Room Availability -->
+    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
+        <h2 class="text-lg font-serif font-bold text-slate-900 italic mb-4">Availability</h2>
+        @php
+        $barPalette = ['#A89070', '#60a5fa', '#34d399', '#f472b6', '#a78bfa', '#fb923c'];
+        @endphp
+        @forelse($roomTypes as $roomType)
+        @php
+            $total     = $roomType->rooms_count;
+            $booked    = $roomType->active_bookings_count;
+            $available = max(0, $total - $booked);
+            $pct       = $total > 0 ? round(($available / $total) * 100) : 0;
+            $color     = $barPalette[$loop->index % count($barPalette)];
+        @endphp
+        <div class="mb-3 last:mb-0">
+            <div class="flex justify-between text-sm mb-1.5">
+                <span class="flex items-center gap-1.5 text-slate-600 font-medium truncate pr-2">
+                    <span class="inline-block w-2 h-2 rounded-full flex-shrink-0" style="background-color: {{ $color }}"></span>
+                    {{ $roomType->name }}
+                </span>
+                <span class="text-slate-900 font-semibold flex-shrink-0">{{ $available }}<span class="text-slate-400 font-normal">/{{ $total }}</span></span>
+            </div>
+            <div class="w-full bg-slate-100 rounded-full h-1.5">
+                <div class="h-1.5 rounded-full transition-all" style="width: {{ $pct }}%; background-color: {{ $color }}"></div>
             </div>
         </div>
-
-        @can('manage room types')
-        <!-- Room Availability -->
-        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
-            <h2 class="text-lg font-serif font-bold text-slate-900 italic mb-4">Availability</h2>
-            @php
-            $barPalette = ['#A89070', '#60a5fa', '#34d399', '#f472b6', '#a78bfa', '#fb923c'];
-            @endphp
-            @forelse($roomTypes as $roomType)
-            @php
-                $total     = $roomType->rooms_count;
-                $booked    = $roomType->active_bookings_count;
-                $available = max(0, $total - $booked);
-                $pct       = $total > 0 ? round(($available / $total) * 100) : 0;
-                $color     = $barPalette[$loop->index % count($barPalette)];
-            @endphp
-            <div class="mb-3 last:mb-0">
-                <div class="flex justify-between text-sm mb-1.5">
-                    <span class="flex items-center gap-1.5 text-slate-600 font-medium truncate pr-2">
-                        <span class="inline-block w-2 h-2 rounded-full flex-shrink-0" style="background-color: {{ $color }}"></span>
-                        {{ $roomType->name }}
-                    </span>
-                    <span class="text-slate-900 font-semibold flex-shrink-0">{{ $available }}<span class="text-slate-400 font-normal">/{{ $total }}</span></span>
-                </div>
-                <div class="w-full bg-slate-100 rounded-full h-1.5">
-                    <div class="h-1.5 rounded-full transition-all" style="width: {{ $pct }}%; background-color: {{ $color }}"></div>
-                </div>
-            </div>
-            @empty
-            <p class="text-sm text-slate-400 italic">No room types configured.</p>
-            @endforelse
-        </div>
-        @endcan
-
+        @empty
+        <p class="text-sm text-slate-400 italic">No room types configured.</p>
+        @endforelse
     </div>
+    @endcan
+
 </div>
 
 @can('view inventory')

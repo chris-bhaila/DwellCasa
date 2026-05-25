@@ -38,6 +38,14 @@
         .bi {
             -webkit-text-stroke: 0.4px currentColor;
         }
+
+        aside nav {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        aside nav::-webkit-scrollbar {
+            display: none;
+        }
     </style>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
@@ -170,27 +178,27 @@
                 <span class="font-medium">Users</span>
             </a>
             @endcan -->
-        </nav>
 
-        <!-- Profile & logout -->
-        <div class="flex-shrink-0 border-t border-slate-800 p-4 space-y-2">
-            <a href="{{ route('admin.profile') }}" class="flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-slate-800 transition-colors group">
-                <div class="w-10 h-10 rounded-full bg-[#A89070] flex items-center justify-center font-bold text-white text-sm flex-shrink-0">
-                    {{ substr(Auth::user()->name, 0, 1) }}
-                </div>
-                <div class="overflow-hidden">
-                    <p class="text-sm font-semibold text-white truncate group-hover:text-[#A89070] transition-colors">{{ Auth::user()->name }}</p>
-                    <p class="text-xs text-slate-400 truncate">{{ Auth::user()->email }}</p>
-                </div>
-            </a>
-            <form method="POST" action="{{ route('admin.logout') }}">
-                @csrf
-                <button type="submit" class="w-full flex items-center gap-3 px-3 py-2.5 cursor-pointer rounded-lg text-slate-400 hover:bg-red-500/20 hover:text-red-300 transition-colors">
-                    <i class="bi bi-box-arrow-left text-lg flex-shrink-0"></i>
-                    <span class="text-sm font-medium">Logout</span>
-                </button>
-            </form>
-        </div>
+            <!-- Profile & logout -->
+            <div class="border-t border-slate-800 pt-4 mt-4 space-y-2">
+                <a href="{{ route('admin.profile') }}" class="flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-slate-800 transition-colors group">
+                    <div class="w-10 h-10 rounded-full bg-[#A89070] flex items-center justify-center font-bold text-white text-sm flex-shrink-0">
+                        {{ substr(Auth::user()->name, 0, 1) }}
+                    </div>
+                    <div class="overflow-hidden">
+                        <p class="text-sm font-semibold text-white truncate group-hover:text-[#A89070] transition-colors">{{ Auth::user()->name }}</p>
+                        <p class="text-xs text-slate-400 truncate">{{ Auth::user()->email }}</p>
+                    </div>
+                </a>
+                <form method="POST" action="{{ route('admin.logout') }}">
+                    @csrf
+                    <button type="submit" class="w-full flex items-center gap-3 px-3 py-2.5 cursor-pointer rounded-lg text-slate-400 hover:bg-red-500/20 hover:text-red-300 transition-colors">
+                        <i class="bi bi-box-arrow-left text-lg flex-shrink-0"></i>
+                        <span class="text-sm font-medium">Logout</span>
+                    </button>
+                </form>
+            </div>
+        </nav>
     </aside>
 
     <!-- Main Content -->

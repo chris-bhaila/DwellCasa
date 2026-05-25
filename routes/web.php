@@ -41,6 +41,7 @@ Route::prefix('{location:slug}')
         Route::get('/contact', [ContactController::class, 'index'])->name('contact');
         Route::get('/booking', [WebBookingController::class, 'create'])->name('booking.create');
         Route::post('/booking', [WebBookingController::class, 'store'])->name('booking.store');
+        Route::get('/booking/verify/{token}', [WebBookingController::class, 'verify'])->name('booking.verify');
     });
 
 Route::get('/map', [MapController::class, 'getMapSettings'])->name('map.settings');

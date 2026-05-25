@@ -223,7 +223,7 @@ $image3 = $imagesForLightbox[2]['url'] ?? $imagesForLightbox[0]['url'];
                         <input type="hidden" name="num_guests" id="bw-form-guests">
 
                         <button type="submit" id="bw-btn"
-                            class="hidden w-full bg-primary text-white text-center px-6 py-4 rounded-xl font-bold tracking-wide 
+                            class="hidden w-full bg-primary text-white text-center px-6 py-4 rounded-xl font-bold tracking-wide cursor-pointer
                        transition-all transform hover:-translate-y-1
                        hover:bg-primary-dark hover:shadow-lg">
                             Reserve Now
